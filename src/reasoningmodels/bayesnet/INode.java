@@ -1,5 +1,7 @@
 package reasoningmodels.bayesnet;
 
+import java.util.List;
+
 public interface INode {
   String toString();
 
@@ -11,11 +13,11 @@ public interface INode {
 
   void updateCPT();
 
-  void updateFrequency();
+  void updateFrequency(List<IRandomVariable> trainingEx);
 
-  void updateRelFrequency();
+  void updateRelFrequency(List<IRandomVariable> trainingEx);
 
-  void getNodeName();
+  String getNodeName();
 
   INode convertToInferenceCPT();
 

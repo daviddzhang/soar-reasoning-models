@@ -1,47 +1,27 @@
 package reasoningmodels.knn;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import reasoningmodels.IReasoningModel;
+import reasoningmodels.classifiers.AClassifier;
+import reasoningmodels.classifiers.IEntry;
+import reasoningmodels.classifiers.IFeature;
 
 import static java.util.stream.Collectors.toMap;
 
-public class KNN implements IReasoningModel {
-  private Map<String, String[]> features;
-  private final List<IEntry> examples;
+public class KNN extends AClassifier {
   private DistanceFunction distanceFunction = DistanceFunction.EUCLIDEAN;
-  private String targetResult;
 
   public KNN() {
-    this.features = new HashMap<>();
-    this.examples = new ArrayList<>();
+    super();
   }
 
   public void setDistanceFunction(DistanceFunction distanceFunction) {
     this.distanceFunction = distanceFunction;
-  }
-
-  public void addFeature(String feature, String[] enumerations) {
-    this.features.put(feature, enumerations);
-  }
-
-  public void addEntry(IEntry entry) {
-    List<String> entryToBeAdded = new ArrayList<>();
-    for (IFeature feature : entry.getFeatures()) {
-      entryToBeAdded.add(feature.getFeatureName());
-    }
-    if (entry.getFeatures().size() != this.features.size() && !this.features.keySet().containsAll(entryToBeAdded)) {
-      throw new IllegalArgumentException("Given entry does not have the same features as the " +
-              "specified features");
-    }
-
-    this.examples.add(entry);
   }
 
   public void query(IEntry queryEntry, int k) {
@@ -49,7 +29,7 @@ public class KNN implements IReasoningModel {
     String targetFeature = this.returnTargetFeatureIfPossible(queryEntry, k);
 
     Map<IEntry, Double> sorted = this.getSortedMapping(queryEntry);
-    
+
     Iterator<IEntry> sortedEntries = sorted.keySet().iterator();
     List<IEntry> firstKEntries = new ArrayList<>();
 

@@ -1,6 +1,4 @@
-package reasoningmodels.knn;
-
-import java.util.Vector;
+package reasoningmodels.classifiers;
 
 public class CategoricalFeature implements IFeature {
   String categoryName;

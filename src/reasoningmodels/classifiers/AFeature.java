@@ -1,4 +1,4 @@
-package reasoningmodels.knn;
+package reasoningmodels.classifiers;
 
 public abstract class AFeature implements IFeature {
   protected String featureName;

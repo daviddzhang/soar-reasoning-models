@@ -1,6 +1,8 @@
-package reasoningmodels.knn;
+package reasoningmodels.classifiers;
 
 import java.util.List;
+
+import reasoningmodels.knn.DistanceFunction;
 
 public interface IEntry {
 

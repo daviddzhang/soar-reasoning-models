@@ -1,4 +1,4 @@
-package reasoningmodels.knn;
+package reasoningmodels.classifiers;
 
 public class NumericalFeature extends AFeature {
 
