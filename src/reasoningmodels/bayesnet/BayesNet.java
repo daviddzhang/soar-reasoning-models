@@ -58,21 +58,6 @@ public class BayesNet implements IReasoningModel {
     return nodeNames;
   }
 
-  public INode stringToNode(String name) {
-    INode returnNode = null;
-    for (int i = 0; i < this.nodes.size(); i++) {
-      if (this.nodes.get(i).getNodeName().equals(name)) {
-        returnNode = this.nodes.get(i);
-      }
-    }
-    if (returnNode != null) {
-      return returnNode;
-    }
-    else {
-      throw new IllegalArgumentException("Given node is not in the graph");
-    }
-  }
-
   public INode getNoParentNode() {
     INode result = null;
     for (int i = 0; i < this.nodes.size(); i++) {
@@ -86,5 +71,21 @@ public class BayesNet implements IReasoningModel {
     else {
       throw new RuntimeException("No nodes with no parents");
     }
+  }
+
+  public List<INode> getNodes() {
+    List<INode> res = new ArrayList<>();
+    for (INode node : this.nodes) {
+      res.add(node);
+    }
+    return res;
+  }
+
+  public double getResult() {
+    return this.queryResult;
+  }
+
+  public void setResult(double res) {
+    this.queryResult = res;
   }
 }

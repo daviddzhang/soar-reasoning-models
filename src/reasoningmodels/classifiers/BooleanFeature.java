@@ -15,4 +15,14 @@ public class BooleanFeature extends AFeature {
   public IFeature getScaled(double max, double min) {
     return this;
   }
+
+  @Override
+  public String toString() {
+    if (.0001 > Math.abs(this.value - 1.0)) {
+      return "TRUE";
+    }
+    else {
+      return "FALSE";
+    }
+  }
 }

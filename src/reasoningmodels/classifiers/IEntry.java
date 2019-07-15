@@ -22,4 +22,6 @@ public interface IEntry {
 
   boolean containsFeature(IFeature feature);
 
+  String toString();
+
 }

@@ -60,4 +60,9 @@ public class EntryImpl implements IEntry {
     return false;
   }
 
+  @Override
+  public String toString() {
+    return this.features.toString();
+  }
+
 }

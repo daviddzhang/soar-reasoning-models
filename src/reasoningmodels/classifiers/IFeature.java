@@ -34,4 +34,6 @@ public interface IFeature {
 
   IFeature getScaled(double max, double min);
 
+  String toString();
+
 }

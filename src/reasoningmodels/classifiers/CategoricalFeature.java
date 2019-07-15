@@ -40,4 +40,9 @@ public class CategoricalFeature implements IFeature {
   public IFeature getScaled(double max, double min) {
     return this;
   }
+
+  @Override
+  public String toString() {
+    return this.categoricalValue;
+  }
 }

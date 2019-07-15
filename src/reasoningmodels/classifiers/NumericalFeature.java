@@ -16,4 +16,9 @@ public class NumericalFeature extends AFeature {
     double scaledVal = (this.value - min) / (max - min);
     return new NumericalFeature(this.featureName, scaledVal);
   }
+
+  @Override
+  public String toString() {
+    return Double.toString(this.value);
+  }
 }

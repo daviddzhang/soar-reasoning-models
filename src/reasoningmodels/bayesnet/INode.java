@@ -27,4 +27,6 @@ public interface INode {
 
   ICPT join(ICPT other, String joinVar);
 
+  ICPT getCPT();
+
 }

@@ -35,4 +35,21 @@ public abstract class AClassifier implements IReasoningModel {
 
     this.examples.add(entry);
   }
+
+  public String toString() {
+    StringBuilder stringBuilder = new StringBuilder();
+
+    for (String feature : this.features.keySet()) {
+      stringBuilder.append(feature);
+      stringBuilder.append("\n");
+    }
+
+    for (IEntry entry : this.examples) {
+      stringBuilder.append(entry.toString());
+      stringBuilder.append("\n");
+    }
+
+    return stringBuilder.toString();
+  }
+
 }

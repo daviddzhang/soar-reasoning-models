@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.rmi.CORBA.Util;
 
 public class NodeImpl implements INode {
   private String name;
@@ -274,5 +273,12 @@ public class NodeImpl implements INode {
     }
 
     return new CPTImpl(newCPT);
+  }
+
+  // returns a reference since it will be used in tandem with the BayesNet class, which should be
+  // able to mutate the CPT.
+  @Override
+  public ICPT getCPT() {
+    return this.cpt;
   }
 }
