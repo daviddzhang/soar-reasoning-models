@@ -2,12 +2,9 @@ package reasoningmodels.naivebayes;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.stat.StatUtils;
-import org.apache.commons.math3.stat.descriptive.moment.Mean;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import reasoningmodels.classifiers.AClassifier;
@@ -15,122 +12,101 @@ import reasoningmodels.classifiers.IEntry;
 import reasoningmodels.classifiers.IFeature;
 
 public class NaiveBayes extends AClassifier {
+  private final String targetFeature;
+  // represents the counts of the target feature's enumerations
+  private Map<String, Integer> targetCounts = new HashMap<>();
+  // key: one of the target feature's enumerations
+  // value: mapping of a categorical feature to its count (i.e. If color was a feature, maps {red,
+  // blue, green} to their respective counts.
+  private Map<String, Map<String, Integer>> categoricalFeatureCounts = new HashMap<>();
+  //similar as above, but keeps track of means instead of counts. Also, nested map maps from
+  // feature name to mean, as opposed to feature value.
+  private Map<String, Map<String, double[]>> numericalFeatureMeans = new HashMap<>();
 
-  public NaiveBayes() {
+  public NaiveBayes(String targetFeature) {
     super();
+    this.targetFeature = targetFeature;
+  }
+
+  @Override
+  public void train(IEntry entry) {
+    super.train(entry);
+    if (this.examples.size() == 1) {
+      this.initData();
+    }
+
+    String targetFeatureEnum = this.getTargetFeatureEnum(entry);
+    this.targetCounts.replace(targetFeatureEnum, this.targetCounts.get(targetFeatureEnum) + 1);
+
+    for (IFeature feature : entry.getFeatures()) {
+      if (!feature.getFeatureName().equalsIgnoreCase(this.targetFeature)) {
+        if (feature.isCategorical()) {
+          Map<String, Integer> counts = this.categoricalFeatureCounts.get(targetFeatureEnum);
+          counts.replace(feature.getCategoricalValue(),
+                  counts.get(feature.getCategoricalValue()) + 1);
+        }
+        else {
+          Map<String, double[]> means = this.numericalFeatureMeans.get(targetFeatureEnum);
+          double[] oldVals = means.get(feature.getFeatureName());
+          double[] newVals = Arrays.copyOf(oldVals, oldVals.length + 1);
+          newVals[oldVals.length] = feature.getValue();
+          means.replace(feature.getFeatureName(), newVals);
+        }
+      }
+    }
+
+  }
+
+  private void initData() {
+    for (String featureEnum : this.features.get(targetFeature)) {
+      targetCounts.put(featureEnum, 0);
+      categoricalFeatureCounts.put(featureEnum, new HashMap<>());
+      numericalFeatureMeans.put(featureEnum, new HashMap<>());
+    }
+
+    for (Map.Entry<String, String[]> featureEntry : this.features.entrySet()) {
+      if (featureEntry.getValue() == null || featureEntry.getValue().length == 1) {
+        for (Map<String, double[]> means : numericalFeatureMeans.values()) {
+          means.put(featureEntry.getKey(), new double[0]);
+        }
+      }
+      else {
+        for (String featureEnum : featureEntry.getValue()) {
+          for (Map<String, Integer> counts : categoricalFeatureCounts.values()) {
+            counts.put(featureEnum, 0);
+          }
+        }
+      }
+    }
   }
 
   public void query(IEntry queryEntry) {
-    // returns the target feature if possible (assuming target feature can change)
-    String targetFeature = this.returnTargetFeatureIfPossible(queryEntry);
-
-    // get the counts of all the appearances of the prior/target feature
-    Map<String, Integer> priorCounts = new HashMap<>();
-
-    for (String option : this.features.get(targetFeature)) {
-      priorCounts.put(option, 0);
+    if (queryEntry.containsFeature(targetFeature)) {
+      throw new IllegalArgumentException("Query cannot contain target class.");
     }
-
-    for (IEntry entry : this.examples) {
-      List<IFeature> features = entry.getFeatures();
-      for (IFeature feature : features) {
-        if (feature.getFeatureName().equals(targetFeature)) {
-          priorCounts.replace(feature.getCategoricalValue(),
-                  priorCounts.get(feature.getCategoricalValue()) + 1);
-        }
-      }
-    }
-
-    // get the counts of all the categorical features for each prior class yj
-    // the nest map maps categorical values from the query features to counts
-    Map<String, Map<String, Integer>> jointCountsForQueryFeatures = new HashMap<>();
-
-    for (String option : this.features.get(targetFeature)) {
-      Map<String, Integer> featureCountForAPrior = new HashMap<>();
-      // p(xi| yj)
-      for (IFeature feature : queryEntry.getFeatures()) {
-        if (feature.isCategorical()) {
-          featureCountForAPrior.put(feature.getCategoricalValue(), 0);
-        }
-      }
-      jointCountsForQueryFeatures.put(option, featureCountForAPrior);
-    }
-
-    // get the means of all the numerical features for each prior class yj
-    // the nested map maps feature name to a list of all values for the given query feature enum
-    Map<String, Map<String, List<Double>>> contVarMeansForQueryFeatures = new HashMap<>();
-
-    for (String option : this.features.get(targetFeature)) {
-      Map<String, List<Double>> featureMeans = new HashMap<>();
-      // p(xi| yj)
-      for (IFeature feature : queryEntry.getFeatures()) {
-        if (!feature.isCategorical()) {
-          featureMeans.put(feature.getFeatureName(), new ArrayList<>());
-        }
-      }
-      contVarMeansForQueryFeatures.put(option, featureMeans);
-    }
-
-    // for every example so far...
-    for (IEntry entry : this.examples) {
-      // go through each feature in the query ...
-      String currentTargetFeatureEnum = this.getTargetFeatureEnum(entry, targetFeature);
-      Map<String, Integer> currentFeatureCountForQueryEnum =
-              jointCountsForQueryFeatures.get(currentTargetFeatureEnum);
-      Map<String, List<Double>> currentNumericalValsForQueryEnum =
-              contVarMeansForQueryFeatures.get(currentTargetFeatureEnum);
-      for (IFeature queryFeature : queryEntry.getFeatures()) {
-        // and check if it appears in the current example and that it is categorical
-        if (queryFeature.isCategorical()) {
-          for (IFeature entryFeature : entry.getFeatures()) {
-            // if it does, update the count
-            if (queryFeature.getCategoricalValue().equals(entryFeature.getCategoricalValue())) {
-              currentFeatureCountForQueryEnum.replace(entryFeature.getCategoricalValue(),
-                      currentFeatureCountForQueryEnum.get(entryFeature.getCategoricalValue()) + 1);
-              break;
-            }
-          }
-        }
-        // if it is numerical, add it to the list of values
-        else {
-          for (IFeature entryFeature : entry.getFeatures()) {
-            if (queryFeature.getFeatureName().equals(entryFeature.getFeatureName())) {
-              currentNumericalValsForQueryEnum.get(queryFeature.getFeatureName()).add(entryFeature.getValue());
-            }
-          }
-        }
-      }
-    }
-
-
 
     Map<String, Double> logProbs = new HashMap<>();
 
-    for (Map.Entry<String, Map<String, Integer>> entry : jointCountsForQueryFeatures.entrySet()) {
-      double current = 0.0;
-      Map<String, Integer> featureCounts = entry.getValue();
-      Map<String, List<Double>> numericalFeatureVals =
-              contVarMeansForQueryFeatures.get(entry.getKey());
-      for (Map.Entry<String, Integer> featureCountEntry : featureCounts.entrySet()) {
-        double prob =
-                (featureCountEntry.getValue() + 1) / (priorCounts.get(entry.getKey())
-                        + this.getFeatureDimensionality(featureCountEntry.getKey()));
-        current += Math.log(prob);
-      }
-
+    for (String targetFeatureEnum : this.features.get(this.targetFeature)) {
+      double overallLogProb = Math.log(this.getPriorProb(targetFeatureEnum));
       for (IFeature queryFeature : queryEntry.getFeatures()) {
-        if (!queryFeature.isCategorical()) {
-          double queryVal = queryFeature.getValue();
-          List<Double> exampleVals = numericalFeatureVals.get(queryFeature.getFeatureName());
-          double[] examplesAsArray = this.doubleListAsArray(exampleVals);
-          double mean = StatUtils.mean(examplesAsArray);
-          double stdDev = Math.sqrt(StatUtils.variance(examplesAsArray));
-          double eval = new NormalDistribution(mean, stdDev).density(queryVal);
-          current += Math.log(eval);
+        if (queryFeature.isCategorical()) {
+          double prob =
+                  (double)(this.categoricalFeatureCounts.get(targetFeatureEnum)
+                          .get(queryFeature.getCategoricalValue()) + 1)
+                  / (this.targetCounts.get(targetFeatureEnum) + this.getFeatureDimensionality(queryFeature.getFeatureName()));
+          overallLogProb += Math.log(prob);
+        }
+        else {
+          double[] vals =
+                  this.numericalFeatureMeans.get(targetFeatureEnum).get(queryFeature.getFeatureName());
+          double prob = new NormalDistribution(StatUtils.mean(vals),
+                  Math.sqrt(StatUtils.variance(vals))).density(queryFeature.getValue());
+          overallLogProb += Math.log(prob);
         }
       }
-
-      logProbs.put(entry.getKey(), current);
+      System.out.println(overallLogProb);
+      logProbs.put(targetFeatureEnum, overallLogProb);
     }
 
     Map.Entry<String, Double> maxEntry = null;
@@ -147,58 +123,34 @@ public class NaiveBayes extends AClassifier {
 
   }
 
-  private double[] doubleListAsArray(List<Double> list) {
-    double[] res = new double[list.size()];
-    for (int i = 0; i < list.size(); i++) {
-      res[i] = list.get(i);
-    }
-
-    return res;
+  @Override
+  public void query(IEntry query, int k) throws UnsupportedOperationException {
+    throw new UnsupportedOperationException("Naive Bayes model does not need a k value");
   }
 
-  private Integer getFeatureDimensionality(String categoricalValue) {
-    for (String[] featureEnums : this.features.values()) {
-      for (String str : featureEnums) {
-        if (str.equals(categoricalValue)) {
-          return featureEnums.length;
-        }
-      }
+  private double getPriorProb(String targetClassEnum) {
+    int total = 0;
+    for (int val : this.targetCounts.values()) {
+      total += val;
     }
 
-    // should not reach here
-    throw new IllegalArgumentException("Given categoricalValue could not be found.");
+    return ((double)this.targetCounts.get(targetClassEnum) / total);
   }
 
-  private String getTargetFeatureEnum(IEntry entry, String targetFeature) {
-    for (int i = 0; i < entry.getFeatures().size(); i++) {
-      if (entry.getFeatures().get(i).equals(targetFeature)) {
-        return entry.getFeatures().get(i).getCategoricalValue();
+  private int getFeatureDimensionality(String featureName) {
+    return this.features.get(featureName).length;
+  }
+
+  private String getTargetFeatureEnum(IEntry entry) {
+    for (IFeature feature : entry.getFeatures()) {
+      if (feature.getFeatureName().equalsIgnoreCase(this.targetFeature)) {
+        return feature.getCategoricalValue();
       }
     }
 
     //shouldn't get here
-    throw new IllegalArgumentException("Could not find supplied target feature in the given entry" +
+    throw new IllegalArgumentException("Could not find target feature in the given entry" +
             ".");
   }
 
-  private String returnTargetFeatureIfPossible(IEntry queryEntry) {
-    if (this.examples.isEmpty()) {
-      throw new IllegalArgumentException("Cannot query when there are no examples");
-    }
-
-    if (queryEntry.getFeatures().size() >= this.examples.get(0).getFeatures().size()) {
-      throw new IllegalArgumentException("Supplied query cannot have all the features/more " +
-              "features than the provided training examples.");
-    }
-
-    // get which feature is being predicted
-    String targetFeature = null;
-    for (IFeature feature : this.examples.get(0).getFeatures()) {
-      if (!queryEntry.containsFeature(feature)) {
-        targetFeature = feature.getFeatureName();
-      }
-    }
-
-    return targetFeature;
-  }
 }

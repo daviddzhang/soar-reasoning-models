@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import reasoningmodels.IReasoningModel;
+import reasoningmodels.bayesnet.INode;
 import reasoningmodels.classifiers.IEntry;
 import reasoningmodels.classifiers.IFeature;
 
@@ -23,7 +24,7 @@ public abstract class AClassifier implements IReasoningModel {
     this.features.put(feature, enumerations);
   }
 
-  public void addEntry(IEntry entry) {
+  public void train(IEntry entry) {
     List<String> entryToBeAdded = new ArrayList<>();
     for (IFeature feature : entry.getFeatures()) {
       entryToBeAdded.add(feature.getFeatureName());
@@ -38,11 +39,9 @@ public abstract class AClassifier implements IReasoningModel {
 
   public String toString() {
     StringBuilder stringBuilder = new StringBuilder();
-
-    for (String feature : this.features.keySet()) {
-      stringBuilder.append(feature);
-      stringBuilder.append("\n");
-    }
+    List<String> header = new ArrayList<>(this.features.keySet());
+    stringBuilder.append(header.toString());
+    stringBuilder.append("\n");
 
     for (IEntry entry : this.examples) {
       stringBuilder.append(entry.toString());
@@ -52,4 +51,16 @@ public abstract class AClassifier implements IReasoningModel {
     return stringBuilder.toString();
   }
 
+  public Map<String, String[]> getFeatures() {
+    return this.features;
+  }
+
+  public String getResult() {
+    return this.targetResult;
+  }
+
+  @Override
+  public void addNode(INode node) {
+    throw new UnsupportedOperationException("Classifiers do not use nodes.");
+  }
 }

@@ -12,8 +12,13 @@ public class BooleanFeature extends AFeature {
   }
 
   @Override
-  public IFeature getScaled(double max, double min) {
-    return this;
+  public void scaleFeature(double max, double min) {
+    this.scaled = this.value;
+  }
+
+  @Override
+  public double getScaledValue() {
+    return this.scaled;
   }
 
   @Override

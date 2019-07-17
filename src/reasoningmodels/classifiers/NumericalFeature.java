@@ -12,10 +12,16 @@ public class NumericalFeature extends AFeature {
   }
 
   @Override
-  public IFeature getScaled(double max, double min) {
+  public void scaleFeature(double max, double min) {
     double scaledVal = (this.value - min) / (max - min);
-    return new NumericalFeature(this.featureName, scaledVal);
+    this.scaled = scaledVal;
   }
+
+  @Override
+  public double getScaledValue() {
+    return this.scaled;
+  }
+
 
   @Override
   public String toString() {

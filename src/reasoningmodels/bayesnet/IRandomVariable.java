@@ -1,6 +1,8 @@
 package reasoningmodels.bayesnet;
 
-public interface IRandomVariable {
+import reasoningmodels.classifiers.IFeature;
+
+public interface IRandomVariable extends IFeature {
 
   String toString();
 

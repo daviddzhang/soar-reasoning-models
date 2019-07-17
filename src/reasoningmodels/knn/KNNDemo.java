@@ -5,8 +5,16 @@ import com.opencsv.CSVReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+
+import reasoningmodels.classifiers.CategoricalFeature;
+import reasoningmodels.classifiers.EntryImpl;
+import reasoningmodels.classifiers.FeatureFactory;
+import reasoningmodels.classifiers.IEntry;
+import reasoningmodels.classifiers.IFeature;
 
 public class KNNDemo {
   public static void main(String[] args) throws IOException {
@@ -22,14 +30,29 @@ public class KNNDemo {
     knn.addFeature(headers[1], new String[]{"square", "circle"});
     knn.addFeature(headers[2], new String[]{"plus", "minus"});
 
-    System.out.println(knn.toString());
+    while (iterator.hasNext()) {
+      List<IFeature> currentFeatures = new ArrayList<>();
+      String[] current = iterator.next();
+      for (int i = 0; i < current.length; i++) {
+        currentFeatures.add(FeatureFactory.createFeature(headers[i], current[i],
+                knn.getFeatures().get(headers[i])));
+      }
+      knn.train(new EntryImpl(currentFeatures));
 
-//    while (iterator.hasNext()) {
-//      String[] current = iterator.next();
-//      for (String string : current) {
-//        System.out.println(string);
-//      }
-//
-//    }
+    }
+
+    IFeature blue = new CategoricalFeature("color",
+            KNN.getVectorForCategoricalValue(knn.getFeatures().get("color"), "blue"), "blue");
+    IFeature square = new CategoricalFeature("shape",
+            KNN.getVectorForCategoricalValue(knn.getFeatures().get("shape"), "square"), "square");
+    List<IFeature> queryFeatures = new ArrayList<>(Arrays.asList(blue, square));
+    IEntry queryEntry = new EntryImpl(queryFeatures);
+
+    knn.query(queryEntry, 1);
+
+    System.out.println(knn.toString() + "\n");
+    System.out.println(knn.getResult());
+
+
   }
 }

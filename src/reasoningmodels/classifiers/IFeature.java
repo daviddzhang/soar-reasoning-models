@@ -14,12 +14,12 @@ public interface IFeature {
   double[] getValueAsVector();
 
   /**
-   * Returns the feature's numerical value. For categorical features, depending on the
-   * implementation, may return 1 to represent its distance from the origin.
+   * Returns the feature's numerical value. May throw an exception if an implementation of
+   * IFeature does not contain a numerical value.
    *
    * @return the value of the feature
    */
-  double getValue();
+  double getValue() throws UnsupportedOperationException;
 
   String getFeatureName();
 
@@ -32,7 +32,9 @@ public interface IFeature {
    */
   String getCategoricalValue() throws UnsupportedOperationException;
 
-  IFeature getScaled(double max, double min);
+  void scaleFeature(double max, double min);
+
+  double getScaledValue() throws UnsupportedOperationException;
 
   String toString();
 

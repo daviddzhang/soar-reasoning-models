@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reasoningmodels.IReasoningModel;
+import reasoningmodels.classifiers.IEntry;
 
 public class BayesNet implements IReasoningModel {
   private List<INode> nodes;
@@ -16,7 +17,11 @@ public class BayesNet implements IReasoningModel {
   }
 
   public BayesNet(List<INode> nodes) {
-    this(nodes, 0.0);
+    this(nodes, -1.0);
+  }
+
+  public BayesNet() {
+    this(new ArrayList<>(), -1.0);
   }
 
   public void updateFrequencies(List<IRandomVariable> trainingEx) {
@@ -87,5 +92,30 @@ public class BayesNet implements IReasoningModel {
 
   public void setResult(double res) {
     this.queryResult = res;
+  }
+
+  @Override
+  public void addNode(INode node) {
+    this.nodes.add(node);
+  }
+
+  @Override
+  public void addFeature(String feature, String[] enumerations) {
+    throw new UnsupportedOperationException("Bayes nets do not have features.");
+  }
+
+  @Override
+  public void train(IEntry entry) {
+    //TODO: fill this in
+  }
+
+  @Override
+  public void query(IEntry query) {
+
+  }
+
+  @Override
+  public void query(IEntry query, int k) throws UnsupportedOperationException {
+    throw new UnsupportedOperationException("Bayes nets do not need a k");
   }
 }

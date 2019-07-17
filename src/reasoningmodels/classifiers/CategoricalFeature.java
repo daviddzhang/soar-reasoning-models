@@ -1,9 +1,9 @@
 package reasoningmodels.classifiers;
 
 public class CategoricalFeature implements IFeature {
-  String categoryName;
-  double[] value;
-  String categoricalValue;
+  private final String categoryName;
+  private final double[] value;
+  private final String categoricalValue;
 
   public CategoricalFeature(String categoryName, double[] value, String categoricalValue) {
     this.categoryName = categoryName;
@@ -23,12 +23,12 @@ public class CategoricalFeature implements IFeature {
 
   @Override
   public double getValue() {
-    return 1;
+    throw new UnsupportedOperationException("Categorical features do not have numerical values.");
   }
 
   @Override
   public String getFeatureName() {
-    return this.getFeatureName();
+    return this.categoryName;
   }
 
   @Override
@@ -37,8 +37,13 @@ public class CategoricalFeature implements IFeature {
   }
 
   @Override
-  public IFeature getScaled(double max, double min) {
-    return this;
+  public void scaleFeature(double max, double min) {
+    throw new UnsupportedOperationException("Cannot scale categorical features.");
+  }
+
+  @Override
+  public double getScaledValue() {
+    throw new UnsupportedOperationException("Categorical features do not have scaled values.");
   }
 
   @Override

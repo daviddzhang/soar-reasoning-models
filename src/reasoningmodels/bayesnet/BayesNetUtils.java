@@ -5,7 +5,7 @@ import java.util.List;
 
 import sml.WMElement;
 
-public class Utils {
+public class BayesNetUtils {
   // removes the duplicates from a list
   static <T> List<T> removeDuplicates(List<T> list) {
     List<T> filteredList = new ArrayList<T>();
@@ -37,7 +37,7 @@ public class Utils {
   static List<IRandomVariable> stringListToVar(List<String> list) {
     List<IRandomVariable> varList = new ArrayList<>();
     for (int i = 0; i < list.size(); i++) {
-      varList.add(Utils.stringToVar(list.get(i)));
+      varList.add(BayesNetUtils.stringToVar(list.get(i)));
     }
     return varList;
   }

@@ -1,8 +1,9 @@
 package reasoningmodels.classifiers;
 
 public abstract class AFeature implements IFeature {
-  protected String featureName;
-  protected double value;
+  protected final String featureName;
+  protected final double value;
+  protected double scaled;
 
   protected AFeature(String featureName, double value) {
     this.featureName = featureName;
@@ -35,5 +36,8 @@ public abstract class AFeature implements IFeature {
   }
 
   @Override
-  public abstract IFeature getScaled(double max, double min);
+  public abstract void scaleFeature(double max, double min);
+
+  @Override
+  public abstract double getScaledValue();
 }

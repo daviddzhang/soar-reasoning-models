@@ -266,7 +266,7 @@ public class NodeImpl implements INode {
           List<IRandomVariable> newAssignment = new ArrayList<>(
                   bigEntry.getKey());
           newAssignment.addAll(smallEntry.getKey());
-          List<IRandomVariable> noDups = Utils.removeDuplicates(newAssignment);
+          List<IRandomVariable> noDups = BayesNetUtils.removeDuplicates(newAssignment);
           newCPT.put(noDups, smallEntry.getValue() * bigEntry.getValue());
         }
       }

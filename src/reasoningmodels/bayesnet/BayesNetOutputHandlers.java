@@ -3,8 +3,6 @@ package reasoningmodels.bayesnet;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.rmi.CORBA.Util;
-
 import sml.Agent.OutputEventInterface;
 import sml.WMElement;
 
@@ -21,7 +19,7 @@ public class BayesNetOutputHandlers {
       // 0).GetValueAsString();
 
       WMElement nodes = graphWME.ConvertToIdentifier().FindByAttribute("nodes", 0);
-      int edgeCount = Utils.numEdges(graphWME);
+      int edgeCount = BayesNetUtils.numEdges(graphWME);
 
       // creates the graph based on the edge WMEs and node attributes
       for (int i = 0; i < nodes.ConvertToIdentifier().GetNumberChildren(); i++) {
@@ -92,7 +90,7 @@ public class BayesNetOutputHandlers {
               .parseInt(pWmeAdded.ConvertToIdentifier().FindByAttribute("id", 0).GetValueAsString());
       BayesNet net = graphs.get(graphID);
 
-      Utils util = new Utils();
+      BayesNetUtils util = new BayesNetUtils();
 
       // gets the queried variable and its name
       String queryVar = "";
@@ -171,7 +169,7 @@ public class BayesNetOutputHandlers {
 
       ArrayList<String> queryVarsList = new ArrayList<>(evidence);
       queryVarsList.add(queryVar);
-      List<IRandomVariable> queryVars = Utils.stringListToVar(queryVarsList);
+      List<IRandomVariable> queryVars = BayesNetUtils.stringListToVar(queryVarsList);
       net.setResult(joinedCPT.getQueryVar(queryVars));
 
       //pWmeAdded.ConvertToIdentifier().CreateFloatWME("result", joinedCPT.getQueryVar(queryVars));

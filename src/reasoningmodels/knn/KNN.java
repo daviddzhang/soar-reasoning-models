@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javafx.util.Pair;
 import reasoningmodels.classifiers.AClassifier;
 import reasoningmodels.classifiers.IEntry;
 import reasoningmodels.classifiers.IFeature;
@@ -14,17 +15,83 @@ import reasoningmodels.classifiers.IFeature;
 import static java.util.stream.Collectors.toMap;
 
 public class KNN extends AClassifier {
-  private DistanceFunction distanceFunction = DistanceFunction.EUCLIDEAN;
+  Map<String, Pair<Double, Double>> minMaxLookup;
+  private IDistanceFunction distanceFunction;
 
   public KNN() {
     super();
+    // defaults L2
+    distanceFunction = new L2Distance();
+    minMaxLookup = new HashMap<>();
   }
 
-  public void setDistanceFunction(DistanceFunction distanceFunction) {
+  @Override
+  public void addFeature(String feature, String[] enumerations) {
+    // feature is not categorical
+    if (enumerations == null || enumerations.length == 0) {
+      minMaxLookup.put(feature, new Pair<>(0.0,0.0));
+    }
+    super.addFeature(feature, enumerations);
+  }
+
+  @Override
+  public void train(IEntry entry) {
+    super.train(entry);
+
+    if (this.examples.size() == 1) {
+      for (IFeature feature : entry.getFeatures()) {
+        if (!feature.isCategorical()) {
+          this.minMaxLookup.replace(feature.getFeatureName(), new Pair<>(feature.getValue(),
+                  feature.getValue()));
+        }
+      }
+    }
+    else {
+      for (IFeature feature : entry.getFeatures()) {
+        if (!feature.isCategorical()) {
+          Pair<Double, Double> featureMinMax = this.minMaxLookup.get(feature.getFeatureName());
+          if (feature.getValue() < featureMinMax.getKey()) {
+            this.minMaxLookup.replace(feature.getFeatureName(), new Pair<>(feature.getValue(),
+                    featureMinMax.getValue()));
+            this.rescaleFeature(feature.getFeatureName());
+          }
+          else if (feature.getValue() > featureMinMax.getValue()) {
+            this.minMaxLookup.replace(feature.getFeatureName(), new Pair<>(featureMinMax.getKey(),
+                    feature.getValue()));
+            this.rescaleFeature(feature.getFeatureName());
+          }
+        }
+      }
+    }
+
+  }
+
+  @Override
+  public void query(IEntry query) {
+    this.queryHelp(query, 1);
+  }
+
+  private void rescaleFeature(String featureName) {
+    for (IEntry entry : this.examples) {
+      for (IFeature feature : entry.getFeatures()) {
+        if (feature.getFeatureName().equalsIgnoreCase(featureName)) {
+          Pair<Double, Double> featureMinMax = this.minMaxLookup.get(featureName);
+          feature.scaleFeature(featureMinMax.getKey(), featureMinMax.getValue());
+        }
+      }
+    }
+  }
+
+
+  public void setDistanceFunction(IDistanceFunction distanceFunction) {
     this.distanceFunction = distanceFunction;
   }
 
   public void query(IEntry queryEntry, int k) {
+    this.queryHelp(queryEntry, k);
+  }
+
+  private void queryHelp(IEntry queryEntry, int k) {
     // returns the target feature if possible
     String targetFeature = this.returnTargetFeatureIfPossible(queryEntry, k);
 
@@ -78,7 +145,7 @@ public class KNN extends AClassifier {
     // get which feature is being predicted
     String targetFeature = null;
     for (IFeature feature : this.examples.get(0).getFeatures()) {
-      if (!queryEntry.containsFeature(feature)) {
+      if (!queryEntry.containsFeature(feature.getFeatureName())) {
         targetFeature = feature.getFeatureName();
       }
     }
@@ -99,7 +166,7 @@ public class KNN extends AClassifier {
     Map<IEntry, Double> distanceMapping = new HashMap<>();
 
     for (IEntry entry : this.examples) {
-      distanceMapping.put(entry, queryEntry.calcDistance(this.distanceFunction, entry));
+      distanceMapping.put(entry, KNN.calcDistance(queryEntry, entry, this.distanceFunction));
     }
 
     Map<IEntry, Double> sorted =
@@ -107,5 +174,45 @@ public class KNN extends AClassifier {
                     LinkedHashMap::new));
 
     return sorted;
+  }
+
+  public static double calcDistance(IEntry queryEntry, IEntry exampleEntry,
+                             IDistanceFunction distanceFunction) {
+    double res = 0.0;
+    List<IFeature> queryFeatures = queryEntry.getFeatures();
+    List<IFeature> exampleFeatures = exampleEntry.getFeatures();
+    double[] queryVals = new double[queryFeatures.size()];
+    double[] exampleVals = new double[queryFeatures.size()];
+    for (int i = 0; i < queryFeatures.size(); i++) {
+      String currentFeature = queryFeatures.get(i).getFeatureName();
+      // iterate through the other entry's features to check for the current feature the loop
+      // is on for this entry
+      for (IFeature otherFeature : exampleFeatures) {
+        if (otherFeature.getFeatureName().equals(currentFeature)) {
+          // use vector calculations if the feature is categorical
+          if (queryFeatures.get(i).isCategorical()) {
+            res += distanceFunction.evaluate(queryFeatures.get(i).getValueAsVector(),
+                    otherFeature.getValueAsVector());
+          } else {
+            queryVals[i] = queryFeatures.get(i).getScaledValue();
+            exampleVals[i] = otherFeature.getScaledValue();
+          }
+        }
+      }
+    }
+
+    res += distanceFunction.evaluate(queryVals, exampleVals);
+
+    return res;
+  }
+
+  public static double[] getVectorForCategoricalValue(String[] values, String value) {
+    double[] res = new double[values.length];
+    for (int i = 0; i < values.length; i++) {
+      if (values[i].equalsIgnoreCase(value)) {
+        res[i] = 1.0;
+      }
+    }
+    return res;
   }
 }
