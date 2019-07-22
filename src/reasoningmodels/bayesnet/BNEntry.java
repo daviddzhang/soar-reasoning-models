@@ -7,9 +7,9 @@ import reasoningmodels.classifiers.IEntry;
 import reasoningmodels.classifiers.IFeature;
 
 public class BNEntry implements IEntry {
-  private final List<IRandomVariable> vars;
+  private final List<IFeature> vars;
 
-  public BNEntry(List<IRandomVariable> vars) {
+  public BNEntry(List<IFeature> vars) {
     this.vars = vars;
   }
 

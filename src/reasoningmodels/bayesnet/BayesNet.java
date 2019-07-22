@@ -8,66 +8,60 @@ import reasoningmodels.classifiers.IEntry;
 
 public class BayesNet implements IReasoningModel {
   private List<INode> nodes;
-  private double queryResult;
-  private int id = -1;
-
-  public BayesNet(List<INode> nodes, double queryResult) {
-    this.nodes = nodes;
-    this.queryResult = queryResult;
-  }
 
   public BayesNet(List<INode> nodes) {
-    this(nodes, -1.0);
+    this.nodes = nodes;
   }
 
   public BayesNet() {
-    this(new ArrayList<>(), -1.0);
+    this(new ArrayList<>());
   }
 
-  public void updateFrequencies(List<IRandomVariable> trainingEx) {
+  private void updateFrequencies(List<IRandomVariable> trainingEx) {
     // for each node, update frequency table
-    for (int i = 0; i < nodes.size(); i++) {
+    for (INode node : nodes) {
       // current node
-      nodes.get(i).updateFrequency(trainingEx);
+      node.updateFrequency(trainingEx);
     }
   }
 
-  public void updateRelFrequencies(List<IRandomVariable> trainingEx) {
+  private void updateRelFrequencies(List<IRandomVariable> trainingEx) {
     // for each node, update frequency table
-    for (int i = 0; i < nodes.size(); i++) {
+    for (INode node : nodes) {
       // current node
-      nodes.get(i).updateRelFrequency(trainingEx);
+      node.updateRelFrequency(trainingEx);
     }
   }
 
-  public void updateCPTs() {
+  private void updateCPTs() {
     // for each node, update the CPT
-    for (int i = 0; i < nodes.size(); i++) {
+    for (INode node : nodes) {
       // current node
-      nodes.get(i).updateCPT();
+      node.updateCPT();
     }
 
   }
 
+  @Override
   public String toString() {
     return this.nodes.toString();
   }
 
-  public List<String> toNodeNames() {
+  private List<String> toNodeNames() {
     List<String> nodeNames = new ArrayList<String>();
 
-    for (int i = 0; i < this.nodes.size(); i++) {
-      nodeNames.add(this.nodes.get(i).getNodeName());
+    for (INode node : this.nodes) {
+      nodeNames.add(node.getNodeName());
     }
 
     return nodeNames;
   }
 
-  public INode getNoParentNode() {
+  private INode getNoParentNode() {
     INode result = null;
-    for (int i = 0; i < this.nodes.size(); i++) {
-      if (this.nodes.get(i).hasNoParents()) {
-        result = this.nodes.get(i);
+    for (INode node : this.nodes) {
+      if (node.hasNoParents()) {
+        result = node;
       }
     }
     if (result != null) {
@@ -76,22 +70,6 @@ public class BayesNet implements IReasoningModel {
     else {
       throw new RuntimeException("No nodes with no parents");
     }
-  }
-
-  public List<INode> getNodes() {
-    List<INode> res = new ArrayList<>();
-    for (INode node : this.nodes) {
-      res.add(node);
-    }
-    return res;
-  }
-
-  public double getResult() {
-    return this.queryResult;
-  }
-
-  public void setResult(double res) {
-    this.queryResult = res;
   }
 
   @Override
@@ -106,16 +84,90 @@ public class BayesNet implements IReasoningModel {
 
   @Override
   public void train(IEntry entry) {
-    //TODO: fill this in
+    List<IRandomVariable> trainingVars =
+            RandomVariableImpl.featureListToVarList(entry.getFeatures());
+
+    this.updateFrequencies(trainingVars);
+    this.updateRelFrequencies(trainingVars);
+    this.updateCPTs();
   }
 
   @Override
-  public void query(IEntry query) {
+  public String query(IEntry query) {
+    throw new UnsupportedOperationException("Bayes nets can only return probabilities.");
+  }
 
+  private double enumeration(List<IRandomVariable> queryVars, List<IRandomVariable> evidenceVars) {
+    List<String> queryVarNames = RandomVariableImpl.listOfVarsToListOfNames(queryVars);
+    List<String> evidenceVarNames = RandomVariableImpl.listOfVarsToListOfNames(evidenceVars);
+
+    // gets a list with the evidence and the query variable
+    List<String> queryList = new ArrayList<>(evidenceVarNames);
+    queryList.addAll(queryVarNames);
+
+    // gets a list of all the variable names in the graph
+    List<String> graphNodeNames = this.toNodeNames();
+
+    List<INode> graphNodes = new ArrayList<>(this.nodes);
+    int numNodes = this.nodes.size();
+
+    // gets a node in the graph with no parents and sets it as the starting CPT,
+    // joining necessary variables
+    INode startingNode = this.getNoParentNode();
+    ICPT joinedCPT = startingNode.convertToInferenceCPT().getCPT();
+    for (int i = 0; i < graphNodes.size(); i++) {
+      if (graphNodes.get(i).hasParent(startingNode.getNodeName())) {
+        // join their CPTs
+        joinedCPT = graphNodes.get(i).convertToInferenceCPT().join(joinedCPT, startingNode.getNodeName());
+
+        graphNodes.remove(graphNodes.get(i));
+      }
+    }
+    graphNodeNames.remove(startingNode.getNodeName());
+
+    // finishes joining on the rest of the variables
+    List<String> cptVariables = joinedCPT.variablesInCPT();
+    while (cptVariables.size() < numNodes) {
+      // goes through the nodes that aren't yet joined and in the current joined
+      // cpt
+      for (int j = 0; j < cptVariables.size(); j++) {
+        String nodeName = cptVariables.get(j);
+        // if still not joined yet
+        if (graphNodeNames.contains(nodeName)) {
+          // go through the graph and find nodes that have the selected node as its
+          // parent
+          for (int k = 0; k < graphNodes.size(); k++) {
+            if (graphNodes.get(k).hasParent(nodeName)) {
+              // join their CPTs
+              joinedCPT = graphNodes.get(k).convertToInferenceCPT().join(joinedCPT, nodeName);
+            }
+          }
+          graphNodeNames.remove(nodeName);
+        }
+      }
+      cptVariables = joinedCPT.variablesInCPT();
+    }
+
+    joinedCPT = joinedCPT.eliminateExcept(queryList);
+    joinedCPT.normalize();
+
+    System.out.println(joinedCPT.printCPT());
+
+    List<IRandomVariable> queryListVars = BayesNetUtils.stringListToVar(queryList);
+    return joinedCPT.getQueryVar(queryListVars);
   }
 
   @Override
-  public void query(IEntry query, int k) throws UnsupportedOperationException {
+  public String query(IEntry query, int k) throws UnsupportedOperationException {
     throw new UnsupportedOperationException("Bayes nets do not need a k");
+  }
+
+  @Override
+  public double queryProbability(IEntry query, IEntry evidence) {
+    List<IRandomVariable> queryVars =
+            RandomVariableImpl.featureListToVarList(query.getFeatures());
+    List<IRandomVariable> evidenceVars =
+            RandomVariableImpl.featureListToVarList(evidence.getFeatures());
+    return this.enumeration(queryVars, evidenceVars);
   }
 }

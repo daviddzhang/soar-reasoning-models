@@ -1,5 +1,7 @@
 package reasoningmodels.bayesnet;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import reasoningmodels.IReasoningModel;
@@ -9,58 +11,13 @@ import reasoningmodels.classifiers.IFeature;
 public class RandomVariableImpl implements IRandomVariable {
   private final String name;
   private final boolean hasOccurred;
-  private final IFeature adaptee;
 
   public RandomVariableImpl(String name, boolean hasOccurred) {
     this.name = name;
     this.hasOccurred = hasOccurred;
-    this.adaptee = new BooleanFeature(this.name, this.hasOccurredToVal());
-  }
-
-  private double hasOccurredToVal() {
-    if (this.hasOccurred) {
-      return 1.0;
-    }
-    else {
-      return 0.0;
-    }
   }
 
   @Override
-  public boolean isCategorical() {
-    return this.adaptee.isCategorical();
-  }
-
-  @Override
-  public double[] getValueAsVector() {
-    return this.adaptee.getValueAsVector();
-  }
-
-  @Override
-  public double getValue() throws UnsupportedOperationException {
-    return this.adaptee.getValue();
-  }
-
-  @Override
-  public String getFeatureName() {
-    return this.adaptee.getFeatureName();
-  }
-
-  @Override
-  public String getCategoricalValue() throws UnsupportedOperationException {
-    return this.adaptee.getCategoricalValue();
-  }
-
-  @Override
-  public void scaleFeature(double max, double min) {
-    this.adaptee.scaleFeature(max, min);
-  }
-
-  @Override
-  public double getScaledValue() throws UnsupportedOperationException {
-    return this.adaptee.getScaledValue();
-  }
-
   public String toString() {
     if (this.hasOccurred) {
       return "+" + this.name;
@@ -91,5 +48,34 @@ public class RandomVariableImpl implements IRandomVariable {
   @Override
   public int hashCode() {
     return Objects.hash(this.name, this.hasOccurred);
+  }
+
+  public static List<IRandomVariable> featureListToVarList(List<IFeature> listToConvert) {
+    List<IRandomVariable> res = new ArrayList<>();
+
+    for (IFeature feature : listToConvert) {
+      boolean hasOccured;
+
+      if (feature.getValue() == 1.0) {
+        hasOccured = true;
+      } else if (feature.getValue() == 0.0) {
+        hasOccured = false;
+      }
+      else {
+        throw new IllegalArgumentException("Features must be boolean features.");
+      }
+
+      res.add(new RandomVariableImpl(feature.getFeatureName(), hasOccured));
+    }
+
+    return res;
+  }
+
+  public static List<String> listOfVarsToListOfNames(List<IRandomVariable> listToConvert) {
+    List<String> res = new ArrayList<>();
+    for (IRandomVariable var : listToConvert) {
+      res.add(var.getName().substring(1).toUpperCase());
+    }
+    return res;
   }
 }

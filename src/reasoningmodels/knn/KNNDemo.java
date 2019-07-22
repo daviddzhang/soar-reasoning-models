@@ -41,17 +41,15 @@ public class KNNDemo {
 
     }
 
-    IFeature blue = new CategoricalFeature("color",
-            KNN.getVectorForCategoricalValue(knn.getFeatures().get("color"), "blue"), "blue");
-    IFeature square = new CategoricalFeature("shape",
-            KNN.getVectorForCategoricalValue(knn.getFeatures().get("shape"), "square"), "square");
+    IFeature blue = new CategoricalFeature("color", "blue");
+    IFeature square = new CategoricalFeature("shape", "square");
     List<IFeature> queryFeatures = new ArrayList<>(Arrays.asList(blue, square));
     IEntry queryEntry = new EntryImpl(queryFeatures);
 
-    knn.query(queryEntry, 1);
+
 
     System.out.println(knn.toString() + "\n");
-    System.out.println(knn.getResult());
+    System.out.println(knn.query(queryEntry, 1));
 
 
   }

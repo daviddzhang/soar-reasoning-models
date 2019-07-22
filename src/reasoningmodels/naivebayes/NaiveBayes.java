@@ -23,8 +23,8 @@ public class NaiveBayes extends AClassifier {
   // feature name to mean, as opposed to feature value.
   private Map<String, Map<String, double[]>> numericalFeatureMeans = new HashMap<>();
 
-  public NaiveBayes(String targetFeature) {
-    super();
+  public NaiveBayes(Map<String, String[]> features, String targetFeature) {
+    super(features);
     this.targetFeature = targetFeature;
   }
 
@@ -80,7 +80,7 @@ public class NaiveBayes extends AClassifier {
     }
   }
 
-  public void query(IEntry queryEntry) {
+  public String query(IEntry queryEntry) {
     if (queryEntry.containsFeature(targetFeature)) {
       throw new IllegalArgumentException("Query cannot contain target class.");
     }
@@ -119,12 +119,11 @@ public class NaiveBayes extends AClassifier {
       }
     }
 
-    this.targetResult = maxEntry.getKey();
-
+    return maxEntry.getKey();
   }
 
   @Override
-  public void query(IEntry query, int k) throws UnsupportedOperationException {
+  public String query(IEntry query, int k) throws UnsupportedOperationException {
     throw new UnsupportedOperationException("Naive Bayes model does not need a k value");
   }
 

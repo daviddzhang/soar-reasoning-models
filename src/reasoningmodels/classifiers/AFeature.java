@@ -14,9 +14,8 @@ public abstract class AFeature implements IFeature {
   public abstract boolean isCategorical();
 
   @Override
-  public double[] getValueAsVector() {
-    double[] res = {this.value};
-    return res;
+  public double[] getValueAsVector(String[] enumerations) {
+    return new double[] {this.value};
   }
 
   @Override

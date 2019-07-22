@@ -13,10 +13,9 @@ import reasoningmodels.classifiers.IFeature;
 public abstract class AClassifier implements IReasoningModel {
   protected final Map<String, String[]> features;
   protected final List<IEntry> examples;
-  protected String targetResult;
 
-  protected AClassifier() {
-    this.features = new HashMap<>();
+  protected AClassifier(Map<String, String[]> features) {
+    this.features = features;
     this.examples = new ArrayList<>();
   }
 
@@ -55,12 +54,13 @@ public abstract class AClassifier implements IReasoningModel {
     return this.features;
   }
 
-  public String getResult() {
-    return this.targetResult;
-  }
-
   @Override
   public void addNode(INode node) {
     throw new UnsupportedOperationException("Classifiers do not use nodes.");
+  }
+
+  @Override
+  public double queryProbability(IEntry query, IEntry evidence) {
+    throw new UnsupportedOperationException("Classifiers cannot query with evidence.");
   }
 }

@@ -50,37 +50,7 @@ public class BayesNetOutputHandlers {
 
   };
 
-  public static final OutputEventInterface multiTrainingHandler = new OutputEventInterface() {
-    public void outputEventHandler(Object data, String agentName, String attributeName,
-                                   WMElement pWmeAdded) {
-      ArrayList<BayesNet> graphs = (ArrayList<BayesNet>) data;
 
-      int graphID = Integer
-              .parseInt(pWmeAdded.ConvertToIdentifier().FindByAttribute("id", 0).GetValueAsString());
-      BayesNet updatedGraph = graphs.get(graphID);
-
-      ArrayList<IRandomVariable> trainingExample = new ArrayList<>();
-      for (int i = 0; i < pWmeAdded.ConvertToIdentifier().GetNumberChildren(); i++) {
-        String currentVariable = pWmeAdded.ConvertToIdentifier().GetChild(i).GetAttribute();
-        String variableName = Character.toString(currentVariable.charAt(1));
-        String trueOrFalse = Character.toString(currentVariable.charAt(0));
-
-        IRandomVariable current = null;
-        if (trueOrFalse.equals("+")) {
-          current = new RandomVariableImpl(variableName, true);
-        }
-        else {
-          current = new RandomVariableImpl(variableName, false);
-        }
-
-        trainingExample.add(current);
-      }
-
-      updatedGraph.updateFrequencies(trainingExample);
-      updatedGraph.updateRelFrequencies(trainingExample);
-      updatedGraph.updateCPTs();
-    }
-  };
 
   public static final OutputEventInterface multiQueryHandler = new OutputEventInterface() {
     public void outputEventHandler(Object data, String agentName, String attributeName,
@@ -90,7 +60,6 @@ public class BayesNetOutputHandlers {
               .parseInt(pWmeAdded.ConvertToIdentifier().FindByAttribute("id", 0).GetValueAsString());
       BayesNet net = graphs.get(graphID);
 
-      BayesNetUtils util = new BayesNetUtils();
 
       // gets the queried variable and its name
       String queryVar = "";

@@ -9,9 +9,11 @@ public interface IFeature {
    * simply convert the feature's numerical value into a length 1 array of just the value. In
    * categorical features, this will return the vector coordinate that the feature represents.
    *
+   * @param enumerations the possible values for the feature
+   *
    * @return the value of the feature as an array
    */
-  double[] getValueAsVector();
+  double[] getValueAsVector(String[] enumerations);
 
   /**
    * Returns the feature's numerical value. May throw an exception if an implementation of

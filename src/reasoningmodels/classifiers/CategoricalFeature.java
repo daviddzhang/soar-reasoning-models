@@ -2,12 +2,10 @@ package reasoningmodels.classifiers;
 
 public class CategoricalFeature implements IFeature {
   private final String categoryName;
-  private final double[] value;
   private final String categoricalValue;
 
-  public CategoricalFeature(String categoryName, double[] value, String categoricalValue) {
+  public CategoricalFeature(String categoryName,  String categoricalValue) {
     this.categoryName = categoryName;
-    this.value = value;
     this.categoricalValue = categoricalValue;
   }
 
@@ -17,8 +15,14 @@ public class CategoricalFeature implements IFeature {
   }
 
   @Override
-  public double[] getValueAsVector() {
-    return this.value;
+  public double[] getValueAsVector(String[] enumerations) {
+    double[] res = new double[enumerations.length];
+    for (int i = 0; i < enumerations.length; i++) {
+      if (enumerations[i].equalsIgnoreCase(this.categoricalValue)) {
+        res[i] = 1.0;
+      }
+    }
+    return res;
   }
 
   @Override

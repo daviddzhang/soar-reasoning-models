@@ -11,7 +11,9 @@ public interface IReasoningModel {
 
   void train(IEntry entry);
 
-  void query(IEntry query);
+  String query(IEntry query);
 
-  void query(IEntry query, int k) throws UnsupportedOperationException;
+  String query(IEntry query, int k) throws UnsupportedOperationException;
+
+  double queryProbability(IEntry query, IEntry evidence) throws UnsupportedOperationException;
 }

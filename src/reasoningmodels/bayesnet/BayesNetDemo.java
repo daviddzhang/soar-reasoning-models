@@ -190,7 +190,7 @@ public class BayesNetDemo {
     for (int i = 0; i < graphs.size(); i++) {
       BayesNet current = graphs.get(i);
 
-      System.out.println("Result for graph " + i + ": " + current.getResult());
+      //System.out.println("Result for graph " + i + ": " + current.getResult());
     }
 
     kernel.Shutdown();
@@ -198,7 +198,7 @@ public class BayesNetDemo {
 
     for (int i  = 0; i < graphs.size(); i++) {
       System.out.println("GRAPH " + i);
-      System.out.println(graphs.get(i).getNodes().toString());
+      System.out.println(graphs.get(i).toString());
     }
   }
 }

@@ -87,7 +87,7 @@ public class CPTImpl implements ICPT {
   // outputs a new CPT that has only the given variables
   public ICPT eliminateExcept(List<String> queryVars) {
     Map<List<IRandomVariable>, Double> newCPT = new HashMap<>();
-    Map<List<IRandomVariable>, Double> currentCPT = this.hm;
+    Map<List<IRandomVariable>, Double> currentCPT = new HashMap<>(this.hm);
 
     // list of variables to eliminate from the CPT
     List<String> eliminateVars = this.variablesInCPT();

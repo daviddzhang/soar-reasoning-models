@@ -52,9 +52,9 @@ public class NBDemo {
     List<IFeature> queryFeatures = new ArrayList<>(Arrays.asList(orange, square));
     IEntry queryEntry = new EntryImpl(queryFeatures);
 
-    nb.query(queryEntry);
+
 
     System.out.println(nb.toString() + "\n");
-    System.out.println(nb.getResult());
+    System.out.println(nb.query(queryEntry));
   }
 }
