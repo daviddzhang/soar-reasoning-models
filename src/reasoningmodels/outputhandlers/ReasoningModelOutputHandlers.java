@@ -52,36 +52,7 @@ public class ReasoningModelOutputHandlers {
 
       WMElement features = pWmeAdded.ConvertToIdentifier().FindByAttribute("train", 0);
 
-      List<IFeature> trainingFeatures = new ArrayList<>();
-      for (int i = 0; i < features.ConvertToIdentifier().GetNumberChildren(); i++) {
-        IFeature res = null;
-        WMElement curFeatureType = features.ConvertToIdentifier().GetChild(i);
-        WMElement curFeature = curFeatureType.ConvertToIdentifier().GetChild(0);
-        String featureName = curFeature.GetAttribute();
-        String featureVal = curFeature.GetValueAsString();
-        double featureValNumerical = -1.0;
-        try {
-          featureValNumerical = Double.parseDouble(featureVal);
-        } catch (Exception e) {
-
-        }
-
-        switch (curFeatureType.GetAttribute()) {
-          case "boolean":
-            res = new BooleanFeature(featureName, featureValNumerical);
-            break;
-          case "numerical":
-            res = new NumericalFeature(featureName, featureValNumerical);
-            break;
-          case "categorical":
-            res = new CategoricalFeature(featureName, featureVal);
-            break;
-          default:
-            throw new IllegalArgumentException("Given feature type is not supported.");
-        }
-
-        trainingFeatures.add(res);
-      }
+      List<IFeature> trainingFeatures = ReasoningModelOutputHandlers.parseFeatures(features);
 
       IEntry trainingExample = new EntryImpl(trainingFeatures);
 
@@ -100,37 +71,8 @@ public class ReasoningModelOutputHandlers {
 
       WMElement queryWME = pWmeAdded.ConvertToIdentifier().FindByAttribute("query", 0);
       WMElement features = queryWME.ConvertToIdentifier().FindByAttribute("features", 0);
-      List<IFeature> queryFeatures = new ArrayList<>();
+      List<IFeature> queryFeatures = ReasoningModelOutputHandlers.parseFeatures(features);
 
-      for (int i = 0; i < features.ConvertToIdentifier().GetNumberChildren(); i++) {
-        IFeature res = null;
-        WMElement curFeatureType = features.ConvertToIdentifier().GetChild(i);
-        WMElement curFeature = curFeatureType.ConvertToIdentifier().GetChild(0);
-        String featureName = curFeature.GetAttribute();
-        String featureVal = curFeature.GetValueAsString();
-        double featureValNumerical = -1.0;
-        try {
-          featureValNumerical = Double.parseDouble(featureVal);
-        } catch (Exception e) {
-
-        }
-
-        switch (curFeatureType.GetAttribute()) {
-          case "boolean":
-            res = new BooleanFeature(featureName, featureValNumerical);
-            break;
-          case "numerical":
-            res = new NumericalFeature(featureName, featureValNumerical);
-            break;
-          case "categorical":
-            res = new CategoricalFeature(featureName, featureVal);
-            break;
-          default:
-            throw new IllegalArgumentException("Given feature type is not supported.");
-        }
-
-        queryFeatures.add(res);
-      }
       IEntry queryEntry = new EntryImpl(queryFeatures);
 
       if (queryWME.ConvertToIdentifier().FindByAttribute("k", 0) != null) {
@@ -166,4 +108,38 @@ public class ReasoningModelOutputHandlers {
       }
     }
   };
+
+  private static List<IFeature> parseFeatures(WMElement features) {
+    List<IFeature> trainingFeatures = new ArrayList<>();
+    for (int i = 0; i < features.ConvertToIdentifier().GetNumberChildren(); i++) {
+      IFeature res = null;
+      WMElement curFeatureType = features.ConvertToIdentifier().GetChild(i);
+      WMElement curFeature = curFeatureType.ConvertToIdentifier().GetChild(0);
+      String featureName = curFeature.GetAttribute();
+      String featureVal = curFeature.GetValueAsString();
+      double featureValNumerical = -1.0;
+      try {
+        featureValNumerical = Double.parseDouble(featureVal);
+      } catch (Exception e) {
+
+      }
+
+      switch (curFeatureType.GetAttribute()) {
+        case "boolean":
+          res = new BooleanFeature(featureName, featureValNumerical);
+          break;
+        case "numerical":
+          res = new NumericalFeature(featureName, featureValNumerical);
+          break;
+        case "categorical":
+          res = new CategoricalFeature(featureName, featureVal);
+          break;
+        default:
+          throw new IllegalArgumentException("Given feature type is not supported.");
+      }
+
+      trainingFeatures.add(res);
+    }
+    return  trainingFeatures;
+  }
 }
