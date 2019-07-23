@@ -15,11 +15,11 @@ import reasoningmodels.classifiers.IFeature;
 import static java.util.stream.Collectors.toMap;
 
 public class KNN extends AClassifier {
-  private Map<String, Pair<Double, Double>> minMaxLookup;
+  private final Map<String, Pair<Double, Double>> minMaxLookup;
   private IDistanceFunction distanceFunction;
 
-  public KNN(Map<String, String[]> features) {
-    super(features);
+  public KNN(Map<String, String[]> features, String targetClass) {
+    super(features, targetClass);
     // defaults L2
     distanceFunction = new L2Distance();
     minMaxLookup = new HashMap<>();
@@ -67,6 +67,11 @@ public class KNN extends AClassifier {
   @Override
   public String query(IEntry query) {
     return this.queryHelp(query, 1);
+  }
+
+  @Override
+  public String query(IEntry query, double smoothing) throws UnsupportedOperationException {
+    throw new UnsupportedOperationException("KNN does not need smoothing");
   }
 
   private void rescaleFeature(String featureName) {

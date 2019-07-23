@@ -13,10 +13,12 @@ import reasoningmodels.classifiers.IFeature;
 public abstract class AClassifier implements IReasoningModel {
   protected final Map<String, String[]> features;
   protected final List<IEntry> examples;
+  protected final String targetClass;
 
-  protected AClassifier(Map<String, String[]> features) {
+  protected AClassifier(Map<String, String[]> features, String targetClass) {
     this.features = features;
     this.examples = new ArrayList<>();
+    this.targetClass = targetClass;
   }
 
   public void addFeature(String feature, String[] enumerations) {

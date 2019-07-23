@@ -12,7 +12,6 @@ import reasoningmodels.classifiers.IEntry;
 import reasoningmodels.classifiers.IFeature;
 
 public class NaiveBayes extends AClassifier {
-  private final String targetFeature;
   // represents the counts of the target feature's enumerations
   private Map<String, Integer> targetCounts = new HashMap<>();
   // key: one of the target feature's enumerations
@@ -24,8 +23,7 @@ public class NaiveBayes extends AClassifier {
   private Map<String, Map<String, double[]>> numericalFeatureMeans = new HashMap<>();
 
   public NaiveBayes(Map<String, String[]> features, String targetFeature) {
-    super(features);
-    this.targetFeature = targetFeature;
+    super(features, targetFeature);
   }
 
   @Override
@@ -39,7 +37,7 @@ public class NaiveBayes extends AClassifier {
     this.targetCounts.replace(targetFeatureEnum, this.targetCounts.get(targetFeatureEnum) + 1);
 
     for (IFeature feature : entry.getFeatures()) {
-      if (!feature.getFeatureName().equalsIgnoreCase(this.targetFeature)) {
+      if (!feature.getFeatureName().equalsIgnoreCase(this.targetClass)) {
         if (feature.isCategorical()) {
           Map<String, Integer> counts = this.categoricalFeatureCounts.get(targetFeatureEnum);
           counts.replace(feature.getCategoricalValue(),
@@ -58,7 +56,7 @@ public class NaiveBayes extends AClassifier {
   }
 
   private void initData() {
-    for (String featureEnum : this.features.get(targetFeature)) {
+    for (String featureEnum : this.features.get(targetClass)) {
       targetCounts.put(featureEnum, 0);
       categoricalFeatureCounts.put(featureEnum, new HashMap<>());
       numericalFeatureMeans.put(featureEnum, new HashMap<>());
@@ -81,13 +79,13 @@ public class NaiveBayes extends AClassifier {
   }
 
   public String query(IEntry queryEntry) {
-    if (queryEntry.containsFeature(targetFeature)) {
+    if (queryEntry.containsFeature(targetClass)) {
       throw new IllegalArgumentException("Query cannot contain target class.");
     }
 
     Map<String, Double> logProbs = new HashMap<>();
 
-    for (String targetFeatureEnum : this.features.get(this.targetFeature)) {
+    for (String targetFeatureEnum : this.features.get(this.targetClass)) {
       double overallLogProb = Math.log(this.getPriorProb(targetFeatureEnum));
       for (IFeature queryFeature : queryEntry.getFeatures()) {
         if (queryFeature.isCategorical()) {
@@ -142,7 +140,7 @@ public class NaiveBayes extends AClassifier {
 
   private String getTargetFeatureEnum(IEntry entry) {
     for (IFeature feature : entry.getFeatures()) {
-      if (feature.getFeatureName().equalsIgnoreCase(this.targetFeature)) {
+      if (feature.getFeatureName().equalsIgnoreCase(this.targetClass)) {
         return feature.getCategoricalValue();
       }
     }

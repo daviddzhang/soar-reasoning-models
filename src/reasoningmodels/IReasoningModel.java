@@ -13,6 +13,8 @@ public interface IReasoningModel {
 
   String query(IEntry query);
 
+  String query(IEntry query, double smoothing) throws UnsupportedOperationException;
+
   String query(IEntry query, int k) throws UnsupportedOperationException;
 
   double queryProbability(IEntry query, IEntry evidence) throws UnsupportedOperationException;

@@ -13,10 +13,6 @@ public class BayesNet implements IReasoningModel {
     this.nodes = nodes;
   }
 
-  public BayesNet() {
-    this(new ArrayList<>());
-  }
-
   private void updateFrequencies(List<IRandomVariable> trainingEx) {
     // for each node, update frequency table
     for (INode node : nodes) {
@@ -97,6 +93,11 @@ public class BayesNet implements IReasoningModel {
     throw new UnsupportedOperationException("Bayes nets can only return probabilities.");
   }
 
+  @Override
+  public String query(IEntry query, double smoothing) throws UnsupportedOperationException {
+    throw new UnsupportedOperationException("Bayes nets do not need smoothing.");
+  }
+
   private double enumeration(List<IRandomVariable> queryVars, List<IRandomVariable> evidenceVars) {
     List<String> queryVarNames = RandomVariableImpl.listOfVarsToListOfNames(queryVars);
     List<String> evidenceVarNames = RandomVariableImpl.listOfVarsToListOfNames(evidenceVars);
@@ -164,6 +165,9 @@ public class BayesNet implements IReasoningModel {
 
   @Override
   public double queryProbability(IEntry query, IEntry evidence) {
+    if (query.getFeatures().size() == 0) {
+      throw new IllegalArgumentException("Query must have at least one variable.");
+    }
     List<IRandomVariable> queryVars =
             RandomVariableImpl.featureListToVarList(query.getFeatures());
     List<IRandomVariable> evidenceVars =

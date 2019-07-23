@@ -5,11 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import reasoningmodels.IReasoningModel;
-import reasoningmodels.bayesnet.BayesNet;
-import reasoningmodels.bayesnet.IFreqTable;
-import reasoningmodels.bayesnet.INode;
-import reasoningmodels.bayesnet.IRandomVariable;
-import reasoningmodels.bayesnet.RandomVariableImpl;
 import reasoningmodels.classifiers.BooleanFeature;
 import reasoningmodels.classifiers.CategoricalFeature;
 import reasoningmodels.classifiers.EntryImpl;
@@ -18,23 +13,25 @@ import reasoningmodels.classifiers.IFeature;
 import reasoningmodels.classifiers.NumericalFeature;
 import sml.Agent;
 import sml.Agent.OutputEventInterface;
-import sml.Identifier;
-import sml.Kernel;
 import sml.WMElement;
 
 public class ReasoningModelOutputHandlers {
+
+  private static List<IReasoningModel> models;
+
+  public static void addReasoningOutputHandlersToAgent(Agent agent, String createWMEName,
+                                                       String trainWMEName, String queryWMEName) {
+    agent.AddOutputHandler(createWMEName, createModel, models);
+    agent.AddOutputHandler(trainWMEName, trainModel, models);
+    agent.AddOutputHandler(queryWMEName, queryModel, models);
+  }
 
   public static final OutputEventInterface createModel = new OutputEventInterface() {
     public void outputEventHandler(Object data, String agentName, String attributeName,
                                    WMElement pWmeAdded) {
       List<IReasoningModel> models = (List<IReasoningModel>) data;
-      IReasoningModel newModel = null;
-      for (int i = 0; i < pWmeAdded.ConvertToIdentifier().GetNumberChildren(); i++) {
-        if (!pWmeAdded.ConvertToIdentifier().GetChild(i).GetAttribute().equalsIgnoreCase("name")) {
-          newModel = ReasoningModelFactory.createModel(pWmeAdded.ConvertToIdentifier().GetChild(i));
-          break;
-        }
-      }
+      WMElement modelWME = pWmeAdded.ConvertToIdentifier().FindByAttribute("model", 0);
+      IReasoningModel newModel = ReasoningModelFactory.createModel(modelWME);
 
       models.add(newModel);
       pWmeAdded.ConvertToIdentifier().CreateIntWME("id", models.size() - 1);
@@ -65,9 +62,9 @@ public class ReasoningModelOutputHandlers {
                                    WMElement pWmeAdded) {
       List<IReasoningModel> models = (List<IReasoningModel>) data;
 
-      int graphID = Integer
+      int modelID = Integer
               .parseInt(pWmeAdded.ConvertToIdentifier().FindByAttribute("id", 0).GetValueAsString());
-      IReasoningModel modelToQuery = models.get(graphID);
+      IReasoningModel modelToQuery = models.get(modelID);
 
       WMElement queryWME = pWmeAdded.ConvertToIdentifier().FindByAttribute("query", 0);
       WMElement features = queryWME.ConvertToIdentifier().FindByAttribute("features", 0);
@@ -75,39 +72,63 @@ public class ReasoningModelOutputHandlers {
 
       IEntry queryEntry = new EntryImpl(queryFeatures);
 
-      if (queryWME.ConvertToIdentifier().FindByAttribute("k", 0) != null) {
-        int k = -1;
-        try {
-          k = Integer.parseInt(queryWME.ConvertToIdentifier().FindByAttribute("k", 0)
-                  .GetValueAsString());
-        } catch (Exception e) {
-          throw new IllegalArgumentException("Given k must be an integer.");
-        }
-        String res = modelToQuery.query(queryEntry, k);
-        pWmeAdded.ConvertToIdentifier().CreateStringWME("result", res);
-      }
-      else if (queryWME.ConvertToIdentifier().FindByAttribute("evidence", 0) != null) {
-        WMElement evidenceWME = queryWME.ConvertToIdentifier().FindByAttribute("evidence", 0);
-        List<IFeature> evidenceVars = new ArrayList<>();
-        for (int j = 0; j < evidenceWME.ConvertToIdentifier().GetNumberChildren(); j++) {
-          WMElement curVar = evidenceWME.ConvertToIdentifier().GetChild(j);
-          double booleanVal = -1.0;
-          try {
-            booleanVal = Double.parseDouble(curVar.GetValueAsString());
-          } catch (Exception e) {
-            throw new IllegalArgumentException("Evidence must be boolean features.");
-          }
-          evidenceVars.add(new BooleanFeature(curVar.GetAttribute(), booleanVal));
-        }
-        double res = modelToQuery.queryProbability(queryEntry, new EntryImpl(evidenceVars));
-        pWmeAdded.ConvertToIdentifier().CreateFloatWME("result", res);
-      }
-      else {
-        String res = modelToQuery.query(queryEntry);
-        pWmeAdded.ConvertToIdentifier().CreateStringWME("result", res);
-      }
+      WMElement params = queryWME.ConvertToIdentifier().FindByAttribute("parameters", 0);
+
+      ReasoningModelOutputHandlers.handleParams(params, modelToQuery, queryEntry, pWmeAdded);
     }
   };
+
+  private static void handleParams(WMElement params, IReasoningModel modelToQuery,
+                                   IEntry queryEntry, WMElement output) {
+    String res = null;
+    for (int i = 0; i < params.ConvertToIdentifier().GetNumberChildren(); i++) {
+      String curParam = params.ConvertToIdentifier().GetChild(i).GetAttribute();
+      switch (curParam) {
+        case "k":
+          int k = -1;
+          try {
+            k = Integer.parseInt(params.ConvertToIdentifier().GetChild(i).GetValueAsString());
+          } catch (Exception e) {
+            throw new IllegalArgumentException("Given k must be an integer.");
+          }
+          res = modelToQuery.query(queryEntry, k);
+          output.ConvertToIdentifier().CreateStringWME("result", res);
+          break;
+        case "target-var":
+          WMElement varWME = params.ConvertToIdentifier().GetChild(i);
+          List<IFeature> targetVars = new ArrayList<>();
+          for (int j = 0; j < varWME.ConvertToIdentifier().GetNumberChildren(); j++) {
+            WMElement curVar = varWME.ConvertToIdentifier().GetChild(j);
+            double booleanVal = -1.0;
+            try {
+              booleanVal = Double.parseDouble(curVar.GetValueAsString());
+            } catch (Exception e) {
+              throw new IllegalArgumentException("Target variables must be boolean features.");
+            }
+            targetVars.add(new BooleanFeature(curVar.GetAttribute(), booleanVal));
+          }
+          double prob = modelToQuery.queryProbability(new EntryImpl(targetVars), queryEntry);
+          output.ConvertToIdentifier().CreateFloatWME("result", prob);
+          break;
+        case "smoothing":
+          double smoothing = -1.0;
+          try {
+            smoothing =
+                    Double.parseDouble(params.ConvertToIdentifier().GetChild(i).GetValueAsString());
+            if (smoothing <= 0) {
+              throw new IllegalArgumentException("Given smoothing must be positive.");
+            }
+          } catch (Exception e) {
+            throw new IllegalArgumentException("Given smoothing must be a positive double");
+          }
+          res = modelToQuery.query(queryEntry, smoothing);
+          output.ConvertToIdentifier().CreateStringWME("result", res);
+          break;
+          default:
+            throw new IllegalArgumentException("Supplied parameter is not supported.");
+      }
+    }
+  }
 
   private static List<IFeature> parseFeatures(WMElement features) {
     List<IFeature> trainingFeatures = new ArrayList<>();

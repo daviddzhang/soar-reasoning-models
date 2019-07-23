@@ -15,25 +15,41 @@ import reasoningmodels.naivebayes.NaiveBayes;
 import sml.WMElement;
 
 public class ReasoningModelFactory {
+
   public static IReasoningModel createModel(WMElement wme) {
     switch (wme.GetAttribute()) {
-      case "graph":
-        return createGraphModel(wme);
-      case "classifier":
-        return createClassifierModel(wme);
+      case "bayes-net":
+        return createBayesNet(wme);
+      case "knn":
+        return createKNN(wme);
+      case "naive-bayes":
+        return createNaiveBayes(wme);
       default:
         throw new IllegalArgumentException("Provided model type: " + wme.GetAttribute() + " is " +
                 "not supported.");
     }
   }
 
-  private static IReasoningModel createClassifierModel(WMElement wme) {
-    WMElement features = wme.ConvertToIdentifier().FindByAttribute("features", 0);
-    WMElement target = wme.ConvertToIdentifier().FindByAttribute("target", 0);
-    String targetClass = null;
-    if (target != null) {
-      targetClass = target.ConvertToIdentifier().GetChild(0).GetAttribute();
-    }
+  private static IReasoningModel createNaiveBayes(WMElement wme) {
+    Map<String, String[]> features = getClassifierFeatures(wme);
+    String targetClass = getTargetClass(wme);
+    return new NaiveBayes(features, targetClass);
+  }
+
+  private static IReasoningModel createKNN(WMElement wme) {
+    Map<String, String[]> features = getClassifierFeatures(wme);
+    String targetClass = getTargetClass(wme);
+    return new KNN(features, targetClass);
+  }
+
+  private static String getTargetClass(WMElement wme) {
+    WMElement params = getParamWME(wme);
+    return params.ConvertToIdentifier().FindByAttribute("target",0).GetValueAsString();
+  }
+
+  private static Map<String, String[]> getClassifierFeatures(WMElement wme) {
+    WMElement params = getParamWME(wme);
+    WMElement features = params.ConvertToIdentifier().FindByAttribute("features", 0);
 
     Map<String, String[]> modelFeatures = new HashMap<>();
 
@@ -46,12 +62,44 @@ public class ReasoningModelFactory {
       modelFeatures.put(featureName, enums);
     }
 
-    if (targetClass != null) {
-      return new NaiveBayes(modelFeatures, targetClass);
+    return modelFeatures;
+  }
+
+  private static IReasoningModel createBayesNet(WMElement wme) {
+    WMElement params = getParamWME(wme);
+    WMElement graph = params.ConvertToIdentifier().FindByAttribute("graph", 0);
+    
+    List<INode> nodesInNewGraph = new ArrayList<>();
+    WMElement nodes = graph.ConvertToIdentifier().FindByAttribute("nodes", 0);
+    int edgeCount = 0;
+    for (int i = 0; i < graph.ConvertToIdentifier().GetNumberChildren(); i++) {
+      if (graph.ConvertToIdentifier().GetChild(i).GetAttribute().equals("edge")) {
+        edgeCount++;
+      }
     }
-    else {
-      return new KNN(modelFeatures);
+
+    // creates the graph based on the edge WMEs and node attributes
+    for (int i = 0; i < nodes.ConvertToIdentifier().GetNumberChildren(); i++) {
+      WMElement aNode = nodes.ConvertToIdentifier().GetChild(i);
+      List<String> parents = new ArrayList<>();
+      for (int j = 0; j < edgeCount; j++) {
+        WMElement from = graph.ConvertToIdentifier().FindByAttribute("edge", j)
+                .ConvertToIdentifier().GetChild(1).ConvertToIdentifier().GetChild(0);
+        WMElement to = graph
+                .ConvertToIdentifier().FindByAttribute("edge", j)
+                .ConvertToIdentifier().GetChild(0).ConvertToIdentifier().GetChild(0);
+
+        if (to.GetValueAsString().equals(aNode.GetValueAsString())) {
+          parents.add(from.GetAttribute());
+        }
+      }
+
+      INode currentNode = new NodeImpl(aNode.GetAttribute(), parents);
+
+      nodesInNewGraph.add(currentNode);
+
     }
+    return new BayesNet(nodesInNewGraph);
   }
 
   private static String[] getFeatureEnums(WMElement featureType) {
@@ -70,37 +118,7 @@ public class ReasoningModelFactory {
     }
   }
 
-  private static IReasoningModel createGraphModel(WMElement wme) {
-    List<INode> nodesInNewGraph = new ArrayList<>();
-    WMElement nodes = wme.ConvertToIdentifier().FindByAttribute("nodes", 0);
-    int edgeCount = 0;
-    for (int i = 0; i < wme.ConvertToIdentifier().GetNumberChildren(); i++) {
-      if (wme.ConvertToIdentifier().GetChild(i).GetAttribute().equals("edge")) {
-        edgeCount++;
-      }
-    }
-
-    // creates the graph based on the edge WMEs and node attributes
-    for (int i = 0; i < nodes.ConvertToIdentifier().GetNumberChildren(); i++) {
-      WMElement aNode = nodes.ConvertToIdentifier().GetChild(i);
-      List<String> parents = new ArrayList<>();
-      for (int j = 0; j < edgeCount; j++) {
-        WMElement from = wme.ConvertToIdentifier().FindByAttribute("edge", j)
-                .ConvertToIdentifier().GetChild(1).ConvertToIdentifier().GetChild(0);
-        WMElement to = wme
-                .ConvertToIdentifier().FindByAttribute("edge", j)
-                .ConvertToIdentifier().GetChild(0).ConvertToIdentifier().GetChild(0);
-
-        if (to.GetValueAsString().equals(aNode.GetValueAsString())) {
-          parents.add(from.GetAttribute());
-        }
-      }
-
-      INode currentNode = new NodeImpl(aNode.GetAttribute(), parents);
-      ;
-      nodesInNewGraph.add(currentNode);
-
-    }
-    return new BayesNet(nodesInNewGraph);
+  private static WMElement getParamWME(WMElement wme) {
+    return wme.ConvertToIdentifier().FindByAttribute("parameters", 0);
   }
 }

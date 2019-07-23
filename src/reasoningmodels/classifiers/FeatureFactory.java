@@ -13,7 +13,7 @@ public class FeatureFactory {
    * @param value value of the feature
    * @return the appropriate type of feature
    */
-  public static IFeature createFeature(String featureName, String value, String[] possibleValues) {
+  public static IFeature createFeature(String featureName, String value) {
     double numVal = 0.0;
     try {
       numVal = Double.parseDouble(value);
@@ -27,8 +27,7 @@ public class FeatureFactory {
         return new BooleanFeature(featureName, 0.0);
       }
       else {
-        return new CategoricalFeature(featureName,
-                KNN.getVectorForCategoricalValue(possibleValues, value), value);
+        return new CategoricalFeature(featureName, value);
       }
     }
   }

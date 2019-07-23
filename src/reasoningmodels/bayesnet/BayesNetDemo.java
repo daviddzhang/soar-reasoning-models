@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
+import reasoningmodels.outputhandlers.ReasoningModelOutputHandlers;
 import sml.Agent;
 import sml.Identifier;
 import sml.Kernel;
@@ -23,10 +24,10 @@ public class BayesNetDemo {
                     "/agent/multi-nets.soar");
 
     ArrayList<BayesNet> graphs = new ArrayList<>();
-    agent.AddOutputHandler("create-net", BayesNetOutputHandlers.idNetCreation,
+    agent.AddOutputHandler("create", ReasoningModelOutputHandlers.createModel,
             graphs);
-    agent.AddOutputHandler("training-ex", BayesNetOutputHandlers.multiTrainingHandler, graphs);
-    agent.AddOutputHandler("query-handler", BayesNetOutputHandlers.multiQueryHandler, graphs);
+    agent.AddOutputHandler("training-ex", ReasoningModelOutputHandlers.trainModel, graphs);
+    agent.AddOutputHandler("query-handler", ReasoningModelOutputHandlers.queryModel, graphs);
 
 
     Identifier il = agent.GetInputLink();
@@ -48,28 +49,24 @@ public class BayesNetDemo {
     final int num = Integer.parseInt(reader.readLine());
 
     System.out.print("Did John call? (Y/N)");
-    boolean johnVar = false;
+    double johnVar = 0.0;
     if (reader.readLine().equals("Y")) {
-      johnVar = true;
+      johnVar = 1.0;
     }
 
-    IRandomVariable johnRandVar = new RandomVariableImpl("J", johnVar);
 
     System.out.print("Did Mary call? (Y/N)");
-    boolean maryVar = false;
+    double maryVar = 0.0;
     if (reader.readLine().equals("Y")) {
-      maryVar = true;
+      maryVar = 1.0;
     }
 
-    IRandomVariable maryRandVar = new RandomVariableImpl("M", maryVar);
 
     System.out.print("Did it rain? (Y/N)");
-    boolean rainVar = false;
+    double rainVar = 0.0;
     if (reader.readLine().equals("Y")) {
-      rainVar = true;
+      rainVar = 1.0;
     }
-
-    IRandomVariable rainRandVar = new RandomVariableImpl("R", rainVar);
 
     // Initializing sampler for each node in the net for traffic training
     SingleVarSample rData = new SingleVarSample(.3, 0);
@@ -128,11 +125,11 @@ public class BayesNetDemo {
         boolean mOccur = mData.sample(jmGivens);
         IRandomVariable mRandVar = new RandomVariableImpl("M", mOccur);
 
-        train.CreateStringWME("b-var", bRandVar.toString());
-        train.CreateStringWME("e-var", eRandVar.toString());
-        train.CreateStringWME("a-var", aRandVar.toString());
-        train.CreateStringWME("j-var", jRandVar.toString());
-        train.CreateStringWME("m-var", mRandVar.toString());
+        train.CreateFloatWME("b", booleanToDouble(bOccur));
+        train.CreateFloatWME("e", booleanToDouble(eOccur));
+        train.CreateFloatWME("a", booleanToDouble(aOccur));
+        train.CreateFloatWME("j", booleanToDouble(jOccur));
+        train.CreateFloatWME("m", booleanToDouble(mOccur));
 
         agent.RunSelf(1);
         train.DestroyWME();
@@ -157,9 +154,9 @@ public class BayesNetDemo {
         boolean lOccur = lData.sample(lGivens);
         IRandomVariable lRandVar = new RandomVariableImpl("L", lOccur);
 
-        train.CreateStringWME("r-var", rRandVar.toString());
-        train.CreateStringWME("t-var", tRandVar.toString());
-        train.CreateStringWME("l-var", lRandVar.toString());
+        train.CreateFloatWME("r-var", booleanToDouble(rOccur));
+        train.CreateFloatWME("t-var", booleanToDouble(tOccur));
+        train.CreateFloatWME("l-var", booleanToDouble(lOccur));
 
         agent.RunSelf(1);
         train.DestroyWME();
@@ -168,24 +165,24 @@ public class BayesNetDemo {
     }
 
     Identifier queryAlarm = il.CreateIdWME("query-signal");
-    queryAlarm.CreateStringWME("john", johnRandVar.toString());
-    queryAlarm.CreateStringWME("mary", maryRandVar.toString());
+    queryAlarm.CreateFloatWME("john", johnVar);
+    queryAlarm.CreateFloatWME("mary", maryVar);
     queryAlarm.CreateStringWME("name", "alarm");
 
     agent.RunSelf(3);
 
-    System.out.println(agent.ExecuteCommandLine("p --depth 10 -t s1"));
     queryAlarm.DestroyWME();
     agent.RunSelf(2);
 
-
     Identifier queryTraff = il.CreateIdWME("query-signal");
-    queryTraff.CreateStringWME("rain", rainRandVar.toString());
+    queryTraff.CreateFloatWME("rain", rainVar);
     queryTraff.CreateStringWME("name", "traffic");
 
     agent.RunSelf(1);
     queryTraff.DestroyWME();
     agent.RunSelf(1);
+
+    System.out.println(agent.ExecuteCommandLine("p --depth 10 -t s1"));
 
     for (int i = 0; i < graphs.size(); i++) {
       BayesNet current = graphs.get(i);
@@ -199,6 +196,15 @@ public class BayesNetDemo {
     for (int i  = 0; i < graphs.size(); i++) {
       System.out.println("GRAPH " + i);
       System.out.println(graphs.get(i).toString());
+    }
+  }
+
+  private static double booleanToDouble(boolean occurred) {
+    if (occurred) {
+      return 1.0;
+    }
+    else {
+      return 0.0;
     }
   }
 }

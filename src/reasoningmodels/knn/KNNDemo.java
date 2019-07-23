@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -18,7 +19,7 @@ import reasoningmodels.classifiers.IFeature;
 
 public class KNNDemo {
   public static void main(String[] args) throws IOException {
-    KNN knn = new KNN();
+    KNN knn = new KNN(new HashMap<>());
 
     Reader dataFile = new FileReader("/Users/davidzhang/Downloads/data2.csv");
     CSVReader reader = new CSVReader(dataFile);
@@ -34,8 +35,7 @@ public class KNNDemo {
       List<IFeature> currentFeatures = new ArrayList<>();
       String[] current = iterator.next();
       for (int i = 0; i < current.length; i++) {
-        currentFeatures.add(FeatureFactory.createFeature(headers[i], current[i],
-                knn.getFeatures().get(headers[i])));
+        currentFeatures.add(FeatureFactory.createFeature(headers[i], current[i]));
       }
       knn.train(new EntryImpl(currentFeatures));
 
