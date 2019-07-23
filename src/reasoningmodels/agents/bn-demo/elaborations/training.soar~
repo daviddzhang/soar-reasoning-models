@@ -1,0 +1,39 @@
+sp {train-alarm
+    (state <s> ^io <io>)
+    (<io> ^output-link <out>)
+    (<io> ^input-link <il>)
+    (<il> ^training-vars <vars>)
+    (<vars> ^name <name>)
+    (<s> ^<name> <id>)
+    (<vars> ^b <b>
+            ^e <e>
+            ^a <a>
+            ^j <j>
+            ^m <m>)
+    -->
+    (<out> ^training-ex <te>)
+    (<te> ^id <id>)
+    (<te> ^train <tr>)
+    (<tr> ^boolean <b1> ^boolean <e1> ^boolean <a1> ^boolean <j1> ^boolean <m1>)
+    (<b1> ^b <b>)
+    (<e1> ^e <e>)
+    (<a1> ^a <a>)
+   (<j1> ^ <e>)
+}
+
+sp {train-traffic
+    (state <s> ^io <io>)
+    (<io> ^output-link <out>)
+    (<io> ^input-link <il>)
+    (<il> ^training-vars <vars>)
+    (<vars> ^name <name>)
+    (<s> ^<name> <id>)
+    (<vars> ^r-var <r>
+            ^t-var <t>
+            ^l-var <l>)
+    -->
+    (<out> ^training-ex <te>)
+    (<te> ^name traffic)
+    (<te> ^id <id>)
+    (<te> ^<r> <r1> ^<t> <t1> ^<l> <l1>)
+}

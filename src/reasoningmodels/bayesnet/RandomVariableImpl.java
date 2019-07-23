@@ -74,7 +74,7 @@ public class RandomVariableImpl implements IRandomVariable {
   public static List<String> listOfVarsToListOfNames(List<IRandomVariable> listToConvert) {
     List<String> res = new ArrayList<>();
     for (IRandomVariable var : listToConvert) {
-      res.add(var.getName().substring(1).toUpperCase());
+      res.add(var.getName().toUpperCase());
     }
     return res;
   }

@@ -79,6 +79,15 @@ public class NaiveBayes extends AClassifier {
   }
 
   public String query(IEntry queryEntry) {
+    return queryHelper(queryEntry, 1.0);
+  }
+
+  @Override
+  public String query(IEntry queryEntry, double smoothing) throws UnsupportedOperationException {
+    return queryHelper(queryEntry, smoothing);
+  }
+
+  private String queryHelper(IEntry queryEntry, double smoothing) {
     if (queryEntry.containsFeature(targetClass)) {
       throw new IllegalArgumentException("Query cannot contain target class.");
     }
@@ -90,9 +99,9 @@ public class NaiveBayes extends AClassifier {
       for (IFeature queryFeature : queryEntry.getFeatures()) {
         if (queryFeature.isCategorical()) {
           double prob =
-                  (double)(this.categoricalFeatureCounts.get(targetFeatureEnum)
-                          .get(queryFeature.getCategoricalValue()) + 1)
-                  / (this.targetCounts.get(targetFeatureEnum) + this.getFeatureDimensionality(queryFeature.getFeatureName()));
+                  (this.categoricalFeatureCounts.get(targetFeatureEnum)
+                          .get(queryFeature.getCategoricalValue()) + smoothing)
+                          / (this.targetCounts.get(targetFeatureEnum) + (smoothing * this.getFeatureDimensionality(queryFeature.getFeatureName())));
           overallLogProb += Math.log(prob);
         }
         else {

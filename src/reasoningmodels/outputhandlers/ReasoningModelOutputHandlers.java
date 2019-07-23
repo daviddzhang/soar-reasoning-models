@@ -17,7 +17,11 @@ import sml.WMElement;
 
 public class ReasoningModelOutputHandlers {
 
-  private static List<IReasoningModel> models;
+  private static List<IReasoningModel> models = new ArrayList<>();
+
+  public static List<IReasoningModel> getModels() {
+    return new ArrayList<>(ReasoningModelOutputHandlers.models);
+  }
 
   public static void addReasoningOutputHandlersToAgent(Agent agent, String createWMEName,
                                                        String trainWMEName, String queryWMEName) {
@@ -29,9 +33,9 @@ public class ReasoningModelOutputHandlers {
   public static final OutputEventInterface createModel = new OutputEventInterface() {
     public void outputEventHandler(Object data, String agentName, String attributeName,
                                    WMElement pWmeAdded) {
-      List<IReasoningModel> models = (List<IReasoningModel>) data;
       WMElement modelWME = pWmeAdded.ConvertToIdentifier().FindByAttribute("model", 0);
-      IReasoningModel newModel = ReasoningModelFactory.createModel(modelWME);
+      IReasoningModel newModel =
+              ReasoningModelFactory.createModel(modelWME.ConvertToIdentifier().GetChild(0));
 
       models.add(newModel);
       pWmeAdded.ConvertToIdentifier().CreateIntWME("id", models.size() - 1);
@@ -41,7 +45,6 @@ public class ReasoningModelOutputHandlers {
   public static final OutputEventInterface trainModel = new OutputEventInterface() {
     public void outputEventHandler(Object data, String agentName, String attributeName,
                                    WMElement pWmeAdded) {
-      List<IReasoningModel> models = (List<IReasoningModel>) data;
 
       int graphID = Integer
               .parseInt(pWmeAdded.ConvertToIdentifier().FindByAttribute("id", 0).GetValueAsString());
@@ -60,8 +63,6 @@ public class ReasoningModelOutputHandlers {
   public static final OutputEventInterface queryModel = new OutputEventInterface() {
     public void outputEventHandler(Object data, String agentName, String attributeName,
                                    WMElement pWmeAdded) {
-      List<IReasoningModel> models = (List<IReasoningModel>) data;
-
       int modelID = Integer
               .parseInt(pWmeAdded.ConvertToIdentifier().FindByAttribute("id", 0).GetValueAsString());
       IReasoningModel modelToQuery = models.get(modelID);
@@ -94,7 +95,7 @@ public class ReasoningModelOutputHandlers {
           res = modelToQuery.query(queryEntry, k);
           output.ConvertToIdentifier().CreateStringWME("result", res);
           break;
-        case "target-var":
+        case "target-vars":
           WMElement varWME = params.ConvertToIdentifier().GetChild(i);
           List<IFeature> targetVars = new ArrayList<>();
           for (int j = 0; j < varWME.ConvertToIdentifier().GetNumberChildren(); j++) {
@@ -161,6 +162,6 @@ public class ReasoningModelOutputHandlers {
 
       trainingFeatures.add(res);
     }
-    return  trainingFeatures;
+    return trainingFeatures;
   }
 }

@@ -1,0 +1,27 @@
+sp {multi-nets*propose*create-traffic
+   (state <s> ^name bn-demo
+              ^complete alarm)
+  -(<s> ^complete traffic)
+-->
+   (<s> ^operator <op> + =)
+   (<op> ^name create-traffic)
+}
+
+sp {apply*create-traffic
+   (state <s> ^operator <op>
+              ^io.input-link <il>
+              ^io.output-link <ol>)
+   (<op> ^name create-traffic)
+-->
+   (<ol> ^create-net <cn>)
+   (<cn> ^graph <g> ^name traffic)
+   (<g> ^nodes <n> ^edge <rtot> ^edge <ttol>)
+   (<n> ^R <r> ^T <t> ^L <l>)
+   (<rtot> ^from <fromr> ^to <tot>)
+   (<fromr> ^R <r>)
+   (<tot> ^T <t>)
+   (<ttol> ^from <fromt> ^to <tol>)
+   (<fromt> ^T <t>)
+   (<tol> ^L <l>)
+   (<s> ^complete alarm -)
+}

@@ -1,0 +1,12 @@
+source _firstload.soar
+pushd all
+source all_source.soar
+popd
+pushd elaborations
+source elaborations_source.soar
+popd
+source clean-alarm.soar
+source clean-traffic.soar
+source create-alarm.soar
+source create-traffic.soar
+source initialize-bn-demo.soar

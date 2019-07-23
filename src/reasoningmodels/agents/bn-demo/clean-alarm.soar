@@ -1,0 +1,24 @@
+sp {multi-nets*propose*clean-alarm
+   (state <s> ^name bn-demo
+              ^io.input-link <il>
+              ^io.output-link <ol>)
+   (<ol> ^create <cn>)
+   -(<s> ^alarm <id>)
+-->
+   (<s> ^operator <op> + =)
+   (<op> ^name clean-alarm)
+}
+
+sp {apply*clean-alarm
+   (state <s> ^operator <op>
+              ^io.input-link <il>
+              ^io.output-link <ol>)
+   (<ol> ^create <cn>)
+   (<cn> ^name alarm)
+   (<cn> ^id <id>)
+   (<op> ^name clean-alarm)
+-->
+   (<s> ^alarm <id>)
+   (<s> ^complete alarm)
+   (<ol> ^create <cn> -)
+}

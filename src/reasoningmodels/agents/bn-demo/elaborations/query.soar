@@ -1,0 +1,38 @@
+sp {query-alarm
+    (state <s> ^io <io>)
+    (<io> ^output-link <out>)
+    (<io> ^input-link <il>)
+    (<il> ^query-signal <q>)
+    (<q>  ^name <name>
+          ^john <j>
+          ^mary <m>)
+    (<s> ^<name> <id>)
+    -->
+    (<out> ^query-handler <qh>)
+    (<qh> ^id <id> ^query <q>)
+    (<q> ^features <f>)
+    (<f> ^boolean <j1> ^boolean <m1>)
+    (<j1> ^j <j>)
+    (<m1> ^m <m>)
+    (<q> ^parameters <p>)
+    (<p> ^target-vars <tv>)
+    (<tv> ^b 1.0)
+}
+
+sp {query-traffic
+    (state <s> ^io <io>)
+    (<io> ^output-link <out>)
+    (<io> ^input-link <il>)
+    (<il> ^query-signal <q>)
+    (<q>  ^name <name>
+          ^rain <r>)
+    (<s> ^<name> <id>)
+    -->
+    (<out> ^query-handler <qh>)
+    (<qh> ^id <id> ^query <q>)
+    (<q> ^features <f> ^parameters <p>)
+    (<f> ^boolean <r1>)
+    (<r1> ^r <r>)
+    (<p> ^target-vars <tv>)
+    (<tv> ^l 1.0)
+}

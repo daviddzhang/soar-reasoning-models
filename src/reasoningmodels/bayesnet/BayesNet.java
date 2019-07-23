@@ -154,8 +154,10 @@ public class BayesNet implements IReasoningModel {
 
     System.out.println(joinedCPT.printCPT());
 
-    List<IRandomVariable> queryListVars = BayesNetUtils.stringListToVar(queryList);
-    return joinedCPT.getQueryVar(queryListVars);
+    List<IRandomVariable> allQueryVars = new ArrayList<>(queryVars);
+    allQueryVars.addAll(evidenceVars);
+
+    return joinedCPT.getQueryVar(allQueryVars);
   }
 
   @Override
@@ -172,6 +174,7 @@ public class BayesNet implements IReasoningModel {
             RandomVariableImpl.featureListToVarList(query.getFeatures());
     List<IRandomVariable> evidenceVars =
             RandomVariableImpl.featureListToVarList(evidence.getFeatures());
+
     return this.enumeration(queryVars, evidenceVars);
   }
 }

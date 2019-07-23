@@ -33,15 +33,6 @@ public class BayesNetUtils {
     }
   }
 
-  // converts a list of string into a list of variables
-  static List<IRandomVariable> stringListToVar(List<String> list) {
-    List<IRandomVariable> varList = new ArrayList<>();
-    for (int i = 0; i < list.size(); i++) {
-      varList.add(BayesNetUtils.stringToVar(list.get(i)));
-    }
-    return varList;
-  }
-
   // gets the number of edges given a WME for a graph
   static int numEdges(WMElement wme) {
     int edgeCount = 0;

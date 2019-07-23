@@ -26,7 +26,7 @@ public class BooleanFeature extends AFeature {
 
   @Override
   public String toString() {
-    if (.0001 > Math.abs(this.value - 1.0)) {
+    if (this.value == 1.0) {
       return "TRUE";
     }
     else {

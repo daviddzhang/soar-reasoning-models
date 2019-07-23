@@ -1,0 +1,3 @@
+pushd bn-demo
+source bn-demo_source.soar
+popd

@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
+import reasoningmodels.IReasoningModel;
 import reasoningmodels.outputhandlers.ReasoningModelOutputHandlers;
 import sml.Agent;
 import sml.Identifier;
@@ -19,22 +20,17 @@ public class BayesNetDemo {
 
     Kernel kernel = Kernel.CreateKernelInCurrentThread(true);
     Agent agent = kernel.CreateAgent("bayes-nets");
+    agent.LoadProductions("/Users/davidzhang/javaprograms/ResearchProjects/SoarReasoningModels" +
+            "/src/reasoningmodels/agents/bn-demo.soar");
 
-    agent.LoadProductions("/Users/davidzhang/javaprograms/EclipseWorkspace/MySMLPropject/bin/soar" +
-                    "/agent/multi-nets.soar");
-
-    ArrayList<BayesNet> graphs = new ArrayList<>();
-    agent.AddOutputHandler("create", ReasoningModelOutputHandlers.createModel,
-            graphs);
-    agent.AddOutputHandler("training-ex", ReasoningModelOutputHandlers.trainModel, graphs);
-    agent.AddOutputHandler("query-handler", ReasoningModelOutputHandlers.queryModel, graphs);
-
+    ReasoningModelOutputHandlers.addReasoningOutputHandlersToAgent(agent, "create", "training-ex"
+            , "query-handler");
 
     Identifier il = agent.GetInputLink();
 
-    Identifier create = il.CreateIdWME("create");
+    Identifier create = il.CreateIdWME("init");
 
-    agent.RunSelf(4);
+    agent.RunSelf(2);
 
     create.DestroyWME();
 
@@ -134,7 +130,6 @@ public class BayesNetDemo {
         agent.RunSelf(1);
         train.DestroyWME();
         alarmTrains++;
-
       }
       else {
         Identifier train = il.CreateIdWME("training-vars");
@@ -154,9 +149,9 @@ public class BayesNetDemo {
         boolean lOccur = lData.sample(lGivens);
         IRandomVariable lRandVar = new RandomVariableImpl("L", lOccur);
 
-        train.CreateFloatWME("r-var", booleanToDouble(rOccur));
-        train.CreateFloatWME("t-var", booleanToDouble(tOccur));
-        train.CreateFloatWME("l-var", booleanToDouble(lOccur));
+        train.CreateFloatWME("r", booleanToDouble(rOccur));
+        train.CreateFloatWME("t", booleanToDouble(tOccur));
+        train.CreateFloatWME("l", booleanToDouble(lOccur));
 
         agent.RunSelf(1);
         train.DestroyWME();
@@ -182,16 +177,18 @@ public class BayesNetDemo {
     queryTraff.DestroyWME();
     agent.RunSelf(1);
 
-    System.out.println(agent.ExecuteCommandLine("p --depth 10 -t s1"));
+
+    List<IReasoningModel> graphs = ReasoningModelOutputHandlers.getModels();
 
     for (int i = 0; i < graphs.size(); i++) {
-      BayesNet current = graphs.get(i);
+      IReasoningModel current = graphs.get(i);
 
       //System.out.println("Result for graph " + i + ": " + current.getResult());
     }
 
-    kernel.Shutdown();
+    System.out.println(agent.ExecuteCommandLine("p --depth 10 -t s1"));
 
+    kernel.Shutdown();
 
     for (int i  = 0; i < graphs.size(); i++) {
       System.out.println("GRAPH " + i);

@@ -19,7 +19,7 @@ import reasoningmodels.classifiers.IFeature;
 
 public class KNNDemo {
   public static void main(String[] args) throws IOException {
-    KNN knn = new KNN(new HashMap<>());
+    KNN knn = new KNN(new HashMap<>(), "temp");
 
     Reader dataFile = new FileReader("/Users/davidzhang/Downloads/data2.csv");
     CSVReader reader = new CSVReader(dataFile);
