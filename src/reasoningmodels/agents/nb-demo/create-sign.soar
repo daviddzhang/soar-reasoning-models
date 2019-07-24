@@ -1,0 +1,30 @@
+sp {nb-demo*propose*create-sign
+   (state <s> ^name nb-demo
+              ^complete play)
+  -(<s> ^complete sign)
+-->
+   (<s> ^operator <op> + =)
+   (<op> ^name create-sign)
+}
+
+sp {apply*create-sign
+   (state <s> ^operator <op>
+              ^io.input-link <il>
+              ^io.output-link <ol>)
+   (<op> ^name create-sign)
+-->
+   (<ol> ^create <cr>)
+   (<cr> ^model <model> ^name sign)
+   (<model> ^naive-bayes <nb>)
+   (<nb> ^parameters <p>)
+   (<p> ^features <f>)
+   (<f> ^color <color> ^shape <shape> ^sign <sign>)
+   (<color> ^categorical <color-vals>)
+   (<color-vals> ^blue <bl> ^black <k> ^red <red> ^orange <or>)
+   (<shape> ^categorical <shape-vals>)
+   (<shape-vals> ^square <sq> ^circle <circ>)
+   (<sign> ^categorical <sign-vals>)
+   (<sign-vals> ^plus <pl> ^minus <min>)
+   (<p> ^target sign)
+   (<s> ^complete play -)
+}

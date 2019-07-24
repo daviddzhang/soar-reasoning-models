@@ -1,0 +1,31 @@
+sp {nb-demo*propose*create-play
+   (state <s> ^name nb-demo
+              ^io.input-link <il>)
+   (<il> ^init <i>)
+-->
+   (<s> ^operator <op> + =)
+   (<op> ^name create-play)
+}
+
+sp {apply*create-play
+   (state <s> ^operator <op>)
+   (<s> ^io.input-link <il>)
+   (<s> ^io.output-link <ol>)
+   (<op> ^name create-play)
+-->
+   (<ol> ^create <cr>)
+   (<cr> ^model <model> ^name play)
+   (<model> ^naive-bayes <nb>)
+   (<nb> ^parameters <p>)
+   (<p> ^features <f>)
+   (<f> ^outlook <olook> ^temp <temp> ^humidity <h> ^windy <wind> ^play <play>)
+   (<olook> ^categorical <olook-vals>)
+   (<olook-vals> ^rainy <rain> ^overcast <ocast> ^sunny <sun>)
+   (<temp> ^numerical <num>)
+   (<h> ^numerical <num2>)
+   (<wind> ^boolean <bool>)
+   (<play> ^categorical <play-vals>)
+   (<play-vals> ^yes <y> ^no <n>)
+   (<p> ^target play)
+}
+

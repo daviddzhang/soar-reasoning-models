@@ -112,7 +112,6 @@ public class NaiveBayes extends AClassifier {
           overallLogProb += Math.log(prob);
         }
       }
-      System.out.println(overallLogProb);
       logProbs.put(targetFeatureEnum, overallLogProb);
     }
 

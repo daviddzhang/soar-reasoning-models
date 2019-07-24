@@ -1,0 +1,15 @@
+sp {propose*initialize-nb-demo
+   (state <s> ^superstate nil
+             -^name)
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name initialize-nb-demo)
+}
+
+sp {apply*initialize-nb-demo
+   (state <s> ^operator <op>)
+   (<op> ^name initialize-nb-demo)
+-->
+   (<s> ^name nb-demo)
+}
+
