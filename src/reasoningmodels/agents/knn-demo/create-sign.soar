@@ -26,5 +26,7 @@ sp {apply*create-sign
    (<shape-vals> ^square <sq> ^circle <circ>)
    (<sign> ^categorical <sign-vals>)
    (<sign-vals> ^plus <pl> ^minus <min>)
+   (<p> ^target sign)
+   (<s> ^complete play -)
 }
 

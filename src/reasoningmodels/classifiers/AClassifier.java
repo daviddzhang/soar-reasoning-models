@@ -40,7 +40,16 @@ public abstract class AClassifier implements IReasoningModel {
 
   public String toString() {
     StringBuilder stringBuilder = new StringBuilder();
-    List<String> header = new ArrayList<>(this.features.keySet());
+    List<String> header = new ArrayList<>();
+    if (this.examples.size() == 0) {
+      header = new ArrayList<>(this.features.keySet());
+    }
+    else {
+      List<IFeature> firstEntry = this.examples.get(0).getFeatures();
+      for (IFeature feature : firstEntry) {
+        header.add(feature.getFeatureName());
+      }
+    }
     stringBuilder.append(header.toString());
     stringBuilder.append("\n");
 

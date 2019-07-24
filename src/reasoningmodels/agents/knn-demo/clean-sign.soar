@@ -19,6 +19,6 @@ sp {apply*clean-sign
    (<op> ^name clean-sign)
 -->
    (<s> ^sign <id>)
-   (<s> ^complete traffic)
+   (<s> ^complete sign)
    (<ol> ^create <cr> -)
 }

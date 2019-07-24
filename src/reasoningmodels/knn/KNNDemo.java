@@ -11,45 +11,103 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import reasoningmodels.IReasoningModel;
 import reasoningmodels.classifiers.CategoricalFeature;
 import reasoningmodels.classifiers.EntryImpl;
 import reasoningmodels.classifiers.FeatureFactory;
 import reasoningmodels.classifiers.IEntry;
 import reasoningmodels.classifiers.IFeature;
+import reasoningmodels.outputhandlers.ReasoningModelOutputHandlers;
+import sml.Agent;
+import sml.Identifier;
+import sml.Kernel;
 
 public class KNNDemo {
   public static void main(String[] args) throws IOException {
-    KNN knn = new KNN(new HashMap<>(), "temp");
+    Kernel kernel = Kernel.CreateKernelInCurrentThread(true);
+    Agent agent = kernel.CreateAgent("knn");
+    agent.LoadProductions("/Users/davidzhang/javaprograms/ResearchProjects/SoarReasoningModels" +
+            "/src/reasoningmodels/agents/knn-demo.soar");
 
-    Reader dataFile = new FileReader("/Users/davidzhang/Downloads/data2.csv");
-    CSVReader reader = new CSVReader(dataFile);
+    ReasoningModelOutputHandlers.addReasoningOutputHandlersToAgent(agent, "create", "training-ex"
+            , "query-handler");
 
-    Iterator<String[]> iterator = reader.iterator();
+    Identifier il = agent.GetInputLink();
 
-    String[] headers = iterator.next();
-    knn.addFeature(headers[0], new String[]{"red", "blue", "black", "orange"});
-    knn.addFeature(headers[1], new String[]{"square", "circle"});
-    knn.addFeature(headers[2], new String[]{"plus", "minus"});
+    Identifier create = il.CreateIdWME("init");
 
-    while (iterator.hasNext()) {
-      List<IFeature> currentFeatures = new ArrayList<>();
-      String[] current = iterator.next();
+    agent.RunSelf(2);
+
+    create.DestroyWME();
+
+    agent.RunSelf(10);
+
+    System.out.println(agent.ExecuteCommandLine("p --depth 10 -t s1"));
+
+
+    // train play classifier
+    Reader data1File = new FileReader("/Users/davidzhang/Downloads/data1.csv");
+    CSVReader reader1 = new CSVReader(data1File);
+
+    Iterator<String[]> iterator1 = reader1.iterator();
+    String[] headers1 = iterator1.next();
+    while (iterator1.hasNext()) {
+      Identifier train = il.CreateIdWME("training");
+      train.CreateStringWME("name", "play");
+      String[] current = iterator1.next();
       for (int i = 0; i < current.length; i++) {
-        currentFeatures.add(FeatureFactory.createFeature(headers[i], current[i]));
+        train.CreateStringWME(headers1[i], current[i]);
       }
-      knn.train(new EntryImpl(currentFeatures));
 
+      agent.RunSelf(1);
+      train.DestroyWME();
     }
 
-    IFeature blue = new CategoricalFeature("color", "blue");
-    IFeature square = new CategoricalFeature("shape", "square");
-    List<IFeature> queryFeatures = new ArrayList<>(Arrays.asList(blue, square));
-    IEntry queryEntry = new EntryImpl(queryFeatures);
+    // train sign classifier
+    Reader data2File = new FileReader("/Users/davidzhang/Downloads/data2.csv");
+    CSVReader reader2 = new CSVReader(data2File);
 
+    Iterator<String[]> iterator2 = reader2.iterator();
 
+    String[] headers2 = iterator2.next();
+    while (iterator2.hasNext()) {
+      Identifier train = il.CreateIdWME("training");
+      train.CreateStringWME("name", "sign");
+      String[] current = iterator2.next();
+      for (int i = 0; i < current.length; i++) {
+        train.CreateStringWME(headers2[i], current[i]);
+      }
 
-    System.out.println(knn.toString() + "\n");
-    System.out.println(knn.query(queryEntry, 1));
+      agent.RunSelf(1);
+      train.DestroyWME();
+    }
+
+    Identifier queryPlay = il.CreateIdWME("query-signal");
+    queryPlay.CreateStringWME("outlook", "sunny");
+    queryPlay.CreateFloatWME("temp", 74);
+    queryPlay.CreateFloatWME("humidity", 71);
+    queryPlay.CreateFloatWME("windy", 1.0);
+    queryPlay.CreateStringWME("name", "play");
+
+    agent.RunSelf(3);
+    queryPlay.DestroyWME();
+    agent.RunSelf(2);
+
+    Identifier querySign = il.CreateIdWME("query-signal");
+    querySign.CreateStringWME("shape", "square");
+    querySign.CreateStringWME("color", "blue");
+    querySign.CreateStringWME("name", "sign");
+
+    agent.RunSelf(3);
+    querySign.DestroyWME();
+    agent.RunSelf(2);
+
+    List<IReasoningModel> models = ReasoningModelOutputHandlers.getModels();
+
+    for (int i = 0; i < models.size(); i++) {
+      System.out.println("Model: " + i);
+      System.out.println(models.get(i).toString());
+    }
 
 
   }

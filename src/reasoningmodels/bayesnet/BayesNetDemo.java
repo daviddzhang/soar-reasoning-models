@@ -17,7 +17,6 @@ import sml.Kernel;
 
 public class BayesNetDemo {
   public static void main(String[] args) throws IOException {
-
     Kernel kernel = Kernel.CreateKernelInCurrentThread(true);
     Agent agent = kernel.CreateAgent("bayes-nets");
     agent.LoadProductions("/Users/davidzhang/javaprograms/ResearchProjects/SoarReasoningModels" +

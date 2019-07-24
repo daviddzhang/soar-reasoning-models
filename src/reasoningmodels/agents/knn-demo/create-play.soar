@@ -8,7 +8,7 @@ sp {knn-demo*propose*create-play
 }
 
 sp {apply*create-play
-   (state <s> ^operator <op> 
+   (state <s> ^operator <op>)
    (<s> ^io.input-link <il>)
    (<s> ^io.output-link <ol>)
    (<op> ^name create-play)
@@ -26,4 +26,5 @@ sp {apply*create-play
    (<wind> ^boolean <bool>)
    (<play> ^categorical <play-vals>)
    (<play-vals> ^yes <y> ^no <n>)
+   (<p> ^target play)
 }

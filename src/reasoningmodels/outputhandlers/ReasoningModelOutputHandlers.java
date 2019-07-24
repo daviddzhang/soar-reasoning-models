@@ -143,7 +143,11 @@ public class ReasoningModelOutputHandlers {
       try {
         featureValNumerical = Double.parseDouble(featureVal);
       } catch (Exception e) {
-
+        if (featureVal.equalsIgnoreCase("true")) {
+          featureValNumerical = 1.0;
+        } else if (featureVal.equalsIgnoreCase("false")) {
+          featureValNumerical = 0.0;
+        }
       }
 
       switch (curFeatureType.GetAttribute()) {

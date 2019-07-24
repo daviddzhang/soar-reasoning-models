@@ -41,11 +41,12 @@ public class KNN extends AClassifier {
     if (this.examples.size() == 1) {
       for (IFeature feature : entry.getFeatures()) {
         if (!feature.isCategorical()) {
-          this.minMaxLookup.replace(feature.getFeatureName(), new Pair<>(feature.getValue(),
+          this.minMaxLookup.put(feature.getFeatureName(), new Pair<>(feature.getValue(),
                   feature.getValue()));
         }
       }
-    } else {
+    }
+    else {
       for (IFeature feature : entry.getFeatures()) {
         if (!feature.isCategorical()) {
           Pair<Double, Double> featureMinMax = this.minMaxLookup.get(feature.getFeatureName());
