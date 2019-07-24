@@ -18,7 +18,8 @@ sp {train-alarm
     (<b1> ^b <b>)
     (<e1> ^e <e>)
     (<a1> ^a <a>)
-   (<j1> ^ <e>)
+    (<j1> ^j <j>)
+    (<m1> ^m <m>)
 }
 
 sp {train-traffic
@@ -28,12 +29,15 @@ sp {train-traffic
     (<il> ^training-vars <vars>)
     (<vars> ^name <name>)
     (<s> ^<name> <id>)
-    (<vars> ^r-var <r>
-            ^t-var <t>
-            ^l-var <l>)
+    (<vars> ^r <r>
+            ^t <t>
+            ^l <l>)
     -->
     (<out> ^training-ex <te>)
-    (<te> ^name traffic)
     (<te> ^id <id>)
-    (<te> ^<r> <r1> ^<t> <t1> ^<l> <l1>)
+    (<te> ^train <tr>)
+    (<tr> ^boolean <r1> ^boolean <t1> ^boolean <l1>)
+    (<r1> ^r <r>)
+    (<t1> ^t <t>)
+    (<l1> ^l <l>)
 }

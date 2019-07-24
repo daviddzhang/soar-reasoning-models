@@ -1,0 +1,3 @@
+pushd knn-demo
+source knn-demo_source.soar
+popd

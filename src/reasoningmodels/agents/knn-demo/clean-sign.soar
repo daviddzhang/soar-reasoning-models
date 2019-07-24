@@ -1,0 +1,24 @@
+sp {knn-demo*propose*clean-sign
+   (state <s> ^name knn-demo
+              ^io.output-link <ol>)
+   (<ol> ^create <cr>)
+   (<cr> ^name sign)
+  -(<s> ^sign <id>)
+-->
+   (<s> ^operator <op> + =)
+   (<op> ^name clean-sign)
+}
+
+sp {apply*clean-sign
+   (state <s> ^operator <op>
+              ^io.input-link <il>
+              ^io.output-link <ol>)
+   (<ol> ^create <cr>)
+   (<cr> ^name sign)
+   (<cr> ^id <id>)
+   (<op> ^name clean-sign)
+-->
+   (<s> ^sign <id>)
+   (<s> ^complete traffic)
+   (<ol> ^create <cr> -)
+}

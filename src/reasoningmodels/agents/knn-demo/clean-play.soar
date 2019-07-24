@@ -1,0 +1,24 @@
+sp {knn-demo*propose*clean-play
+   (state <s> ^name knn-demo
+              ^io.input-link <il>
+              ^io.output-link <ol>)
+   (<ol> ^create <cr>)
+  -(<s> ^play <id>)
+-->
+   (<s> ^operator <op> + =)
+   (<op> ^name clean-play)
+}
+
+sp {apply*clean-play
+   (state <s> ^operator <op>
+              ^io.input-link <il>
+              ^io.output-link <ol>)
+   (<ol> ^create <cr>)
+   (<cr> ^name play)
+   (<cr> ^id <id>)
+   (<op> ^name clean-play)
+-->
+   (<s> ^play <id>)
+   (<s> ^complete play)
+   (<ol> ^create <cr> -)
+}

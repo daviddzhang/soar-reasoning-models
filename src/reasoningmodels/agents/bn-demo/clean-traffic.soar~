@@ -2,7 +2,7 @@ sp {multi-nets*propose*clean-traffic
    (state <s> ^name bn-demo
               ^io.input-link <il>
               ^io.output-link <ol>)
-   (<ol> ^create-net <cn>)
+   (<ol> ^create <cn>)
    (<cn> ^name traffic)
    -(<s> ^traffic <id>)
 -->
@@ -14,13 +14,12 @@ sp {apply*clean-traffic
    (state <s> ^operator <op>
               ^io.input-link <il>
               ^io.output-link <ol>)
-   (<ol> ^create-net <cn>)
+   (<ol> ^create <cn>)
    (<cn> ^name traffic)
    (<cn> ^id <id>)
    (<op> ^name clean-traffic)
 -->
    (<s> ^traffic <id>)
    (<s> ^complete traffic)
-   (<s> ^operator create-traffic -)
-   (<ol> ^create-net <cn> -)
+   (<ol> ^create <cn> -)
 }

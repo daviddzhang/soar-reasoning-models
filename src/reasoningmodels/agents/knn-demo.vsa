@@ -1,0 +1,12 @@
+VERSION 4
+/knn-demo/knn-demo.dm
+0	ROOT knn-demo knn-demo 1
+1	0	FOPERATOR _firstload _firstload.soar 3
+2	0	FOLDER all all 4
+3	0	FOLDER elaborations elaborations 2
+4	3	FOPERATOR _all _all.soar 5
+5	3	FOPERATOR top-state top-state.soar 6
+6	0	OPERATOR clean-play clean-play.soar 9
+7	0	OPERATOR create-play create-play.soar 8
+8	0	OPERATOR initialize-knn-demo initialize-knn-demo.soar 7
+END
