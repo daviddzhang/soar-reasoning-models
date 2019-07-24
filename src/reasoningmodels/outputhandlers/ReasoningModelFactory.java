@@ -7,7 +7,6 @@ import java.util.Map;
 
 import reasoningmodels.IReasoningModel;
 import reasoningmodels.bayesnet.BayesNet;
-import reasoningmodels.bayesnet.BayesNetUtils;
 import reasoningmodels.bayesnet.INode;
 import reasoningmodels.bayesnet.NodeImpl;
 import reasoningmodels.knn.KNN;

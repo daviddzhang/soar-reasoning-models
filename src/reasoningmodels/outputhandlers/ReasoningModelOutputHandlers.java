@@ -30,7 +30,7 @@ public class ReasoningModelOutputHandlers {
     agent.AddOutputHandler(queryWMEName, queryModel, models);
   }
 
-  public static final OutputEventInterface createModel = new OutputEventInterface() {
+  private static final OutputEventInterface createModel = new OutputEventInterface() {
     public void outputEventHandler(Object data, String agentName, String attributeName,
                                    WMElement pWmeAdded) {
       WMElement modelWME = pWmeAdded.ConvertToIdentifier().FindByAttribute("model", 0);
@@ -42,7 +42,7 @@ public class ReasoningModelOutputHandlers {
     }
   };
 
-  public static final OutputEventInterface trainModel = new OutputEventInterface() {
+  private static final OutputEventInterface trainModel = new OutputEventInterface() {
     public void outputEventHandler(Object data, String agentName, String attributeName,
                                    WMElement pWmeAdded) {
 
@@ -60,7 +60,7 @@ public class ReasoningModelOutputHandlers {
     }
   };
 
-  public static final OutputEventInterface queryModel = new OutputEventInterface() {
+  private static final OutputEventInterface queryModel = new OutputEventInterface() {
     public void outputEventHandler(Object data, String agentName, String attributeName,
                                    WMElement pWmeAdded) {
       int modelID = Integer
@@ -81,7 +81,7 @@ public class ReasoningModelOutputHandlers {
 
   private static void handleParams(WMElement params, IReasoningModel modelToQuery,
                                    IEntry queryEntry, WMElement output) {
-    String res = null;
+    String res;
     for (int i = 0; i < params.ConvertToIdentifier().GetNumberChildren(); i++) {
       String curParam = params.ConvertToIdentifier().GetChild(i).GetAttribute();
       switch (curParam) {
@@ -125,8 +125,8 @@ public class ReasoningModelOutputHandlers {
           res = modelToQuery.query(queryEntry, smoothing);
           output.ConvertToIdentifier().CreateStringWME("result", res);
           break;
-          default:
-            throw new IllegalArgumentException("Supplied parameter is not supported.");
+        default:
+          throw new IllegalArgumentException("Supplied parameter is not supported.");
       }
     }
   }
