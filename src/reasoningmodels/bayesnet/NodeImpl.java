@@ -266,7 +266,7 @@ public class NodeImpl implements INode {
           List<IRandomVariable> newAssignment = new ArrayList<>(
                   bigEntry.getKey());
           newAssignment.addAll(smallEntry.getKey());
-          List<IRandomVariable> noDups = BayesNetUtils.removeDuplicates(newAssignment);
+          List<IRandomVariable> noDups = this.removeDuplicates(newAssignment);
           newCPT.put(noDups, smallEntry.getValue() * bigEntry.getValue());
         }
       }
@@ -281,4 +281,17 @@ public class NodeImpl implements INode {
   public ICPT getCPT() {
     return this.cpt;
   }
+
+  private List<IRandomVariable> removeDuplicates(List<IRandomVariable> list) {
+    List<IRandomVariable> filteredList = new ArrayList<IRandomVariable>();
+
+    for (IRandomVariable var : list) {
+      if (!filteredList.contains(var)) {
+        filteredList.add(var);
+      }
+    }
+    return filteredList;
+  }
 }
+
+

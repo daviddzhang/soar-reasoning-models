@@ -69,16 +69,6 @@ public class BayesNet implements IReasoningModel {
   }
 
   @Override
-  public void addNode(INode node) {
-    this.nodes.add(node);
-  }
-
-  @Override
-  public void addFeature(String feature, String[] enumerations) {
-    throw new UnsupportedOperationException("Bayes nets do not have features.");
-  }
-
-  @Override
   public void train(IEntry entry) {
     List<IRandomVariable> trainingVars =
             RandomVariableImpl.featureListToVarList(entry.getFeatures());

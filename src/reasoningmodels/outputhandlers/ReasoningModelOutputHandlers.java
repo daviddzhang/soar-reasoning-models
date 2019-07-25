@@ -45,10 +45,9 @@ public class ReasoningModelOutputHandlers {
   private static final OutputEventInterface trainModel = new OutputEventInterface() {
     public void outputEventHandler(Object data, String agentName, String attributeName,
                                    WMElement pWmeAdded) {
-
-      int graphID = Integer
+      int modelID = Integer
               .parseInt(pWmeAdded.ConvertToIdentifier().FindByAttribute("id", 0).GetValueAsString());
-      IReasoningModel modelToTrain = models.get(graphID);
+      IReasoningModel modelToTrain = models.get(modelID);
 
       WMElement features = pWmeAdded.ConvertToIdentifier().FindByAttribute("train", 0);
 
@@ -134,7 +133,7 @@ public class ReasoningModelOutputHandlers {
   private static List<IFeature> parseFeatures(WMElement features) {
     List<IFeature> trainingFeatures = new ArrayList<>();
     for (int i = 0; i < features.ConvertToIdentifier().GetNumberChildren(); i++) {
-      IFeature res = null;
+      IFeature res;
       WMElement curFeatureType = features.ConvertToIdentifier().GetChild(i);
       WMElement curFeature = curFeatureType.ConvertToIdentifier().GetChild(0);
       String featureName = curFeature.GetAttribute();

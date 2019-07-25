@@ -26,15 +26,6 @@ public class KNN extends AClassifier {
   }
 
   @Override
-  public void addFeature(String feature, String[] enumerations) {
-    // feature is not categorical
-    if (enumerations == null || enumerations.length == 0) {
-      minMaxLookup.put(feature, new Pair<>(0.0, 0.0));
-    }
-    super.addFeature(feature, enumerations);
-  }
-
-  @Override
   public void train(IEntry entry) {
     super.train(entry);
 

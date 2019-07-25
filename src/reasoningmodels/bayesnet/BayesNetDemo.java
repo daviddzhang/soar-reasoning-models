@@ -15,6 +15,8 @@ import sml.Agent;
 import sml.Identifier;
 import sml.Kernel;
 
+import static reasoningmodels.bayesnet.BayesSampler.*;
+
 public class BayesNetDemo {
   public static void main(String[] args) throws IOException {
     Kernel kernel = Kernel.CreateKernelInCurrentThread(true);
@@ -34,9 +36,6 @@ public class BayesNetDemo {
     create.DestroyWME();
 
     agent.RunSelf(10);
-
-//    validIDs.add(Integer.parseInt(il.FindByAttribute("id", 0).GetValueAsString()));
-//    validIDs.add(Integer.parseInt(il.FindByAttribute("id", 1).GetValueAsString()));
 
     final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 

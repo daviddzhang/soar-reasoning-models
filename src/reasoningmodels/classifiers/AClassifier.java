@@ -21,10 +21,6 @@ public abstract class AClassifier implements IReasoningModel {
     this.targetClass = targetClass;
   }
 
-  public void addFeature(String feature, String[] enumerations) {
-    this.features.put(feature, enumerations);
-  }
-
   public void train(IEntry entry) {
     List<String> entryToBeAdded = new ArrayList<>();
     for (IFeature feature : entry.getFeatures()) {
@@ -63,11 +59,6 @@ public abstract class AClassifier implements IReasoningModel {
 
   public Map<String, String[]> getFeatures() {
     return this.features;
-  }
-
-  @Override
-  public void addNode(INode node) {
-    throw new UnsupportedOperationException("Classifiers do not use nodes.");
   }
 
   @Override
