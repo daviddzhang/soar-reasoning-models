@@ -1,0 +1,15 @@
+sp {propose*initialize-reasoning-models-demo
+   (state <s> ^superstate nil
+             -^name)
+-->
+   (<s> ^operator <o> +)
+   (<o> ^name initialize-reasoning-models-demo)
+}
+
+sp {apply*initialize-reasoning-models-demo
+   (state <s> ^operator <op>)
+   (<op> ^name initialize-reasoning-models-demo)
+-->
+   (<s> ^name reasoning-models-demo)
+}
+

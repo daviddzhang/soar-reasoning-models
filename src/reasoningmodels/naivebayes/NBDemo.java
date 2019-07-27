@@ -34,9 +34,6 @@ public class NBDemo {
 
     agent.RunSelf(10);
 
-    System.out.println(agent.ExecuteCommandLine("p --depth 10 -t s1"));
-
-
     // train play classifier
     Reader data1File = new FileReader("/Users/davidzhang/Downloads/data1.csv");
     CSVReader reader1 = new CSVReader(data1File);

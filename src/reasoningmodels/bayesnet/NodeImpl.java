@@ -144,22 +144,20 @@ public class NodeImpl implements INode {
 
   // updates the frequencies in the frequency tables
   public void updateFrequency(List<IRandomVariable> trainingEx) {
-    // gets the freq table for the current node
-    IFreqTable currentFreqTable = this.frequencies;
-    Map<List<IRandomVariable>, Integer> currentFrequency = currentFreqTable.getFreqTable();
+    Map<List<IRandomVariable>, Integer> currentFrequency = this.frequencies.getFreqTable();
 
     // updates the frequency assignment for this node
     if (this.parents.isEmpty()) {
 
       for (Map.Entry<List<IRandomVariable>, Integer> entry : currentFrequency.entrySet()) {
-        currentFrequency.replace(entry.getKey(), entry.getValue() + 1);
+        this.frequencies.replace(entry.getKey(), entry.getValue() + 1);
       }
 
     }
     else {
       for (Map.Entry<List<IRandomVariable>, Integer> entry : currentFrequency.entrySet()) {
         if (trainingEx.containsAll(entry.getKey())) {
-          currentFrequency.replace(entry.getKey(), entry.getValue() + 1);
+          this.frequencies.replace(entry.getKey(), entry.getValue() + 1);
         }
       }
     }
@@ -167,15 +165,13 @@ public class NodeImpl implements INode {
 
   // updates the values in the relative frequency table
   public void updateRelFrequency(List<IRandomVariable> trainingEx) {
-    // gets the freq table for the current node
-    IFreqTable currentFreqTable = this.relFrequencies;
-    Map<List<IRandomVariable>, Integer> currentFrequency = currentFreqTable.getFreqTable();
+    Map<List<IRandomVariable>, Integer> currentFrequency = this.relFrequencies.getFreqTable();
 
     // updates the frequency assignment for this node
     if (this.parents.isEmpty()) {
       for (Map.Entry<List<IRandomVariable>, Integer> entry : currentFrequency.entrySet()) {
         if (trainingEx.containsAll(entry.getKey())) {
-          currentFrequency.replace(entry.getKey(), entry.getValue() + 1);
+          this.relFrequencies.replace(entry.getKey(), entry.getValue() + 1);
         }
 
       }
@@ -189,7 +185,7 @@ public class NodeImpl implements INode {
         if (trainingEx.containsAll(currentKey)) {
           entry.getKey().remove(currentRandVar);
 
-          currentFrequency.replace(entry.getKey(), entry.getValue() + 1);
+          this.relFrequencies.replace(entry.getKey(), entry.getValue() + 1);
         }
       }
     }
@@ -210,7 +206,7 @@ public class NodeImpl implements INode {
       else {
         prob = relFrequency / frequency;
       }
-      this.cpt.getCPT().replace(currentRow, prob);
+      this.cpt.replace(currentRow, prob);
     }
   }
 

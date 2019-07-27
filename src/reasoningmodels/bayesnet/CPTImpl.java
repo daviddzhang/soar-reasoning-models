@@ -5,31 +5,57 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This class implements the ICPT interface. It represents the CPT as a Hashmap of a List of
+ * random variables to doubles. Notable specifics of this implementations are specified below.
+ */
 public class CPTImpl implements ICPT {
-  private Map<List<IRandomVariable>, Double> hm;
+  private final Map<List<IRandomVariable>, Double> hm;
 
+  /**
+   * Constructs an instance of CPTImpl. Requires a mapping of random variables to doubles. This
+   * will most likely be the initial structure of the CPT.
+   *
+   * @param hm the probability table
+   * @throws IllegalArgumentException if the provided mapping is null
+   */
   public CPTImpl(Map<List<IRandomVariable>, Double> hm) {
+    if (hm == null) {
+      throw new IllegalArgumentException("Provided mapping cannot be null.");
+    }
     this.hm = hm;
   }
 
-  // prints this CPT
+  /**
+   * Formats the CPT as follows for each entry in the CPT:
+   * [Random Variables] | Probability: x
+   */
+  @Override
   public String printCPT() {
-    String str = "";
+    StringBuilder str = new StringBuilder();
     for (Map.Entry<List<IRandomVariable>, Double> entry : this.hm.entrySet()) {
-      str += entry.getKey().toString() + "| Probability: " + entry.getValue() + "\n";
+      str.append(entry.getKey().toString()).append("| Probability: ").append(entry.getValue()).append("\n");
     }
-    return str;
+    return str.toString();
   }
 
   @Override
   public Map<List<IRandomVariable>, Double> getCPT() {
-    // although this is poor practice, for this implementation, the node and CPT are closely
-    // interconnected and thus should have produce a mutable version of the CPT
-    return this.hm;
+    return new HashMap<>(this.hm);
   }
 
-  // checks if this CPT includes the given HashMap key
+  /**
+   * Checks if the given list of variables is in the CPT as an entry. Throws an exception if the
+   * key provided is null.
+   *
+   * @param key list of variables to check for
+   * @return true if the exact row is in the CPT, false otherwise
+   * @throws IllegalArgumentException if the key is null
+   */
   private boolean doesCPTIncludeKey(List<IRandomVariable> key) {
+    if (key == null) {
+      throw new IllegalArgumentException("Provided argument cannot be null.");
+    }
     boolean result = false;
     for (Map.Entry<List<IRandomVariable>, Double> entry : this.hm.entrySet()) {
       if (entry.getKey().equals(key)) {
@@ -39,15 +65,27 @@ public class CPTImpl implements ICPT {
     return result;
   }
 
-  // constructs a new CPT with new rows belonging to the given node name
+  @Override
   public ICPT toInferenceCPT(String nodeName) {
+    if (nodeName == null) {
+      throw new IllegalArgumentException("Provided argument cannot be null.");
+    }
+
     Map<List<IRandomVariable>, Double> inferenceCPT = new HashMap<List<IRandomVariable>,
             Double>();
 
-    for (Map.Entry<List<IRandomVariable>, Double> entry : this.hm.entrySet()) {
+    // has no parents
+    if (this.hm.entrySet().size() == 1) {
+      Map.Entry<List<IRandomVariable>, Double> entry = this.hm.entrySet().iterator().next();
+      List<IRandomVariable> newAssignmentFalse = new ArrayList<IRandomVariable>();
+      inferenceCPT.put(entry.getKey(), entry.getValue());
 
-      // if the current table belongs to a node that has parents
-      if (this.hm.entrySet().size() > 1) {
+      IRandomVariable falseVar = new RandomVariableImpl(entry.getKey().get(0).getName(), false);
+      newAssignmentFalse.add(falseVar);
+      inferenceCPT.put(newAssignmentFalse, 1 - entry.getValue());
+    }
+    else {
+      for (Map.Entry<List<IRandomVariable>, Double> entry : this.hm.entrySet()) {
         List<IRandomVariable> newAssignmentTrue = new ArrayList<IRandomVariable>(entry.getKey());
         List<IRandomVariable> newAssignmentFalse = new ArrayList<IRandomVariable>(
                 entry.getKey());
@@ -59,23 +97,17 @@ public class CPTImpl implements ICPT {
         newAssignmentFalse.add(falseVar);
         inferenceCPT.put(newAssignmentFalse, 1 - entry.getValue());
       }
-      // if it has no parents
-      else {
-        ArrayList<IRandomVariable> newAssignmentFalse = new ArrayList<IRandomVariable>();
-        inferenceCPT.put(entry.getKey(), entry.getValue());
-
-        IRandomVariable falseVar = new RandomVariableImpl(nodeName, false);
-        newAssignmentFalse.add(falseVar);
-        inferenceCPT.put(newAssignmentFalse, 1 - entry.getValue());
-      }
     }
     return new CPTImpl(inferenceCPT);
   }
 
-  // returns a list of the variables in the CPT
+  @Override
   public List<String> variablesInCPT() {
     List<String> assignment = new ArrayList<>();
     Map<List<IRandomVariable>, Double> map = this.hm;
+    if (this.hm.size() == 0) {
+      return assignment;
+    }
     Map.Entry<List<IRandomVariable>, Double> entry = map.entrySet().iterator().next();
     List<IRandomVariable> key = entry.getKey();
     for (int i = 0; i < key.size(); i++) {
@@ -84,9 +116,12 @@ public class CPTImpl implements ICPT {
     return assignment;
   }
 
-  // outputs a new CPT that has only the given variables
+  @Override
   public ICPT eliminateExcept(List<String> queryVars) {
-    Map<List<IRandomVariable>, Double> newCPT = new HashMap<>();
+    if (queryVars == null) {
+      throw new IllegalArgumentException("Provided argument cannot be null.");
+    }
+
     Map<List<IRandomVariable>, Double> currentCPT = new HashMap<>(this.hm);
 
     // list of variables to eliminate from the CPT
@@ -95,8 +130,8 @@ public class CPTImpl implements ICPT {
 
     // for every variable to eliminate, go through every entry of the currentCPT and
     // remove the current variable
-    for (int i = 0; i < eliminateVars.size(); i++) {
-      String eliminateVar = eliminateVars.get(i);
+    for (String eliminateVar : eliminateVars) {
+      Map<List<IRandomVariable>, Double> newCPT = new HashMap<>();
       IRandomVariable trueElimVar = new RandomVariableImpl(eliminateVar, true);
       IRandomVariable falseElimVar = new RandomVariableImpl(eliminateVar, false);
       for (Map.Entry<List<IRandomVariable>, Double> entry : currentCPT.entrySet()) {
@@ -118,35 +153,50 @@ public class CPTImpl implements ICPT {
       }
       currentCPT.clear();
       currentCPT.putAll(newCPT);
-      newCPT.clear();
     }
     return new CPTImpl(currentCPT);
   }
 
-  // normalizes a CPT by dividing by sum of entries
+  @Override
   public void normalize() {
-    Map<List<IRandomVariable>, Double> newCPT = new HashMap<>();
-    Map<List<IRandomVariable>, Double> currentCPT = this.hm;
     double sum = 0.0;
 
-    for (Map.Entry<List<IRandomVariable>, Double> entry : currentCPT.entrySet()) {
+    for (Map.Entry<List<IRandomVariable>, Double> entry : this.hm.entrySet()) {
       sum += entry.getValue();
     }
-    for (Map.Entry<List<IRandomVariable>, Double> entry : currentCPT.entrySet()) {
-      newCPT.put(entry.getKey(), entry.getValue() / sum);
-    }
 
-    this.hm = newCPT;
+    if (sum == 0.0 && this.hm.size() != 0) {
+      throw new IllegalArgumentException("Sum of CPT probabilities cannot be 0 before normalizing" +
+              ".");
+    }
+    for (Map.Entry<List<IRandomVariable>, Double> entry : this.hm.entrySet()) {
+      this.hm.replace(entry.getKey(), entry.getValue() / sum);
+    }
   }
 
-  // gets the probability associated with the given list of variables
+  @Override
   public double getQueryVar(List<IRandomVariable> queryList) {
-    double result = -1.0;
+    if (queryList == null) {
+      throw new IllegalArgumentException("Given input cannot be null.");
+    }
+
     for (Map.Entry<List<IRandomVariable>, Double> entry : this.hm.entrySet()) {
       if (entry.getKey().containsAll(queryList)) {
-        result = entry.getValue();
+        return entry.getValue();
       }
     }
-    return result;
+    throw new IllegalArgumentException("Given entry could not be found.");
+  }
+
+  @Override
+  public void replace(List<IRandomVariable> rowToReplace, double newVal) {
+    if (rowToReplace == null) {
+      throw new IllegalArgumentException("Row to replace cannot be null.");
+    }
+
+    if (newVal < 0) {
+      throw new IllegalArgumentException("Negative probability cannot be in CPT.");
+    }
+    this.hm.replace(rowToReplace, newVal);
   }
 }

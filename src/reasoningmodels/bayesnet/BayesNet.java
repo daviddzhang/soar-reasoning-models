@@ -142,8 +142,6 @@ public class BayesNet implements IReasoningModel {
     joinedCPT = joinedCPT.eliminateExcept(queryList);
     joinedCPT.normalize();
 
-    System.out.println(joinedCPT.printCPT());
-
     List<IRandomVariable> allQueryVars = new ArrayList<>(queryVars);
     allQueryVars.addAll(evidenceVars);
 

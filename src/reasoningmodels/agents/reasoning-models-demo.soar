@@ -1,0 +1,3 @@
+pushd reasoning-models-demo
+source reasoning-models-demo_source.soar
+popd

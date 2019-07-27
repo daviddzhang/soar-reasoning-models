@@ -1,0 +1,18 @@
+VERSION 4
+/reasoning-models-demo/reasoning-models-demo.dm
+0	ROOT reasoning-models-demo reasoning-models-demo 1
+1	0	FOPERATOR _firstload _firstload.soar 3
+2	0	FOLDER all all 4
+3	0	FOLDER elaborations elaborations 2
+4	3	FOPERATOR _all _all.soar 5
+5	3	FOPERATOR query query.soar 15
+6	3	FOPERATOR top-state top-state.soar 6
+7	3	FOPERATOR training training.soar 14
+8	0	OPERATOR clean-alarm clean-alarm.soar 11
+9	0	OPERATOR clean-play clean-play.soar 13
+10	0	OPERATOR clean-sign clean-sign.soar 12
+11	0	OPERATOR create-alarm create-alarm.soar 8
+12	0	OPERATOR create-play create-play.soar 9
+13	0	OPERATOR create-sign create-sign.soar 10
+14	0	OPERATOR initialize-reasoning-models-demo initialize-reasoning-models-demo.soar 7
+END
