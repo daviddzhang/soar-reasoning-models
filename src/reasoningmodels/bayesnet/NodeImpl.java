@@ -227,6 +227,10 @@ public class NodeImpl implements INode {
    */
   @Override
   public void updateCPT(List<IRandomVariable> trainingEx) {
+    if (trainingEx == null) {
+      throw new IllegalArgumentException("Given list to train with cannot be null.");
+    }
+
     this.updateFrequency(trainingEx);
     this.updateRelFrequency(trainingEx);
     for (Map.Entry<List<IRandomVariable>, Double> entry : this.cpt.getCPT().entrySet()) {
@@ -263,11 +267,17 @@ public class NodeImpl implements INode {
 
   @Override
   public boolean hasParent(String parentNode) {
+    if (parentNode == null) {
+      throw new IllegalArgumentException("Given parent cannot be null.");
+    }
     return this.parents.contains(parentNode);
   }
 
   @Override
   public ICPT join(ICPT other, String joinVar) {
+    if (other == null || joinVar == null) {
+      throw new IllegalArgumentException("Given parameters cannot be null.");
+    }
     Map<List<IRandomVariable>, Double> thisCPT = this.cpt.getCPT();
     Map<List<IRandomVariable>, Double> otherCPT = other.getCPT();
     Map<List<IRandomVariable>, Double> newCPT = new HashMap<>();
