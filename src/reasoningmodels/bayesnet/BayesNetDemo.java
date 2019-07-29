@@ -82,10 +82,10 @@ public class BayesNetDemo {
     MultiVarSample lData = new MultiVarSample(lateHM, 2);
 
     // samplers for burglary detection
-    BurglaryData bData = new BurglaryData(3);
-    EarthquakeData eData = new EarthquakeData(2);
-    AlarmData aData = new AlarmData(6);
-    JohnData jData = new JohnData(0);
+    BurglaryData bData = new BurglaryData(20);
+    EarthquakeData eData = new EarthquakeData(14);
+    AlarmData aData = new AlarmData(23);
+    JohnData jData = new JohnData(4);
     MaryData mData = new MaryData(1);
 
     Random chooseNet = new Random(0);

@@ -5,16 +5,47 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
+/**
+ * This class is an implementation of the INode interface. It represents the CPT as an ICPT and
+ * keeps track of what the probabilities should be with the usage of frequency tables in the form
+ * of IFreqTables for frequencies and relative frequencies. Specifics of this implementation are
+ * further documented below.
+ */
 public class NodeImpl implements INode {
-  private String name;
-  private List<String> parents;
+  private final String name;
+  private final List<String> parents;
   private ICPT cpt;
   private IFreqTable frequencies;
   private IFreqTable relFrequencies;
 
+  /**
+   * Constructs an instance of a NodeImpl. Required the name, parents, CPT, and both frequency
+   * tables to be constructed. Most likely used when creating copies, or for similar uses.
+   *
+   * @param name of the node
+   * @param parents list of parents
+   * @param cpt holds the node's CPT
+   * @param frequencies holds the node's parents' frequencies
+   * @param relFrequencies holds the node's parents' relative frequencies
+   * @throws IllegalArgumentException for null parameters
+   */
   public NodeImpl(String name, List<String> parents, ICPT cpt, IFreqTable frequencies,
        IFreqTable relFrequencies) {
+    if (name == null) {
+      throw new IllegalArgumentException("Name cannot be null.");
+    }
+    else if (parents == null) {
+      throw new IllegalArgumentException("Parents cannot be null.");
+    }
+    else if (cpt == null) {
+      throw new IllegalArgumentException("CPT cannot be null.");
+    }
+    else if (frequencies == null) {
+      throw new IllegalArgumentException("Frequencies cannot be null.");
+    }
+    else if (relFrequencies == null) {
+      throw new IllegalArgumentException("Relative frequencies cannot be null.");
+    }
     this.name = name;
     this.parents = parents;
     this.cpt = cpt;
@@ -22,15 +53,32 @@ public class NodeImpl implements INode {
     this.relFrequencies = relFrequencies;
   }
 
+  /**
+   * Constructs an instance of NodeImpl. Required name and parents and initializes CPT and
+   * frequency tables based on parents.
+   *
+   * @param name of the node
+   * @param parents list of the parents
+   * @throws IllegalArgumentException for null parameters
+   */
   public NodeImpl(String name, List<String> parents) {
-    this.name = name;
-    this.parents = parents;
-    this.initializeCPT();
-    this.initializeFreqTable();
-    this.initializeRelFreqTable();
+    this(name, parents, new CPTImpl(new HashMap<>()), new FreqTableImpl(new HashMap<>()),
+            new FreqTableImpl(new HashMap<>()));
+    this.cpt = this.initializeCPT();
+    this.frequencies = this.initializeAFreqTable();
+    this.relFrequencies = this.initializeAFreqTable();
   }
 
-  // prints a Node
+  /**
+   * Formats the node text as the following:
+   * Name, [parents]
+   * CPT:
+   * ICPT.printCPT()
+   * Frequencies:
+   * IFreqTable.printFreqTable()
+   * Relative Frequencies:
+   * IFreqTable.printFreqTable()
+   */
   @Override
   public String toString() {
     return this.name + ", " + this.parents + "\n" + "CPT: \n" + this.cpt.printCPT() + "\n"
@@ -38,9 +86,12 @@ public class NodeImpl implements INode {
             + this.relFrequencies.printFreqTable();
   }
 
-  // initializes a CPT for this Node
-  @Override
-  public void initializeCPT() {
+  /**
+   * Initializes and creates an empty CPT with the structure based on this node's name and parents.
+   *
+   * @return the cpt
+   */
+  private ICPT initializeCPT() {
     // initializes a hashmap/cpt for the current node
     Map<List<IRandomVariable>, Double> currentAssignment = new HashMap<>();
 
@@ -50,7 +101,7 @@ public class NodeImpl implements INode {
       variableAssignment.add(new RandomVariableImpl(this.name, true));
       currentAssignment.put(variableAssignment, 0.0);
 
-      this.cpt = new CPTImpl(currentAssignment);
+      return new CPTImpl(currentAssignment);
     }
     else {
       int n = this.parents.size();
@@ -69,13 +120,17 @@ public class NodeImpl implements INode {
         currentAssignment.put(variableAssignment, 0.0);
       }
 
-      this.cpt = new CPTImpl(currentAssignment);
+      return new CPTImpl(currentAssignment);
     }
   }
 
-  // initializes a frequency table for this node
-  @Override
-  public void initializeFreqTable() {
+  /**
+   * Initializes and creates an empty frequency table with the structure based on this node's name
+   * and parents.
+   *
+   * @return a frequency table
+   */
+  private IFreqTable initializeAFreqTable() {
     // initializes a hashmap for the current node
     HashMap<List<IRandomVariable>, Integer> currentFrequency = new HashMap<>();
 
@@ -85,7 +140,7 @@ public class NodeImpl implements INode {
       variableAssignment.add(new RandomVariableImpl(this.name, true));
       currentFrequency.put(variableAssignment, 0);
 
-      this.frequencies = new FreqTableImpl(currentFrequency);
+      return new FreqTableImpl(currentFrequency);
     }
     else {
       int n = this.parents.size();
@@ -104,46 +159,16 @@ public class NodeImpl implements INode {
         currentFrequency.put(variableAssignment, 0);
       }
 
-      this.frequencies = new FreqTableImpl(currentFrequency);
+      return new FreqTableImpl(currentFrequency);
     }
   }
 
-  // initializes a relative frequency table
-  @Override
-  public void initializeRelFreqTable() {
-    // initializes a hashmap for the current node
-    HashMap<List<IRandomVariable>, Integer> currentFrequency = new HashMap<>();
-
-    // creates a freq table for the given node
-    if (this.parents.isEmpty()) {
-      List<IRandomVariable> variableAssignment = new ArrayList<IRandomVariable>();
-      variableAssignment.add(new RandomVariableImpl(this.name, true));
-      currentFrequency.put(variableAssignment, 0);
-
-      this.relFrequencies = new FreqTableImpl(currentFrequency);
-    }
-    else {
-      int n = this.parents.size();
-      int rows = (int) Math.pow(2, n);
-
-      for (int j = 0; j < rows; j++) {
-        List<IRandomVariable> variableAssignment = new ArrayList<IRandomVariable>();
-        for (int k = n - 1; k >= 0; k--) {
-          if ((j / ((int) Math.pow(2, k))) % 2 == 0) {
-            variableAssignment.add(new RandomVariableImpl(this.parents.get(k), true));
-          }
-          else {
-            variableAssignment.add(new RandomVariableImpl(this.parents.get(k), false));
-          }
-        }
-        currentFrequency.put(variableAssignment, 0);
-      }
-      this.relFrequencies = new FreqTableImpl(currentFrequency);
-    }
-  }
-
-  // updates the frequencies in the frequency tables
-  public void updateFrequency(List<IRandomVariable> trainingEx) {
+  /**
+   * Updates this nodes frequency table with the given training example.
+   *
+   * @param trainingEx training example
+   */
+  private void updateFrequency(List<IRandomVariable> trainingEx) {
     Map<List<IRandomVariable>, Integer> currentFrequency = this.frequencies.getFreqTable();
 
     // updates the frequency assignment for this node
@@ -163,8 +188,12 @@ public class NodeImpl implements INode {
     }
   }
 
-  // updates the values in the relative frequency table
-  public void updateRelFrequency(List<IRandomVariable> trainingEx) {
+  /**
+   * Updates this nodes relative frequency table with the given training example.
+   *
+   * @param trainingEx training example
+   */
+  private void updateRelFrequency(List<IRandomVariable> trainingEx) {
     Map<List<IRandomVariable>, Integer> currentFrequency = this.relFrequencies.getFreqTable();
 
     // updates the frequency assignment for this node
@@ -192,8 +221,14 @@ public class NodeImpl implements INode {
 
   }
 
-  // updates the CPT of this node
-  public void updateCPT() {
+  /**
+   * Updates the node's CPT by updating the frequency tables and dividing the corresponding rows
+   * to get a probability for each row.
+   */
+  @Override
+  public void updateCPT(List<IRandomVariable> trainingEx) {
+    this.updateFrequency(trainingEx);
+    this.updateRelFrequency(trainingEx);
     for (Map.Entry<List<IRandomVariable>, Double> entry : this.cpt.getCPT().entrySet()) {
       List<IRandomVariable> currentRow = entry.getKey();
       double frequency = this.frequencies.getFreq(currentRow);
@@ -210,29 +245,28 @@ public class NodeImpl implements INode {
     }
   }
 
-  // gets this node's name
+  @Override
   public String getNodeName() {
     return this.name;
   }
 
-  // converts this node's CPT to an inference CPT used for joining
+  @Override
   public INode convertToInferenceCPT() {
     return new NodeImpl(this.name, this.parents, this.cpt.toInferenceCPT(this.name), this.frequencies,
             this.relFrequencies);
   }
 
-  // does this node have the given parent?
+  @Override
+  public List<String> getParents() {
+    return new ArrayList<>(this.parents);
+  }
+
+  @Override
   public boolean hasParent(String parentNode) {
     return this.parents.contains(parentNode);
   }
 
-  // does this node have no parents?
-  public boolean hasNoParents() {
-    return this.parents.isEmpty();
-  }
-
-  // joins the CPT of this node with another CPT using the given join variable
-  // name
+  @Override
   public ICPT join(ICPT other, String joinVar) {
     Map<List<IRandomVariable>, Double> thisCPT = this.cpt.getCPT();
     Map<List<IRandomVariable>, Double> otherCPT = other.getCPT();
@@ -256,6 +290,11 @@ public class NodeImpl implements INode {
           join = currentAssignment.get(i);
         }
       }
+
+      if (join == null) {
+        throw new IllegalArgumentException("Variable to join on must be in both CPTs");
+      }
+
       // look through the larger CPT for common variables
       for (Map.Entry<List<IRandomVariable>, Double> bigEntry : bigger.entrySet()) {
         if (bigEntry.getKey().contains(join)) {
@@ -271,13 +310,17 @@ public class NodeImpl implements INode {
     return new CPTImpl(newCPT);
   }
 
-  // returns a reference since it will be used in tandem with the BayesNet class, which should be
-  // able to mutate the CPT.
   @Override
   public ICPT getCPT() {
-    return this.cpt;
+    return new CPTImpl(this.cpt.getCPT());
   }
 
+  /**
+   * Removes duplicates from a list of random variables.
+   *
+   * @param list of variables to filter
+   * @return a filtered unique list
+   */
   private List<IRandomVariable> removeDuplicates(List<IRandomVariable> list) {
     List<IRandomVariable> filteredList = new ArrayList<IRandomVariable>();
 

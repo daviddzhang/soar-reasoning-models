@@ -13,27 +13,11 @@ public class BayesNet implements IReasoningModel {
     this.nodes = nodes;
   }
 
-  private void updateFrequencies(List<IRandomVariable> trainingEx) {
-    // for each node, update frequency table
-    for (INode node : nodes) {
-      // current node
-      node.updateFrequency(trainingEx);
-    }
-  }
-
-  private void updateRelFrequencies(List<IRandomVariable> trainingEx) {
-    // for each node, update frequency table
-    for (INode node : nodes) {
-      // current node
-      node.updateRelFrequency(trainingEx);
-    }
-  }
-
-  private void updateCPTs() {
+  private void updateCPTs(List<IRandomVariable> trainingEx) {
     // for each node, update the CPT
     for (INode node : nodes) {
       // current node
-      node.updateCPT();
+      node.updateCPT(trainingEx);
     }
 
   }
@@ -56,7 +40,7 @@ public class BayesNet implements IReasoningModel {
   private INode getNoParentNode() {
     INode result = null;
     for (INode node : this.nodes) {
-      if (node.hasNoParents()) {
+      if (node.getParents().isEmpty()) {
         result = node;
       }
     }
@@ -73,9 +57,7 @@ public class BayesNet implements IReasoningModel {
     List<IRandomVariable> trainingVars =
             RandomVariableImpl.featureListToVarList(entry.getFeatures());
 
-    this.updateFrequencies(trainingVars);
-    this.updateRelFrequencies(trainingVars);
-    this.updateCPTs();
+    this.updateCPTs(trainingVars);
   }
 
   @Override
