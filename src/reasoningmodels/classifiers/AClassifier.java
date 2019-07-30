@@ -61,8 +61,4 @@ public abstract class AClassifier implements IReasoningModel {
     return this.features;
   }
 
-  @Override
-  public double queryProbability(IEntry query, IEntry evidence) {
-    throw new UnsupportedOperationException("Classifiers cannot query with evidence.");
-  }
 }

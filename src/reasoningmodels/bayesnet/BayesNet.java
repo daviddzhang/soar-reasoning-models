@@ -1,10 +1,16 @@
 package reasoningmodels.bayesnet;
 
+import org.apache.commons.math3.util.Pair;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import reasoningmodels.IReasoningModel;
+import reasoningmodels.classifiers.BooleanFeature;
+import reasoningmodels.classifiers.EntryImpl;
 import reasoningmodels.classifiers.IEntry;
+import reasoningmodels.classifiers.IFeature;
 
 public class BayesNet implements IReasoningModel {
   private List<INode> nodes;
@@ -61,13 +67,38 @@ public class BayesNet implements IReasoningModel {
   }
 
   @Override
-  public String query(IEntry query) {
-    throw new UnsupportedOperationException("Bayes nets can only return probabilities.");
-  }
+  public String queryWithParams(IEntry queryEntry, Map<String, Object> queryParams) {
+    if (queryEntry == null || queryParams == null) {
+      throw new IllegalArgumentException("Cannot query with null arguments.");
+    }
 
-  @Override
-  public String query(IEntry query, double smoothing) throws UnsupportedOperationException {
-    throw new UnsupportedOperationException("Bayes nets do not need smoothing.");
+    Object param = queryParams.get("target-vars");
+    if (param == null) {
+      throw new IllegalArgumentException("Must provide smoothing when querying a Naive Bayes " +
+              "model.");
+    }
+
+    List<IFeature> targetFeatures = new ArrayList<>();
+    List<Pair<String, String>> targetVars = (List<Pair<String, String>>)param;
+    for (Pair<String, String> pair : targetVars) {
+      String varName = pair.getKey();
+      try {
+        double occur = Double.parseDouble(pair.getValue());
+        targetFeatures.add(new BooleanFeature(varName, occur));
+      } catch (Exception e) {
+        throw new IllegalArgumentException("Must provide a double for boolean value of target " +
+                "variables.");
+      }
+    }
+
+    IEntry targetEntry = new EntryImpl(targetFeatures);
+
+    List<IRandomVariable> queryVars =
+            RandomVariableImpl.featureListToVarList(targetEntry.getFeatures());
+    List<IRandomVariable> evidenceVars =
+            RandomVariableImpl.featureListToVarList(queryEntry.getFeatures());
+
+    return String.valueOf(this.enumeration(queryVars, evidenceVars));
   }
 
   private double enumeration(List<IRandomVariable> queryVars, List<IRandomVariable> evidenceVars) {
@@ -128,23 +159,5 @@ public class BayesNet implements IReasoningModel {
     allQueryVars.addAll(evidenceVars);
 
     return joinedCPT.getQueryVar(allQueryVars);
-  }
-
-  @Override
-  public String query(IEntry query, int k) throws UnsupportedOperationException {
-    throw new UnsupportedOperationException("Bayes nets do not need a k");
-  }
-
-  @Override
-  public double queryProbability(IEntry query, IEntry evidence) {
-    if (query.getFeatures().size() == 0) {
-      throw new IllegalArgumentException("Query must have at least one variable.");
-    }
-    List<IRandomVariable> queryVars =
-            RandomVariableImpl.featureListToVarList(query.getFeatures());
-    List<IRandomVariable> evidenceVars =
-            RandomVariableImpl.featureListToVarList(evidence.getFeatures());
-
-    return this.enumeration(queryVars, evidenceVars);
   }
 }

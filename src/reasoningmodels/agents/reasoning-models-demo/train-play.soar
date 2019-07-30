@@ -1,0 +1,41 @@
+sp {reasoning-models-demo*propose*train-play
+   (state <s> ^name reasoning-models-demo
+              ^io.input-link <il>
+              ^io.output-link <ol>)
+   (<il> ^training <vars>)
+   (<vars> ^name <name>)
+   (<s> ^<name> <id>)
+   (<vars> ^outlook <olook>
+           ^temp <temp>
+           ^humidity <humid>
+           ^windy <windy>
+           ^play <play>)
+-->
+   (<s> ^operator <op> + =)
+   (<op> ^name train-play)
+}
+
+sp {apply*train-play
+   (state <s> ^operator <op>
+              ^io.input-link <il>
+              ^io.output-link <ol>)
+   (<il> ^training <vars>)
+   (<vars> ^name <name>)
+   (<s> ^<name> <id>)
+   (<vars> ^outlook <olook>
+           ^temp <temp>
+           ^humidity <humid>
+           ^windy <windy>
+           ^play <play>)
+   (<op> ^name train-play)
+-->
+   (<ol> ^training-ex <te>)
+   (<te> ^id <id>)
+   (<te> ^train <tr>)
+   (<tr> ^categorical <o1> ^numerical <t1> ^numerical <h1> ^boolean <w1> ^categorical <p1>)
+   (<o1> ^outlook <olook>)
+   (<t1> ^temp <temp>)
+   (<h1> ^humidity <humid>)
+   (<w1> ^windy <windy>)
+   (<p1> ^play <play>)
+}

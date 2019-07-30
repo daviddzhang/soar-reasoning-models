@@ -1,11 +1,6 @@
 package reasoningmodels.classifiers;
 
-import org.apache.commons.math3.ml.distance.EuclideanDistance;
-
-import java.util.ArrayList;
 import java.util.List;
-
-import reasoningmodels.knn.IDistanceFunction;
 
 
 public class EntryImpl implements IEntry {

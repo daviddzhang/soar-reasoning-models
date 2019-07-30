@@ -1,0 +1,35 @@
+sp {reasoning-models-demo*propose*query-sign
+   (state <s> ^name reasoning-models-demo
+              ^io <io>)
+   (<io> ^output-link <out>)
+   (<io> ^input-link <il>)
+   (<il> ^query-signal <qs>)
+   (<qs>  ^name <name>
+          ^shape <shape>
+          ^color <color>)
+   (<s> ^<name> <id>)
+-->
+   (<s> ^operator <op> + =)
+   (<op> ^name query-sign)
+}
+
+sp {apply*query-sign
+   (state <s> ^operator <op>
+              ^io.input-link <il>
+              ^io.output-link <ol>)
+   (<il> ^query-signal <qs>)
+   (<qs>  ^name <name>
+          ^shape <shape>
+          ^color <color>)
+   (<s> ^<name> <id>)
+   (<op> ^name query-sign)
+-->
+   (<ol> ^query-handler <qh>)
+   (<qh> ^id <id> ^query <q>)
+   (<q> ^features <f>)
+   (<f> ^categorical <sh1> ^categorical <c1>)
+   (<sh1> ^shape <shape>)
+   (<c1> ^color <color>)
+   (<q> ^parameters <p>)
+   (<p> ^smoothing 1.0)
+}

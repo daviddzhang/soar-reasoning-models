@@ -1,5 +1,7 @@
 package reasoningmodels.knn;
 
+import org.apache.commons.math3.util.Pair;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -7,7 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javafx.util.Pair;
 import reasoningmodels.classifiers.AClassifier;
 import reasoningmodels.classifiers.IEntry;
 import reasoningmodels.classifiers.IFeature;
@@ -16,12 +17,9 @@ import static java.util.stream.Collectors.toMap;
 
 public class KNN extends AClassifier {
   private final Map<String, Pair<Double, Double>> minMaxLookup;
-  private IDistanceFunction distanceFunction;
 
   public KNN(Map<String, String[]> features, String targetClass) {
     super(features, targetClass);
-    // defaults L2
-    distanceFunction = new L2Distance();
     minMaxLookup = new HashMap<>();
   }
 
@@ -56,16 +54,6 @@ public class KNN extends AClassifier {
 
   }
 
-  @Override
-  public String query(IEntry query) {
-    return this.queryHelp(query, 1);
-  }
-
-  @Override
-  public String query(IEntry query, double smoothing) throws UnsupportedOperationException {
-    throw new UnsupportedOperationException("KNN does not need smoothing");
-  }
-
   private void rescaleFeature(String featureName) {
     for (IEntry entry : this.examples) {
       for (IFeature feature : entry.getFeatures()) {
@@ -77,20 +65,35 @@ public class KNN extends AClassifier {
     }
   }
 
+  @Override
+  public String queryWithParams(IEntry queryEntry, Map<String, Object> queryParams) {
+    if (queryEntry == null || queryParams == null) {
+      throw new IllegalArgumentException("Cannot query with null arguments.");
+    }
 
-  public void setDistanceFunction(IDistanceFunction distanceFunction) {
-    this.distanceFunction = distanceFunction;
+    String paramK = (String)queryParams.get("k");
+    if (paramK == null) {
+      throw new IllegalArgumentException("Must provide k when querying a KNN " +
+              "model.");
+    }
+
+    Object paramDistance = queryParams.get("distance");
+    if (paramDistance == null) {
+      throw new IllegalArgumentException("Must provide a distance function when querying a KNN " +
+              "model.");
+    }
+    int k = Integer.parseInt(paramK);
+    IDistanceFunction distanceFunction =
+            IDistanceFunction.createDistanceFunction((String)paramDistance);
+
+    return this.queryHelp(queryEntry, k, distanceFunction);
   }
 
-  public String query(IEntry queryEntry, int k) {
-    return this.queryHelp(queryEntry, k);
-  }
-
-  private String queryHelp(IEntry queryEntry, int k) {
+  private String queryHelp(IEntry queryEntry, int k, IDistanceFunction distanceFunction) {
     // returns the target feature if possible
     String targetFeature = this.returnTargetFeatureIfPossible(queryEntry, k);
 
-    Map<IEntry, Double> sorted = this.getSortedMapping(queryEntry);
+    Map<IEntry, Double> sorted = this.getSortedMapping(queryEntry, distanceFunction);
 
     Iterator<IEntry> sortedEntries = sorted.keySet().iterator();
     List<IEntry> firstKEntries = new ArrayList<>();
@@ -157,11 +160,11 @@ public class KNN extends AClassifier {
     return targetFeature;
   }
 
-  private Map<IEntry, Double> getSortedMapping(IEntry queryEntry) {
+  private Map<IEntry, Double> getSortedMapping(IEntry queryEntry, IDistanceFunction distanceFunction) {
     Map<IEntry, Double> distanceMapping = new HashMap<>();
 
     for (IEntry entry : this.examples) {
-      distanceMapping.put(entry, KNN.calcDistance(queryEntry, entry, this.distanceFunction,
+      distanceMapping.put(entry, KNN.calcDistance(queryEntry, entry, distanceFunction,
               this.features));
     }
 
@@ -171,7 +174,7 @@ public class KNN extends AClassifier {
 
   }
 
-  public static double calcDistance(IEntry queryEntry, IEntry exampleEntry,
+  private static double calcDistance(IEntry queryEntry, IEntry exampleEntry,
                                     IDistanceFunction distanceFunction,
                                     Map<String, String[]> enumerations) {
     double res = 0.0;

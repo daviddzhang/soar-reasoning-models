@@ -1,0 +1,21 @@
+sp {reasoning-models-demo*propose*clean-query-sign
+   (state <s> ^name reasoning-models-demo
+              ^io.output-link <ol>)
+   (<ol> ^query-handler <qh>)
+   (<qh> ^id <id>)
+   (<s> ^sign <id>)
+-->
+   (<s> ^operator <op> + =)
+   (<op> ^name clean-query-sign)
+}
+
+sp {apply*clean-query-sign
+   (state <s> ^operator <op>
+              ^io.output-link <ol>)
+   (<ol> ^query-handler <qh>)
+   (<qh> ^result <r>)
+   (<op> ^name clean-query-sign)
+-->
+   (<s> ^sign-result <r>)
+   (<ol> ^query-handler <qh> -)
+}

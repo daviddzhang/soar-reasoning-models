@@ -1,0 +1,36 @@
+sp {reasoning-models-demo*propose*train-sign
+   (state <s> ^name reasoning-models-demo
+              ^io.input-link <il>
+              ^io.output-link <ol>)
+   (<il> ^training <vars>)
+   (<vars> ^name <name>)
+   (<s> ^<name> <id>)
+   (<vars> ^shape <shape>
+           ^color <color>
+           ^sign <sign>)
+-->
+   (<s> ^operator <op> + =)
+   (<op> ^name train-sign)
+}
+
+sp {apply*train-sign
+   (state <s> ^operator <op>
+              ^io.input-link <il>
+              ^io.output-link <ol>)
+   (<il> ^training <vars>)
+   (<vars> ^name <name>)
+   (<s> ^<name> <id>)
+   (<vars> ^shape <shape>
+           ^color <color>
+           ^sign <sign>)
+   (<op> ^name train-sign)
+-->
+   (<ol> ^training-ex <te>)
+   (<te> ^id <id>)
+   (<te> ^train <tr>)
+   (<tr> ^categorical <sh1> ^categorical <c1> ^categorical <si1>)
+   (<sh1> ^shape <shape>)
+   (<c1> ^color <color>)
+   (<si1> ^sign <sign>)
+}
+

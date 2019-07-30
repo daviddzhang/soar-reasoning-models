@@ -1,0 +1,18 @@
+sp {reasoning-models-demo*propose*train-cleanup
+   (state <s> ^name reasoning-models-demo
+              ^io.output-link <ol>)
+   (<ol> ^training-ex <te>)
+-->
+   (<s> ^operator <op> + =)
+   (<op> ^name train-cleanup)
+}
+
+sp {apply*train-cleanup
+   (state <s> ^operator <op>
+              ^io.output-link <ol>)
+   (<ol> ^training-ex <te>)
+   (<op> ^name train-cleanup)
+-->
+   (<ol> ^training-ex <te> -)
+}
+

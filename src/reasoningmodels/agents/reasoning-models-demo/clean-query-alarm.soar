@@ -1,0 +1,22 @@
+sp {reasoning-models-demo*propose*clean-query-alarm
+   (state <s> ^name reasoning-models-demo
+              ^io.output-link <ol>)
+   (<ol> ^query-handler <qh>)
+   (<qh> ^id <id>)
+   (<s> ^alarm <id>)
+-->
+   (<s> ^operator <op> + =)
+   (<op> ^name clean-query-alarm)
+}
+
+sp {apply*clean-query-alarm
+   (state <s> ^operator <op>
+              ^io.output-link <ol>)
+   (<ol> ^query-handler <qh>)
+   (<qh> ^result <r>)
+   (<op> ^name clean-query-alarm)
+-->
+   (<s> ^alarm-result <r>)
+   (<ol> ^query-handler <qh> -)
+}
+

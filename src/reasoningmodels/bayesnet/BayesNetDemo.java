@@ -89,8 +89,6 @@ public class BayesNetDemo {
     MaryData mData = new MaryData(1);
 
     Random chooseNet = new Random(0);
-    int alarmTrains = 0;
-    int trafficTrains = 0;
 
     // trains the net based on sampling probability distributions
     for (int i = num; i > 0; i--) {
@@ -127,7 +125,6 @@ public class BayesNetDemo {
 
         agent.RunSelf(1);
         train.DestroyWME();
-        alarmTrains++;
       }
       else {
         Identifier train = il.CreateIdWME("training-vars");
@@ -153,7 +150,6 @@ public class BayesNetDemo {
 
         agent.RunSelf(1);
         train.DestroyWME();
-        trafficTrains++;
       }
     }
 
@@ -180,8 +176,6 @@ public class BayesNetDemo {
 
     for (int i = 0; i < graphs.size(); i++) {
       IReasoningModel current = graphs.get(i);
-
-      //System.out.println("Result for graph " + i + ": " + current.getResult());
     }
 
     System.out.println(agent.ExecuteCommandLine("p --depth 10 -t s1"));

@@ -1,8 +1,12 @@
 package reasoningmodels.outputhandlers;
 
 
+import org.apache.commons.math3.util.Pair;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import reasoningmodels.IReasoningModel;
 import reasoningmodels.classifiers.BooleanFeature;
@@ -74,60 +78,39 @@ public class ReasoningModelOutputHandlers {
 
       WMElement params = queryWME.ConvertToIdentifier().FindByAttribute("parameters", 0);
 
-      ReasoningModelOutputHandlers.handleParams(params, modelToQuery, queryEntry, pWmeAdded);
+      Map<String, Object> queryParams = ReasoningModelOutputHandlers.handleParams(params);
+
+      String res  = modelToQuery.queryWithParams(queryEntry, queryParams);
+
+      try {
+        double prob = Double.parseDouble(res);
+        pWmeAdded.ConvertToIdentifier().CreateFloatWME("result", prob);
+      } catch (Exception e) {
+        pWmeAdded.ConvertToIdentifier().CreateStringWME("result", res);
+      }
     }
   };
 
-  private static void handleParams(WMElement params, IReasoningModel modelToQuery,
-                                   IEntry queryEntry, WMElement output) {
-    String res;
-    for (int i = 0; i < params.ConvertToIdentifier().GetNumberChildren(); i++) {
-      String curParam = params.ConvertToIdentifier().GetChild(i).GetAttribute();
-      switch (curParam) {
-        case "k":
-          int k = -1;
-          try {
-            k = Integer.parseInt(params.ConvertToIdentifier().GetChild(i).GetValueAsString());
-          } catch (Exception e) {
-            throw new IllegalArgumentException("Given k must be an integer.");
-          }
-          res = modelToQuery.query(queryEntry, k);
-          output.ConvertToIdentifier().CreateStringWME("result", res);
-          break;
-        case "target-vars":
-          WMElement varWME = params.ConvertToIdentifier().GetChild(i);
-          List<IFeature> targetVars = new ArrayList<>();
-          for (int j = 0; j < varWME.ConvertToIdentifier().GetNumberChildren(); j++) {
-            WMElement curVar = varWME.ConvertToIdentifier().GetChild(j);
-            double booleanVal = -1.0;
-            try {
-              booleanVal = Double.parseDouble(curVar.GetValueAsString());
-            } catch (Exception e) {
-              throw new IllegalArgumentException("Target variables must be boolean features.");
-            }
-            targetVars.add(new BooleanFeature(curVar.GetAttribute(), booleanVal));
-          }
-          double prob = modelToQuery.queryProbability(new EntryImpl(targetVars), queryEntry);
-          output.ConvertToIdentifier().CreateFloatWME("result", prob);
-          break;
-        case "smoothing":
-          double smoothing = -1.0;
-          try {
-            smoothing =
-                    Double.parseDouble(params.ConvertToIdentifier().GetChild(i).GetValueAsString());
-            if (smoothing <= 0) {
-              throw new IllegalArgumentException("Given smoothing must be positive.");
-            }
-          } catch (Exception e) {
-            throw new IllegalArgumentException("Given smoothing must be a positive double");
-          }
-          res = modelToQuery.query(queryEntry, smoothing);
-          output.ConvertToIdentifier().CreateStringWME("result", res);
-          break;
-        default:
-          throw new IllegalArgumentException("Supplied parameter is not supported.");
+  private static Map<String, Object> handleParams(WMElement params) {
+    Map<String, Object> res = new HashMap<>();
+    int i = 0;
+    for (; i < params.ConvertToIdentifier().GetNumberChildren(); i++) {
+      WMElement curParam = params.ConvertToIdentifier().GetChild(i);
+      String curParamName = curParam.GetAttribute();
+      if (!curParam.GetValueType().equalsIgnoreCase("id")) {
+        res.put(curParamName, curParam.GetValueAsString());
+      }
+      else {
+        List<Pair<String, String>> extraFeatures = new ArrayList<>();
+        for (int j = 0; j < curParam.ConvertToIdentifier().GetNumberChildren(); j++) {
+          WMElement curFeature = curParam.ConvertToIdentifier().GetChild(j);
+          extraFeatures.add(new Pair<>(curFeature.GetAttribute(), curFeature.GetValueAsString()));
+        }
+
+        res.put(curParamName, extraFeatures);
       }
     }
+    return res;
   }
 
   private static List<IFeature> parseFeatures(WMElement features) {

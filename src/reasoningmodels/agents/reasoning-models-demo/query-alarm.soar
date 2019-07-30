@@ -1,0 +1,37 @@
+sp {reasoning-models-demo*propose*query-alarm
+   (state <s> ^name reasoning-models-demo
+              ^io <io>)
+   (<io> ^output-link <out>)
+   (<io> ^input-link <il>)
+   (<il> ^query-signal <qs>)
+   (<qs>  ^name <name>
+          ^john <j>
+          ^mary <m>)
+   (<s> ^<name> <id>)
+-->
+   (<s> ^operator <op> + =)
+   (<op> ^name query-alarm)
+}
+
+sp {apply*query-alarm
+   (state <s> ^operator <op>
+              ^io.input-link <il>
+              ^io.output-link <ol>)
+   (<il> ^query-signal <qs>)
+   (<qs>  ^name <name>
+          ^john <j>
+          ^mary <m>)
+   (<s> ^<name> <id>)
+   (<op> ^name query-alarm)
+-->
+   (<ol> ^query-handler <qh>)
+   (<qh> ^id <id> ^query <q>)
+   (<q> ^features <f>)
+   (<f> ^boolean <j1> ^boolean <m1>)
+   (<j1> ^j <j>)
+   (<m1> ^m <m>)
+   (<q> ^parameters <p>)
+   (<p> ^target-vars <tv>)
+   (<tv> ^b 1.0)
+}
+

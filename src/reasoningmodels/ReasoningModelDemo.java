@@ -31,8 +31,8 @@ public class ReasoningModelDemo {
   public static void main(String[] args) throws IOException {
     Kernel kernel = Kernel.CreateKernelInCurrentThread(true);
     Agent agent = kernel.CreateAgent("bayes-nets");
-    agent.LoadProductions("/Users/davidzhang/javaprograms/ResearchProjects/SoarReasoningModels" +
-            "/src/reasoningmodels/agents/reasoning-models-demo.soar");
+    agent.LoadProductions(ReasoningModelDemo.class.getResource("agents/reasoning-models-demo" +
+            ".soar").getPath());
 
     ReasoningModelOutputHandlers.addReasoningOutputHandlersToAgent(agent, "create", "training-ex"
             , "query-handler");
@@ -47,10 +47,16 @@ public class ReasoningModelDemo {
 
     agent.RunSelf(10);
 
-    final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+    int num = 0;
 
-    System.out.print("How many times do you want to train in total?");
-    final int num = Integer.parseInt(reader.readLine());
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
+      System.out.print("How many times do you want to train in total?");
+       num = Integer.parseInt(reader.readLine());
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
+
 
     // samplers for burglary detection
     BurglaryData bData = new BurglaryData(3);
@@ -104,18 +110,15 @@ public class ReasoningModelDemo {
                 new ArrayList<IRandomVariable>(Arrays.asList(aRandVar));
 
         boolean jOccur = jData.sample(jmGivens);
-        IRandomVariable jRandVar = new RandomVariableImpl("J", jOccur);
 
         boolean mOccur = mData.sample(jmGivens);
-        IRandomVariable mRandVar = new RandomVariableImpl("M", mOccur);
-
         train.CreateFloatWME("b", booleanToDouble(bOccur));
         train.CreateFloatWME("e", booleanToDouble(eOccur));
         train.CreateFloatWME("a", booleanToDouble(aOccur));
         train.CreateFloatWME("j", booleanToDouble(jOccur));
         train.CreateFloatWME("m", booleanToDouble(mOccur));
 
-        agent.RunSelf(1);
+        agent.RunSelf(2);
         train.DestroyWME();
       }
       else if (randModel == 1) {
@@ -126,7 +129,7 @@ public class ReasoningModelDemo {
           train.CreateStringWME(headers1[j], current[j]);
         }
 
-        agent.RunSelf(1);
+        agent.RunSelf(2);
         train.DestroyWME();
       }
       else {
@@ -137,19 +140,23 @@ public class ReasoningModelDemo {
           train.CreateStringWME(headers2[k], current[k]);
         }
 
-        agent.RunSelf(1);
+        agent.RunSelf(2);
         train.DestroyWME();
       }
     }
+
+    reader1.close();
+    reader2.close();
+
 
     Identifier queryAlarm = il.CreateIdWME("query-signal");
     queryAlarm.CreateFloatWME("john", 1.0);
     queryAlarm.CreateFloatWME("mary", 1.0);
     queryAlarm.CreateStringWME("name", "alarm");
 
-    agent.RunSelf(3);
+    agent.RunSelf(1);
     queryAlarm.DestroyWME();
-    agent.RunSelf(2);
+    agent.RunSelf(3);
 
     Identifier queryPlay = il.CreateIdWME("query-signal");
     queryPlay.CreateStringWME("outlook", "sunny");
@@ -158,20 +165,22 @@ public class ReasoningModelDemo {
     queryPlay.CreateFloatWME("windy", 1.0);
     queryPlay.CreateStringWME("name", "play");
 
-    agent.RunSelf(3);
+    agent.RunSelf(1);
     queryPlay.DestroyWME();
-    agent.RunSelf(2);
+    agent.RunSelf(3);
 
     Identifier querySign = il.CreateIdWME("query-signal");
     querySign.CreateStringWME("shape", "square");
     querySign.CreateStringWME("color", "blue");
     querySign.CreateStringWME("name", "sign");
 
-    agent.RunSelf(3);
+    agent.RunSelf(2);
     querySign.DestroyWME();
     agent.RunSelf(2);
 
     List<IReasoningModel> models = ReasoningModelOutputHandlers.getModels();
+
+    System.out.println(agent.ExecuteCommandLine("p --depth 10 -t s1"));
 
     for (int i = 0; i < models.size(); i++) {
       System.out.println("Model: " + i);

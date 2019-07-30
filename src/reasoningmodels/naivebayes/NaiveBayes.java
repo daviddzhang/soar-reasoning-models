@@ -78,15 +78,6 @@ public class NaiveBayes extends AClassifier {
     }
   }
 
-  public String query(IEntry queryEntry) {
-    return queryHelper(queryEntry, 1.0);
-  }
-
-  @Override
-  public String query(IEntry queryEntry, double smoothing) throws UnsupportedOperationException {
-    return queryHelper(queryEntry, smoothing);
-  }
-
   private String queryHelper(IEntry queryEntry, double smoothing) {
     if (queryEntry.containsFeature(targetClass)) {
       throw new IllegalArgumentException("Query cannot contain target class.");
@@ -129,8 +120,20 @@ public class NaiveBayes extends AClassifier {
   }
 
   @Override
-  public String query(IEntry query, int k) throws UnsupportedOperationException {
-    throw new UnsupportedOperationException("Naive Bayes model does not need a k value");
+  public String queryWithParams(IEntry queryEntry, Map<String, Object> queryParams) {
+    if (queryEntry == null || queryParams == null) {
+      throw new IllegalArgumentException("Cannot query with null arguments.");
+    }
+
+    String param = (String)queryParams.get("smoothing");
+    if (param == null) {
+      throw new IllegalArgumentException("Must provide smoothing when querying a Naive Bayes " +
+              "model.");
+    }
+
+    double smoothing = Double.parseDouble(param);
+
+    return this.queryHelper(queryEntry, smoothing);
   }
 
   private double getPriorProb(String targetClassEnum) {

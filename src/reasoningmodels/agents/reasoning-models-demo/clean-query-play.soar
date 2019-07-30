@@ -1,0 +1,21 @@
+sp {reasoning-models-demo*propose*clean-query-play
+   (state <s> ^name reasoning-models-demo
+              ^io.output-link <ol>)
+   (<ol> ^query-handler <qh>)
+   (<qh> ^id <id>)
+   (<s> ^play <id>)
+-->
+   (<s> ^operator <op> + =)
+   (<op> ^name clean-query-play)
+}
+
+sp {apply*clean-query-play
+   (state <s> ^operator <op>
+              ^io.output-link <ol>)
+   (<ol> ^query-handler <qh>)
+   (<qh> ^result <r>)
+   (<op> ^name clean-query-play)
+-->
+   (<s> ^play-result <r>)
+   (<ol> ^query-handler <qh> -)
+}

@@ -476,6 +476,50 @@ public class NodeTests {
     assertFalse(this.a.hasParent("Z"));
   }
 
-//  @Test
-//  void testJoin
+  @Test
+  void testJoin() {
+    assertEquals("[-E, -B, +A, -J]| Probability: 0.0\n" +
+            "[+E, -B, -A, +J]| Probability: 0.0\n" +
+            "[+E, +B, -A, -J]| Probability: 1.0\n" +
+            "[+E, +B, +A, +J]| Probability: 0.0\n" +
+            "[+E, +B, -A, +J]| Probability: 0.0\n" +
+            "[-E, +B, -A, +J]| Probability: 0.0\n" +
+            "[-E, -B, -A, +J]| Probability: 0.0\n" +
+            "[-E, +B, -A, -J]| Probability: 1.0\n" +
+            "[-E, +B, +A, +J]| Probability: 0.0\n" +
+            "[+E, -B, +A, -J]| Probability: 0.0\n" +
+            "[-E, -B, -A, -J]| Probability: 1.0\n" +
+            "[-E, -B, +A, +J]| Probability: 0.0\n" +
+            "[-E, +B, +A, -J]| Probability: 0.0\n" +
+            "[+E, -B, -A, -J]| Probability: 1.0\n" +
+            "[+E, -B, +A, +J]| Probability: 0.0\n" +
+            "[+E, +B, +A, -J]| Probability: 0.0\n", this.j.convertToInferenceCPT().join(this.a.convertToInferenceCPT().getCPT(),
+     "A").printCPT());
+  }
+
+  @Test
+  void testJoinDifferentVals() {
+    this.j.updateCPT(new ArrayList<>(Arrays.asList(new RandomVariableImpl("J", true),
+            new RandomVariableImpl("A", true), new RandomVariableImpl("B", true))));
+    this.a.updateCPT(new ArrayList<>(Arrays.asList(new RandomVariableImpl("J", true),
+            new RandomVariableImpl("A", true), new RandomVariableImpl("B", true),
+            new RandomVariableImpl("E", true))));
+    assertEquals("[-E, -B, +A, -J]| Probability: 0.0\n" +
+            "[+E, -B, -A, +J]| Probability: 0.0\n" +
+            "[+E, +B, -A, -J]| Probability: 0.0\n" +
+            "[+E, +B, +A, +J]| Probability: 1.0\n" +
+            "[+E, +B, -A, +J]| Probability: 0.0\n" +
+            "[-E, +B, -A, +J]| Probability: 0.0\n" +
+            "[-E, -B, -A, +J]| Probability: 0.0\n" +
+            "[-E, +B, -A, -J]| Probability: 1.0\n" +
+            "[-E, +B, +A, +J]| Probability: 0.0\n" +
+            "[+E, -B, +A, -J]| Probability: 0.0\n" +
+            "[-E, -B, -A, -J]| Probability: 1.0\n" +
+            "[-E, -B, +A, +J]| Probability: 0.0\n" +
+            "[-E, +B, +A, -J]| Probability: 0.0\n" +
+            "[+E, -B, -A, -J]| Probability: 1.0\n" +
+            "[+E, -B, +A, +J]| Probability: 0.0\n" +
+            "[+E, +B, +A, -J]| Probability: 0.0\n", this.j.convertToInferenceCPT().join(this.a.convertToInferenceCPT().getCPT(),
+            "A").printCPT());
+  }
 }

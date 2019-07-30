@@ -1,0 +1,42 @@
+sp {reasoning-models-demo*propose*train-alarm
+   (state <s> ^name reasoning-models-demo
+              ^io.input-link <il>
+              ^io.output-link <ol>)
+   (<il> ^training-vars <vars>)
+   (<vars> ^name <name>)
+   (<s> ^<name> <id>)
+   (<vars> ^b <b>
+           ^e <e>
+           ^a <a>
+           ^j <j>
+           ^m <m>)
+-->
+   (<s> ^operator <op> + =)
+   (<op> ^name train-alarm)
+}
+
+sp {apply*train-alarm
+   (state <s> ^operator <op>
+              ^io.input-link <il>
+              ^io.output-link <ol>)
+   (<il> ^training-vars <vars>)
+   (<vars> ^name <name>)
+   (<s> ^<name> <id>)
+   (<vars> ^b <b>
+           ^e <e>
+           ^a <a>
+           ^j <j>
+           ^m <m>)
+   (<op> ^name train-alarm)
+-->
+   (<ol> ^training-ex <te>)
+   (<te> ^id <id>)
+   (<te> ^train <tr>)
+   (<tr> ^boolean <b1> ^boolean <e1> ^boolean <a1> ^boolean <j1> ^boolean <m1>)
+   (<b1> ^b <b>)
+   (<e1> ^e <e>)
+   (<a1> ^a <a>)
+   (<j1> ^j <j>)
+   (<m1> ^m <m>)
+}
+

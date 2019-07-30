@@ -1,4 +1,2 @@
 source _all.soar
-source query.soar
 source top-state.soar
-source training.soar

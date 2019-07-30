@@ -7,8 +7,18 @@ source elaborations_source.soar
 popd
 source clean-alarm.soar
 source clean-play.soar
+source clean-query-alarm.soar
+source clean-query-play.soar
+source clean-query-sign.soar
 source clean-sign.soar
 source create-alarm.soar
 source create-play.soar
 source create-sign.soar
 source initialize-reasoning-models-demo.soar
+source query-alarm.soar
+source query-play.soar
+source query-sign.soar
+source train-alarm.soar
+source train-cleanup.soar
+source train-play.soar
+source train-sign.soar

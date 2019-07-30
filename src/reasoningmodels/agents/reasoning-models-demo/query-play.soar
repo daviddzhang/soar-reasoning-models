@@ -1,0 +1,43 @@
+sp {reasoning-models-demo*propose*query-play
+   (state <s> ^name reasoning-models-demo
+               ^io <io>)
+   (<io> ^output-link <out>)
+   (<io> ^input-link <il>)
+   (<il> ^query-signal <qs>)
+   (<qs>  ^name <name>
+         ^outlook <olook>
+         ^temp <temp>
+         ^humidity <humid>
+         ^windy <windy>)
+   (<s> ^<name> <id>)
+-->
+   (<s> ^operator <op> + =)
+   (<op> ^name query-play)
+}
+
+sp {apply*query-play
+   (state <s> ^operator <op>
+              ^io.input-link <il>
+              ^io.output-link <ol>)
+   (<il> ^query-signal <qs>)
+   (<qs>  ^name <name>
+         ^outlook <olook>
+         ^temp <temp>
+         ^humidity <humid>
+         ^windy <windy>)
+   (<s> ^<name> <id>)
+   (<op> ^name query-play)
+-->
+   (<ol> ^query-handler <qh>)
+   (<qh> ^id <id> ^query <q>)
+   (<q> ^features <f>)
+   (<f> ^categorical <o1> ^numerical <t1> ^numerical <h1> ^boolean <w1>)
+   (<o1> ^outlook <olook>)
+   (<t1> ^temp <temp>)
+   (<h1> ^humidity <humid>)
+   (<w1> ^windy <windy>)
+   (<q> ^parameters <p>)
+   (<p> ^k 1)
+   (<p> ^distance euclidean)
+}
+
