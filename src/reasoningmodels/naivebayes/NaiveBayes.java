@@ -5,8 +5,10 @@ import org.apache.commons.math3.stat.StatUtils;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import reasoningmodels.bayesnet.INode;
 import reasoningmodels.classifiers.AClassifier;
 import reasoningmodels.classifiers.IEntry;
 import reasoningmodels.classifiers.IFeature;
@@ -22,8 +24,8 @@ public class NaiveBayes extends AClassifier {
   // feature name to mean, as opposed to feature value.
   private Map<String, Map<String, double[]>> numericalFeatureMeans = new HashMap<>();
 
-  public NaiveBayes(Map<String, String[]> features, String targetFeature) {
-    super(features, targetFeature);
+  public NaiveBayes(String targetFeature) {
+    super(targetFeature);
   }
 
   @Override
@@ -53,6 +55,11 @@ public class NaiveBayes extends AClassifier {
       }
     }
 
+  }
+
+  @Override
+  public boolean hasFlatFeatures() {
+    return true;
   }
 
   private void initData() {
@@ -134,6 +141,16 @@ public class NaiveBayes extends AClassifier {
     double smoothing = Double.parseDouble(param);
 
     return this.queryHelper(queryEntry, smoothing);
+  }
+
+  @Override
+  public void parameterizeWithFlatFeatures(Map<String, String[]> features) {
+    this.features = features;
+  }
+
+  @Override
+  public void parameterizeWithGraphicalFeatures(List<INode> nodes) {
+    throw new IllegalArgumentException("Naive Bayes uses flat features.");
   }
 
   private double getPriorProb(String targetClassEnum) {

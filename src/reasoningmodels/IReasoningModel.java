@@ -1,7 +1,9 @@
 package reasoningmodels;
 
+import java.util.List;
 import java.util.Map;
 
+import reasoningmodels.bayesnet.INode;
 import reasoningmodels.classifiers.IEntry;
 
 public interface IReasoningModel {
@@ -14,4 +16,10 @@ public interface IReasoningModel {
   void train(IEntry entry);
 
   String queryWithParams(IEntry queryEntry, Map<String, Object> queryParams);
+
+  boolean hasFlatFeatures();
+
+  void parameterizeWithFlatFeatures(Map<String, String[]> features);
+
+  void parameterizeWithGraphicalFeatures(List<INode> nodes);
 }

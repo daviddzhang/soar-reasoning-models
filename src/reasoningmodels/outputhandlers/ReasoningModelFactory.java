@@ -16,58 +16,44 @@ import sml.WMElement;
 public class ReasoningModelFactory {
 
   public static IReasoningModel createModel(WMElement wme) {
+    IReasoningModel res;
+    String targetClass = null;
+    WMElement maybeTarget = getParamWME(wme).ConvertToIdentifier().FindByAttribute("target",0);
+    if (maybeTarget != null) {
+      targetClass = maybeTarget.GetValueAsString();
+    }
+
     switch (wme.GetAttribute()) {
       case "bayes-net":
-        return createBayesNet(wme);
+        res = new BayesNet();
+        break;
       case "knn":
-        return createKNN(wme);
+        res = new KNN(targetClass);
+        break;
       case "naive-bayes":
-        return createNaiveBayes(wme);
+        res = new NaiveBayes(targetClass);
+        break;
       default:
         throw new IllegalArgumentException("Provided model type: " + wme.GetAttribute() + " is " +
                 "not supported.");
     }
-  }
 
-  private static IReasoningModel createNaiveBayes(WMElement wme) {
-    Map<String, String[]> features = getClassifierFeatures(wme);
-    String targetClass = getTargetClass(wme);
-    return new NaiveBayes(features, targetClass);
-  }
-
-  private static IReasoningModel createKNN(WMElement wme) {
-    Map<String, String[]> features = getClassifierFeatures(wme);
-    String targetClass = getTargetClass(wme);
-    return new KNN(features, targetClass);
-  }
-
-  private static String getTargetClass(WMElement wme) {
-    WMElement params = getParamWME(wme);
-    return params.ConvertToIdentifier().FindByAttribute("target",0).GetValueAsString();
-  }
-
-  private static Map<String, String[]> getClassifierFeatures(WMElement wme) {
-    WMElement params = getParamWME(wme);
-    WMElement features = params.ConvertToIdentifier().FindByAttribute("features", 0);
-
-    Map<String, String[]> modelFeatures = new HashMap<>();
-
-    for (int i = 0; i < features.ConvertToIdentifier().GetNumberChildren(); i++) {
-      WMElement curFeature = features.ConvertToIdentifier().GetChild(i);
-      String featureName = curFeature.GetAttribute();
-      WMElement featureType = curFeature.ConvertToIdentifier().GetChild(0);
-      // will be null if there are no enums (boolean or numerical)
-      String[] enums = getFeatureEnums(featureType);
-      modelFeatures.put(featureName, enums);
+    if (res.hasFlatFeatures()) {
+      Map<String, String[]> features = getFlatFeatures(wme);
+      res.parameterizeWithFlatFeatures(features);
+    }
+    else {
+      List<INode> nodes = getGraphicalFeatures(wme);
+      res.parameterizeWithGraphicalFeatures(nodes);
     }
 
-    return modelFeatures;
+    return res;
   }
 
-  private static IReasoningModel createBayesNet(WMElement wme) {
+  private static List<INode> getGraphicalFeatures(WMElement wme) {
     WMElement params = getParamWME(wme);
     WMElement graph = params.ConvertToIdentifier().FindByAttribute("graph", 0);
-    
+
     List<INode> nodesInNewGraph = new ArrayList<>();
     WMElement nodes = graph.ConvertToIdentifier().FindByAttribute("nodes", 0);
     int edgeCount = 0;
@@ -98,22 +84,37 @@ public class ReasoningModelFactory {
       nodesInNewGraph.add(currentNode);
 
     }
-    return new BayesNet(nodesInNewGraph);
+    return nodesInNewGraph;
+  }
+
+  private static Map<String, String[]> getFlatFeatures(WMElement wme) {
+    WMElement params = getParamWME(wme);
+    WMElement features = params.ConvertToIdentifier().FindByAttribute("features", 0);
+
+    Map<String, String[]> modelFeatures = new HashMap<>();
+
+    for (int i = 0; i < features.ConvertToIdentifier().GetNumberChildren(); i++) {
+      WMElement curFeature = features.ConvertToIdentifier().GetChild(i);
+      String featureName = curFeature.GetAttribute();
+      WMElement featureType = curFeature.ConvertToIdentifier().GetChild(0);
+      // will be null if there are no enums (boolean or numerical)
+      String[] enums = getFeatureEnums(featureType);
+      modelFeatures.put(featureName, enums);
+    }
+
+    return modelFeatures;
   }
 
   private static String[] getFeatureEnums(WMElement featureType) {
     List<String> res = new ArrayList<>();
-    switch (featureType.GetAttribute()) {
-      case "categorical":
-        for (int i = 0; i < featureType.ConvertToIdentifier().GetNumberChildren(); i++) {
-          res.add(featureType.ConvertToIdentifier().GetChild(i).GetAttribute());
-        }
-        return res.toArray(new String[0]);
-      case "boolean":
-      case "numerical":
-        return null;
-      default:
-        throw new IllegalArgumentException("Please use a valid feature attribute.");
+    if (featureType.GetValueType().equalsIgnoreCase("id")) {
+      for (int i = 0; i < featureType.ConvertToIdentifier().GetNumberChildren(); i++) {
+        res.add(featureType.ConvertToIdentifier().GetChild(i).GetAttribute());
+      }
+      return res.toArray(new String[0]);
+    }
+    else {
+      return null;
     }
   }
 

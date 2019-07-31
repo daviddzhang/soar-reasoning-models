@@ -1,22 +1,18 @@
 package reasoningmodels.classifiers;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import reasoningmodels.IReasoningModel;
 import reasoningmodels.bayesnet.INode;
-import reasoningmodels.classifiers.IEntry;
-import reasoningmodels.classifiers.IFeature;
 
 public abstract class AClassifier implements IReasoningModel {
-  protected final Map<String, String[]> features;
+  protected Map<String, String[]> features;
   protected final List<IEntry> examples;
   protected final String targetClass;
 
-  protected AClassifier(Map<String, String[]> features, String targetClass) {
-    this.features = features;
+  protected AClassifier(String targetClass) {
     this.examples = new ArrayList<>();
     this.targetClass = targetClass;
   }
@@ -57,8 +53,13 @@ public abstract class AClassifier implements IReasoningModel {
     return stringBuilder.toString();
   }
 
-  public Map<String, String[]> getFeatures() {
-    return this.features;
-  }
+  @Override
+  public abstract boolean hasFlatFeatures();
+
+  @Override
+  public abstract void parameterizeWithFlatFeatures(Map<String, String[]> features);
+
+  @Override
+  public abstract void parameterizeWithGraphicalFeatures(List<INode> nodes);
 
 }

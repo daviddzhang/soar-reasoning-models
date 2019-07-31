@@ -15,8 +15,7 @@ import reasoningmodels.classifiers.IFeature;
 public class BayesNet implements IReasoningModel {
   private List<INode> nodes;
 
-  public BayesNet(List<INode> nodes) {
-    this.nodes = nodes;
+  public BayesNet() {
   }
 
   private void updateCPTs(List<IRandomVariable> trainingEx) {
@@ -25,7 +24,6 @@ public class BayesNet implements IReasoningModel {
       // current node
       node.updateCPT(trainingEx);
     }
-
   }
 
   @Override
@@ -99,6 +97,21 @@ public class BayesNet implements IReasoningModel {
             RandomVariableImpl.featureListToVarList(queryEntry.getFeatures());
 
     return String.valueOf(this.enumeration(queryVars, evidenceVars));
+  }
+
+  @Override
+  public boolean hasFlatFeatures() {
+    return false;
+  }
+
+  @Override
+  public void parameterizeWithFlatFeatures(Map<String, String[]> features) {
+    throw new UnsupportedOperationException("Bayes Nets use graphical features.");
+  }
+
+  @Override
+  public void parameterizeWithGraphicalFeatures(List<INode> nodes) {
+    this.nodes = nodes;
   }
 
   private double enumeration(List<IRandomVariable> queryVars, List<IRandomVariable> evidenceVars) {

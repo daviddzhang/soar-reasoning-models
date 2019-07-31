@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import reasoningmodels.bayesnet.INode;
 import reasoningmodels.classifiers.AClassifier;
 import reasoningmodels.classifiers.IEntry;
 import reasoningmodels.classifiers.IFeature;
@@ -18,8 +19,8 @@ import static java.util.stream.Collectors.toMap;
 public class KNN extends AClassifier {
   private final Map<String, Pair<Double, Double>> minMaxLookup;
 
-  public KNN(Map<String, String[]> features, String targetClass) {
-    super(features, targetClass);
+  public KNN(String targetClass) {
+    super(targetClass);
     minMaxLookup = new HashMap<>();
   }
 
@@ -52,6 +53,21 @@ public class KNN extends AClassifier {
       }
     }
 
+  }
+
+  @Override
+  public boolean hasFlatFeatures() {
+    return true;
+  }
+
+  @Override
+  public void parameterizeWithFlatFeatures(Map<String, String[]> features) {
+    this.features = features;
+  }
+
+  @Override
+  public void parameterizeWithGraphicalFeatures(List<INode> nodes) {
+    throw new IllegalArgumentException("KNN uses flat features.");
   }
 
   private void rescaleFeature(String featureName) {
