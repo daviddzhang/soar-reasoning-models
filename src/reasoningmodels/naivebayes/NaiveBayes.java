@@ -70,7 +70,7 @@ public class NaiveBayes extends AClassifier {
     }
 
     for (Map.Entry<String, String[]> featureEntry : this.features.entrySet()) {
-      if (featureEntry.getValue() == null || featureEntry.getValue().length == 1) {
+      if (featureEntry.getValue() == null || featureEntry.getValue().length == 0) {
         for (Map<String, double[]> means : numericalFeatureMeans.values()) {
           means.put(featureEntry.getKey(), new double[0]);
         }

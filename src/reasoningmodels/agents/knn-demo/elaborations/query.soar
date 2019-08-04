@@ -20,6 +20,7 @@ sp {query-play
    (<w1> ^windy <windy>)
    (<q> ^parameters <p>)
    (<p> ^k 1)
+   (<p> ^distance euclidean)
 }
 
 sp {query-sign
@@ -40,4 +41,5 @@ sp {query-sign
    (<c1> ^color <color>)
    (<q> ^parameters <p>)
    (<p> ^k 1)
+   (<p> ^distance euclidean)
 }

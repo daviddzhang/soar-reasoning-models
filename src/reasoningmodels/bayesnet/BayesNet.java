@@ -12,12 +12,26 @@ import reasoningmodels.classifiers.EntryImpl;
 import reasoningmodels.classifiers.IEntry;
 import reasoningmodels.classifiers.IFeature;
 
+/**
+ * Represents a Bayes Net reasoning model. It holds graphical features in the form of nodes as an
+ * acyclic directed graph. The net uses CPTs to maintain training information. Queries return
+ * probabilities.
+ */
 public class BayesNet implements IReasoningModel {
   private List<INode> nodes;
 
+  /**
+   * Constructs an instance of a BayesNet with its nodes set to an empty list.
+   */
   public BayesNet() {
+    this.nodes = new ArrayList<>();
   }
 
+  /**
+   * Updates each node's CPTs with the given training example.
+   *
+   * @param trainingEx training example to train the model with
+   */
   private void updateCPTs(List<IRandomVariable> trainingEx) {
     // for each node, update the CPT
     for (INode node : nodes) {
@@ -26,11 +40,20 @@ public class BayesNet implements IReasoningModel {
     }
   }
 
+  /**
+   * Formats the Bayes Net string as follows:
+   *[list of NodeImpl.toString()]
+   */
   @Override
   public String toString() {
     return this.nodes.toString();
   }
 
+  /**
+   * Returns a list of names that includes all the nodes of the net.
+   *
+   * @return a list of node names
+   */
   private List<String> toNodeNames() {
     List<String> nodeNames = new ArrayList<String>();
 
@@ -41,6 +64,12 @@ public class BayesNet implements IReasoningModel {
     return nodeNames;
   }
 
+  /**
+   * Returns the first node found with no parents. Throws an exception if no nodes are found,
+   * which represents an impossible net as the graph should be acyclic.
+   *
+   * @return a node with no parents
+   */
   private INode getNoParentNode() {
     INode result = null;
     for (INode node : this.nodes) {
@@ -52,12 +81,16 @@ public class BayesNet implements IReasoningModel {
       return result;
     }
     else {
-      throw new RuntimeException("No nodes with no parents");
+      throw new IllegalStateException("No nodes with no parents");
     }
   }
 
   @Override
   public void train(IEntry entry) {
+    if (entry == null) {
+      throw new IllegalArgumentException("Supplied training example cannot be null.");
+    }
+
     List<IRandomVariable> trainingVars =
             RandomVariableImpl.featureListToVarList(entry.getFeatures());
 
@@ -104,6 +137,9 @@ public class BayesNet implements IReasoningModel {
     return false;
   }
 
+  /**
+   * Throws an exception as Bayes Nets do not use flat features.
+   */
   @Override
   public void parameterizeWithFlatFeatures(Map<String, String[]> features) {
     throw new UnsupportedOperationException("Bayes Nets use graphical features.");
@@ -111,9 +147,20 @@ public class BayesNet implements IReasoningModel {
 
   @Override
   public void parameterizeWithGraphicalFeatures(List<INode> nodes) {
+    if (nodes == null) {
+      throw new IllegalArgumentException("Supplied nodes cannot be null.");
+    }
     this.nodes = nodes;
   }
 
+  /**
+   * Performs inference through enumeration by joining on the query and evidence vars and
+   * eliminates the rest of the variables.
+   *
+   * @param queryVars the variables to query for
+   * @param evidenceVars the variables to use as evidence
+   * @return the probability associated with the query variable given the evidence
+   */
   private double enumeration(List<IRandomVariable> queryVars, List<IRandomVariable> evidenceVars) {
     List<String> queryVarNames = RandomVariableImpl.listOfVarsToListOfNames(queryVars);
     List<String> evidenceVarNames = RandomVariableImpl.listOfVarsToListOfNames(evidenceVars);

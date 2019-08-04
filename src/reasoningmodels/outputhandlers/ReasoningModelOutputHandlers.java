@@ -58,7 +58,6 @@ public class ReasoningModelOutputHandlers {
       List<IFeature> trainingFeatures = ReasoningModelOutputHandlers.parseFeatures(features);
 
       IEntry trainingExample = new EntryImpl(trainingFeatures);
-
       modelToTrain.train(trainingExample);
     }
   };

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Random;
 
 import reasoningmodels.IReasoningModel;
+import reasoningmodels.ReasoningModelDemo;
 import reasoningmodels.outputhandlers.ReasoningModelOutputHandlers;
 import sml.Agent;
 import sml.Identifier;
@@ -21,8 +22,7 @@ public class BayesNetDemo {
   public static void main(String[] args) throws IOException {
     Kernel kernel = Kernel.CreateKernelInCurrentThread(true);
     Agent agent = kernel.CreateAgent("bayes-nets");
-    agent.LoadProductions("/Users/davidzhang/javaprograms/ResearchProjects/SoarReasoningModels" +
-            "/src/reasoningmodels/agents/bn-demo.soar");
+    agent.LoadProductions(ReasoningModelDemo.class.getResource("agents/bn-demo.soar").getPath());
 
     ReasoningModelOutputHandlers.addReasoningOutputHandlersToAgent(agent, "create", "training-ex"
             , "query-handler");

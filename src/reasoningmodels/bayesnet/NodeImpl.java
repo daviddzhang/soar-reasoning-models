@@ -172,7 +172,7 @@ public class NodeImpl implements INode {
     Map<List<IRandomVariable>, Integer> currentFrequency = this.frequencies.getFreqTable();
 
     // updates the frequency assignment for this node
-    if (this.parents.isEmpty()) {
+    if (this.parents.isEmpty() && this.trainingExampleHasOccurrence(trainingEx)) {
 
       for (Map.Entry<List<IRandomVariable>, Integer> entry : currentFrequency.entrySet()) {
         this.frequencies.replace(entry.getKey(), entry.getValue() + 1);
@@ -340,6 +340,22 @@ public class NodeImpl implements INode {
       }
     }
     return filteredList;
+  }
+
+  /**
+   * Returns whether this variable occurs in the training example by name.
+   *
+   * @param trainingEx training example
+   * @return true if this variable occurs, false otherwise
+   */
+  private boolean trainingExampleHasOccurrence(List<IRandomVariable> trainingEx) {
+    for (IRandomVariable var : trainingEx) {
+      if (var.getName().equalsIgnoreCase(this.name)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }
 

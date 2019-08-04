@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public  class BayesSampler {
@@ -35,14 +36,14 @@ public  class BayesSampler {
 
   public static class MultiVarSample {
     Random rand;
-    HashMap<List<IRandomVariable>, Double> prob;
+    Map<List<IRandomVariable>, Double> prob;
 
-    public MultiVarSample(HashMap<List<IRandomVariable>, Double> prob) {
+    public MultiVarSample(Map<List<IRandomVariable>, Double> prob) {
       this.prob = prob;
       this.rand = new Random();
     }
 
-    public MultiVarSample(HashMap<List<IRandomVariable>, Double> prob, int rand) {
+    public MultiVarSample(Map<List<IRandomVariable>, Double> prob, int rand) {
       this.prob = prob;
       this.rand = new Random(rand);
     }

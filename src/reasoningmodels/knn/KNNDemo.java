@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import reasoningmodels.IReasoningModel;
+import reasoningmodels.ReasoningModelDemo;
 import reasoningmodels.outputhandlers.ReasoningModelOutputHandlers;
 import sml.Agent;
 import sml.Identifier;
@@ -18,8 +19,7 @@ public class KNNDemo {
   public static void main(String[] args) throws IOException {
     Kernel kernel = Kernel.CreateKernelInCurrentThread(true);
     Agent agent = kernel.CreateAgent("knn");
-    agent.LoadProductions("/Users/davidzhang/javaprograms/ResearchProjects/SoarReasoningModels" +
-            "/src/reasoningmodels/agents/knn-demo.soar");
+    agent.LoadProductions(ReasoningModelDemo.class.getResource("agents/knn-demo.soar").getPath());
 
     ReasoningModelOutputHandlers.addReasoningOutputHandlersToAgent(agent, "create", "training-ex"
             , "query-handler");
