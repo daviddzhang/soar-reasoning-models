@@ -185,7 +185,7 @@ public class CPTTests {
   void testNormalizeOneVar() {
     this.bCPT.replace(this.bVarPlusList, .25);
     this.bCPT.normalize();
-    assertEquals(1.0, this.bCPT.getCPT().get(this.bVarPlusList));
+    assertEquals(1.0, this.bCPT.getCPT().get(this.bVarPlusList), 001);
   }
 
   @Test
@@ -195,10 +195,10 @@ public class CPTTests {
     this.aCPT.replace(this.ePlusBMinus, 1.0);
     this.aCPT.replace(this.ePlusBPlus, 1.0);
     this.aCPT.normalize();
-    assertEquals(.25, this.aCPT.getCPT().get(this.eMinusBMinus));
-    assertEquals(.25, this.aCPT.getCPT().get(this.eMinusBPlus));
-    assertEquals(.25, this.aCPT.getCPT().get(this.ePlusBMinus));
-    assertEquals(.25, this.aCPT.getCPT().get(this.ePlusBPlus));
+    assertEquals(.25, this.aCPT.getCPT().get(this.eMinusBMinus), 001);
+    assertEquals(.25, this.aCPT.getCPT().get(this.eMinusBPlus), 001);
+    assertEquals(.25, this.aCPT.getCPT().get(this.ePlusBMinus), 001);
+    assertEquals(.25, this.aCPT.getCPT().get(this.ePlusBPlus), 001);
   }
 
   @Test
@@ -208,7 +208,7 @@ public class CPTTests {
     this.aCPT.replace(this.ePlusBMinus, .25);
     this.aCPT.replace(this.ePlusBPlus, 1.0);
     this.aCPT.normalize();
-    assertEquals(.25, this.aCPT.getCPT().get(this.eMinusBMinus));
+    assertEquals(.25, this.aCPT.getCPT().get(this.eMinusBMinus), 001);
     assertEquals(.333, this.aCPT.getCPT().get(this.eMinusBPlus), .001);
     assertEquals(.08333, this.aCPT.getCPT().get(this.ePlusBMinus), .001);
     assertEquals(.333, this.aCPT.getCPT().get(this.ePlusBPlus), .001);
