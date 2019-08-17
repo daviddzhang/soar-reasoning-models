@@ -1,5 +1,6 @@
 package reasoningmodels.bayesnet;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.Map;
  * This class implements the ICPT interface. It represents the CPT as a Hashmap of a List of
  * random variables to doubles. Notable specifics of this implementations are specified below.
  */
-public class CPTImpl implements ICPT {
+public class CPTImpl implements ICPT, Serializable {
   private final Map<List<IRandomVariable>, Double> hm;
 
   /**

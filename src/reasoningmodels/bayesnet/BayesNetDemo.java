@@ -5,26 +5,31 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
-import reasoningmodels.IReasoningModel;
 import reasoningmodels.ReasoningModelDemo;
-import reasoningmodels.outputhandlers.ReasoningModelOutputHandlers;
+import reasoningmodels.outputhandlers.ReasoningModels;
 import sml.Agent;
 import sml.Identifier;
 import sml.Kernel;
 
-import static reasoningmodels.bayesnet.BayesSampler.*;
-
+/**
+ * A class that contains a main method to run a demo for Bayes Nets using a soar agent. It
+ * constructs two different bayes nets - alarm and traffic. User must input number of times to
+ * train and whether the target variables happened or not, then the models will be printed. To
+ * see query result, please see the ReasoningModelDemo demo.
+ */
 public class BayesNetDemo {
   public static void main(String[] args) throws IOException {
     Kernel kernel = Kernel.CreateKernelInCurrentThread(true);
     Agent agent = kernel.CreateAgent("bayes-nets");
     agent.LoadProductions(ReasoningModelDemo.class.getResource("agents/bn-demo.soar").getPath());
 
-    ReasoningModelOutputHandlers.addReasoningOutputHandlersToAgent(agent, "create", "training-ex"
+    ReasoningModels.addReasoningOutputHandlersToAgent(agent, "create", "training-ex"
             , "query-handler");
 
     Identifier il = agent.GetInputLink();
@@ -81,12 +86,49 @@ public class BayesNetDemo {
 
     MultiVarSample lData = new MultiVarSample(lateHM, 2);
 
-    // samplers for burglary detection
-    BurglaryData bData = new BurglaryData(20);
-    EarthquakeData eData = new EarthquakeData(14);
-    AlarmData aData = new AlarmData(23);
-    JohnData jData = new JohnData(4);
-    MaryData mData = new MaryData(1);
+    // Initializing sampler for each node in the net for alarm training
+
+    SingleVarSample bData = new SingleVarSample(.9, 20);
+    SingleVarSample eData = new SingleVarSample(.3, 14);
+
+    IRandomVariable eVarPlus = new RandomVariableImpl("E", true);
+    IRandomVariable eVarMinus = new RandomVariableImpl("E", false);
+    IRandomVariable bVarPlus = new RandomVariableImpl("B", true);
+    IRandomVariable bVarMinus = new RandomVariableImpl("B", false);
+
+    List<IRandomVariable> ePlusBPlus = new ArrayList<>(Arrays.asList(eVarPlus, bVarPlus));
+    List<IRandomVariable> eMinusBPlus = new ArrayList<>(Arrays.asList(eVarMinus, bVarPlus));
+    List<IRandomVariable> eMinusBMinus = new ArrayList<>(Arrays.asList(eVarMinus, bVarMinus));
+    List<IRandomVariable> ePlusBMinus = new ArrayList<>(Arrays.asList(eVarPlus, bVarMinus));
+
+    Map<List<IRandomVariable>, Double> alarmProbs = new HashMap<>();
+
+    alarmProbs.put(ePlusBPlus, .99);
+    alarmProbs.put(eMinusBPlus, .9);
+    alarmProbs.put(eMinusBMinus, .1);
+    alarmProbs.put(ePlusBMinus, .15);
+
+    MultiVarSample aData = new MultiVarSample(alarmProbs, 23);
+
+    IRandomVariable aPlus = new RandomVariableImpl("A", true);
+    IRandomVariable aMinus = new RandomVariableImpl("A", false);
+
+    List<IRandomVariable> aPlusList = new ArrayList<IRandomVariable>(Collections.singletonList(aPlus));
+    List<IRandomVariable> aMinusList = new ArrayList<IRandomVariable>(Collections.singletonList(aMinus));
+
+    Map<List<IRandomVariable>, Double> johnProbs = new HashMap<>();
+
+    johnProbs.put(aPlusList, .9);
+    johnProbs.put(aMinusList, .1);
+
+    MultiVarSample jData = new MultiVarSample(johnProbs, 4);
+
+    Map<List<IRandomVariable>, Double> maryProbs = new HashMap<>();
+
+    maryProbs.put(aPlusList, .7);
+    maryProbs.put(aMinusList, .15);
+
+    MultiVarSample mData = new MultiVarSample(maryProbs, 1);
 
     Random chooseNet = new Random(0);
 
@@ -172,20 +214,10 @@ public class BayesNetDemo {
     agent.RunSelf(1);
 
 
-    List<IReasoningModel> graphs = ReasoningModelOutputHandlers.getModels();
-
-    for (int i = 0; i < graphs.size(); i++) {
-      IReasoningModel current = graphs.get(i);
-    }
-
-    System.out.println(agent.ExecuteCommandLine("p --depth 10 -t s1"));
 
     kernel.Shutdown();
 
-    for (int i  = 0; i < graphs.size(); i++) {
-      System.out.println("GRAPH " + i);
-      System.out.println(graphs.get(i).toString());
-    }
+    System.out.println(ReasoningModels.printModels());
   }
 
   private static double booleanToDouble(boolean occurred) {
@@ -196,4 +228,64 @@ public class BayesNetDemo {
       return 0.0;
     }
   }
+
+  /**
+   * A single variable sampler. Returns true based on the supplied occurrence rate.
+   */
+  public static class SingleVarSample {
+    Random rand;
+    double occurrence;
+
+    public SingleVarSample(double occurrence) {
+      this.occurrence = occurrence;
+      this.rand = new Random();
+    }
+
+    public SingleVarSample(double occurrence, int rand) {
+      this.occurrence = occurrence;
+      this.rand = new Random(rand);
+    }
+
+    public boolean sample() {
+      double random = rand.nextDouble();
+
+      if (random <= this.occurrence) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
+
+  /**
+   * A multi variable sampler. Returns true based on the supplied probability table and the given
+   * list of variables that occurred.
+   */
+  public static class MultiVarSample {
+    Random rand;
+    Map<List<IRandomVariable>, Double> prob;
+
+    public MultiVarSample(Map<List<IRandomVariable>, Double> prob) {
+      this.prob = prob;
+      this.rand = new Random();
+    }
+
+    public MultiVarSample(Map<List<IRandomVariable>, Double> prob, int rand) {
+      this.prob = prob;
+      this.rand = new Random(rand);
+    }
+
+    public boolean sample(List<IRandomVariable> givens) {
+      double probForGiven = this.prob.get(givens);
+      double random = this.rand.nextDouble();
+
+      if (random <= probForGiven) {
+        return true;
+      } else {
+        return false;
+      }
+
+    }
+  }
+
 }

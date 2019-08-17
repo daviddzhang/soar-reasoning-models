@@ -1,5 +1,6 @@
 package reasoningmodels.bayesnet;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.Map;
  * of IFreqTables for frequencies and relative frequencies. Specifics of this implementation are
  * further documented below.
  */
-public class NodeImpl implements INode {
+public class NodeImpl implements INode, Serializable {
   private final String name;
   private final List<String> parents;
   private ICPT cpt;

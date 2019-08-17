@@ -1,5 +1,6 @@
 package reasoningmodels.bayesnet;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -10,7 +11,7 @@ import reasoningmodels.classifiers.IFeature;
  * This class represents a random variable. It uses a boolean value to indicate whether it occurred
  * or not. Specifics of how certain details are implemented are documented below.
  */
-public class RandomVariableImpl implements IRandomVariable {
+public class RandomVariableImpl implements IRandomVariable, Serializable {
   private final String name;
   private final boolean hasOccurred;
 

@@ -6,22 +6,25 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Iterator;
-import java.util.List;
 
-import reasoningmodels.IReasoningModel;
 import reasoningmodels.ReasoningModelDemo;
-import reasoningmodels.outputhandlers.ReasoningModelOutputHandlers;
+import reasoningmodels.outputhandlers.ReasoningModels;
 import sml.Agent;
 import sml.Identifier;
 import sml.Kernel;
 
+/**
+ * A main method that runs a demonstration of the KNN model with a Soar agent. Reads in CSV data
+ * for two problems (sign of the shape and whether to play or not) - files are located in the
+ * resources package. To see query results, see ReasoningModelDemo.
+ */
 public class KNNDemo {
   public static void main(String[] args) throws IOException {
     Kernel kernel = Kernel.CreateKernelInCurrentThread(true);
     Agent agent = kernel.CreateAgent("knn");
     agent.LoadProductions(ReasoningModelDemo.class.getResource("agents/knn-demo.soar").getPath());
 
-    ReasoningModelOutputHandlers.addReasoningOutputHandlersToAgent(agent, "create", "training-ex"
+    ReasoningModels.addReasoningOutputHandlersToAgent(agent, "create", "training-ex"
             , "query-handler");
 
     Identifier il = agent.GetInputLink();
@@ -33,9 +36,6 @@ public class KNNDemo {
     create.DestroyWME();
 
     agent.RunSelf(10);
-
-    System.out.println(agent.ExecuteCommandLine("p --depth 10 -t s1"));
-
 
     // train play classifier
     Reader data1File = new FileReader("/Users/davidzhang/Downloads/data1.csv");
@@ -94,13 +94,7 @@ public class KNNDemo {
     querySign.DestroyWME();
     agent.RunSelf(2);
 
-    List<IReasoningModel> models = ReasoningModelOutputHandlers.getModels();
-
-    for (int i = 0; i < models.size(); i++) {
-      System.out.println("Model: " + i);
-      System.out.println(models.get(i).toString());
-    }
-
+    System.out.println(ReasoningModels.printModels());
 
   }
 }

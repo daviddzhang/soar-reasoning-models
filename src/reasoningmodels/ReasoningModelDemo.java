@@ -9,24 +9,24 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
+import reasoningmodels.bayesnet.BayesNetDemo;
 import reasoningmodels.bayesnet.IRandomVariable;
 import reasoningmodels.bayesnet.RandomVariableImpl;
-import reasoningmodels.outputhandlers.ReasoningModelOutputHandlers;
+import reasoningmodels.outputhandlers.ReasoningModels;
 import sml.Agent;
 import sml.Identifier;
 import sml.Kernel;
 
-import static reasoningmodels.bayesnet.BayesSampler.AlarmData;
-import static reasoningmodels.bayesnet.BayesSampler.BurglaryData;
-import static reasoningmodels.bayesnet.BayesSampler.EarthquakeData;
-import static reasoningmodels.bayesnet.BayesSampler.JohnData;
-import static reasoningmodels.bayesnet.BayesSampler.MaryData;
-
-
+/**
+ * 
+ */
 public class ReasoningModelDemo {
   public static void main(String[] args) throws IOException {
     Kernel kernel = Kernel.CreateKernelInCurrentThread(true);
@@ -34,7 +34,8 @@ public class ReasoningModelDemo {
     agent.LoadProductions(ReasoningModelDemo.class.getResource("agents/reasoning-models-demo" +
             ".soar").getPath());
 
-    ReasoningModelOutputHandlers.addReasoningOutputHandlersToAgent(agent, "create", "training-ex"
+    ReasoningModels.addReasoningOutputHandlersToAgent(agent, null, "create",
+            "training-ex"
             , "query-handler");
 
     Identifier il = agent.GetInputLink();
@@ -51,19 +52,56 @@ public class ReasoningModelDemo {
 
     try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
       System.out.print("How many times do you want to train in total?");
-       num = Integer.parseInt(reader.readLine());
-    }
-    catch (Exception e) {
+      num = Integer.parseInt(reader.readLine());
+    } catch (Exception e) {
       e.printStackTrace();
     }
 
 
     // samplers for burglary detection
-    BurglaryData bData = new BurglaryData(3);
-    EarthquakeData eData = new EarthquakeData(2);
-    AlarmData aData = new AlarmData(6);
-    JohnData jData = new JohnData(0);
-    MaryData mData = new MaryData(1);
+    BayesNetDemo.SingleVarSample bData = new BayesNetDemo.SingleVarSample(.9, 20);
+    BayesNetDemo.SingleVarSample eData = new BayesNetDemo.SingleVarSample(.3, 14);
+
+    IRandomVariable eVarPlus = new RandomVariableImpl("E", true);
+    IRandomVariable eVarMinus = new RandomVariableImpl("E", false);
+    IRandomVariable bVarPlus = new RandomVariableImpl("B", true);
+    IRandomVariable bVarMinus = new RandomVariableImpl("B", false);
+
+    List<IRandomVariable> ePlusBPlus = new ArrayList<>(Arrays.asList(eVarPlus, bVarPlus));
+    List<IRandomVariable> eMinusBPlus = new ArrayList<>(Arrays.asList(eVarMinus, bVarPlus));
+    List<IRandomVariable> eMinusBMinus = new ArrayList<>(Arrays.asList(eVarMinus, bVarMinus));
+    List<IRandomVariable> ePlusBMinus = new ArrayList<>(Arrays.asList(eVarPlus, bVarMinus));
+
+    Map<List<IRandomVariable>, Double> alarmProbs = new HashMap<>();
+
+    alarmProbs.put(ePlusBPlus, .99);
+    alarmProbs.put(eMinusBPlus, .9);
+    alarmProbs.put(eMinusBMinus, .1);
+    alarmProbs.put(ePlusBMinus, .15);
+
+    BayesNetDemo.MultiVarSample aData = new BayesNetDemo.MultiVarSample(alarmProbs, 23);
+
+    IRandomVariable aPlus = new RandomVariableImpl("A", true);
+    IRandomVariable aMinus = new RandomVariableImpl("A", false);
+
+    List<IRandomVariable> aPlusList =
+            new ArrayList<IRandomVariable>(Collections.singletonList(aPlus));
+    List<IRandomVariable> aMinusList =
+            new ArrayList<IRandomVariable>(Collections.singletonList(aMinus));
+
+    Map<List<IRandomVariable>, Double> johnProbs = new HashMap<>();
+
+    johnProbs.put(aPlusList, .9);
+    johnProbs.put(aMinusList, .1);
+
+    BayesNetDemo.MultiVarSample jData = new BayesNetDemo.MultiVarSample(johnProbs, 4);
+
+    Map<List<IRandomVariable>, Double> maryProbs = new HashMap<>();
+
+    maryProbs.put(aPlusList, .7);
+    maryProbs.put(aMinusList, .15);
+
+    BayesNetDemo.MultiVarSample mData = new BayesNetDemo.MultiVarSample(maryProbs, 1);
 
     Random chooseModel = new Random(0);
 
@@ -81,6 +119,8 @@ public class ReasoningModelDemo {
 
     String[] headers2 = iterator2.next();
 
+    // set up to train randomly between three different models - stops training classifiers if
+    // they run out of csv examples
     List<Integer> modelIndices = new ArrayList<>(Arrays.asList(0, 1, 2));
 
     for (int i = num; i > 0; i--) {
@@ -120,8 +160,7 @@ public class ReasoningModelDemo {
 
         agent.RunSelf(2);
         train.DestroyWME();
-      }
-      else if (randModel == 1) {
+      } else if (randModel == 1) {
         Identifier train = il.CreateIdWME("training");
         train.CreateStringWME("name", "play");
         String[] current = iterator1.next();
@@ -131,8 +170,7 @@ public class ReasoningModelDemo {
 
         agent.RunSelf(2);
         train.DestroyWME();
-      }
-      else {
+      } else {
         Identifier train = il.CreateIdWME("training");
         train.CreateStringWME("name", "sign");
         String[] current = iterator2.next();
@@ -154,9 +192,9 @@ public class ReasoningModelDemo {
     queryAlarm.CreateFloatWME("mary", 1.0);
     queryAlarm.CreateStringWME("name", "alarm");
 
-    agent.RunSelf(1);
+    agent.RunSelf(2);
     queryAlarm.DestroyWME();
-    agent.RunSelf(3);
+    agent.RunSelf(2);
 
     Identifier queryPlay = il.CreateIdWME("query-signal");
     queryPlay.CreateStringWME("outlook", "sunny");
@@ -165,9 +203,9 @@ public class ReasoningModelDemo {
     queryPlay.CreateFloatWME("windy", 1.0);
     queryPlay.CreateStringWME("name", "play");
 
-    agent.RunSelf(1);
+    agent.RunSelf(2);
     queryPlay.DestroyWME();
-    agent.RunSelf(3);
+    agent.RunSelf(2);
 
     Identifier querySign = il.CreateIdWME("query-signal");
     querySign.CreateStringWME("shape", "square");
@@ -178,14 +216,14 @@ public class ReasoningModelDemo {
     querySign.DestroyWME();
     agent.RunSelf(2);
 
-    List<IReasoningModel> models = ReasoningModelOutputHandlers.getModels();
+    System.out.println("BAYES NET RESULT: " + agent.GetOutputLink().FindByAttribute("alarm-result"
+            , 0).ConvertToFloatElement().GetValue());
+    System.out.println("KNN RESULT: " + agent.GetOutputLink().FindByAttribute("play-result"
+            , 0).GetValueAsString());
+    System.out.println("NAIVE BAYES RESULT: " + agent.GetOutputLink().FindByAttribute("sign-result"
+            , 0).GetValueAsString());
 
-    System.out.println(agent.ExecuteCommandLine("p --depth 10 -t s1"));
-
-    for (int i = 0; i < models.size(); i++) {
-      System.out.println("Model: " + i);
-      System.out.println(models.get(i).toString());
-    }
+    System.out.println(ReasoningModels.printModels());
 
 
   }
@@ -193,8 +231,7 @@ public class ReasoningModelDemo {
   private static double booleanToDouble(boolean occurred) {
     if (occurred) {
       return 1.0;
-    }
-    else {
+    } else {
       return 0.0;
     }
   }

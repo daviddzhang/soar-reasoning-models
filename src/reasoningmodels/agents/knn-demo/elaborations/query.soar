@@ -2,8 +2,8 @@ sp {query-play
    (state <s> ^io <io>)
    (<io> ^output-link <out>)
    (<io> ^input-link <il>)
-   (<il> ^query-signal <q>)
-   (<q>  ^name <name>
+   (<il> ^query-signal <qs>)
+   (<qs>  ^name <name>
          ^outlook <olook>
          ^temp <temp>
          ^humidity <humid>
@@ -27,8 +27,8 @@ sp {query-sign
    (state <s> ^io <io>)
    (<io> ^output-link <out>)
    (<io> ^input-link <il>)
-   (<il> ^query-signal <q>)
-   (<q>  ^name <name>
+   (<il> ^query-signal <qs>)
+   (<qs>  ^name <name>
          ^shape <shape>
          ^color <color>)
    (<s> ^<name> <id>)

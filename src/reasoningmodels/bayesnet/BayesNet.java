@@ -2,6 +2,7 @@ package reasoningmodels.bayesnet;
 
 import org.apache.commons.math3.util.Pair;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,7 @@ import reasoningmodels.classifiers.IFeature;
  * acyclic directed graph. The net uses CPTs to maintain training information. Queries return
  * probabilities.
  */
-public class BayesNet implements IReasoningModel {
+public class BayesNet implements IReasoningModel, Serializable {
   private List<INode> nodes;
 
   /**
@@ -97,6 +98,9 @@ public class BayesNet implements IReasoningModel {
     this.updateCPTs(trainingVars);
   }
 
+  /**
+   * BayesNet requires a set of target variables, labeled "target-vars" from the queryParams field.
+   */
   @Override
   public String queryWithParams(IEntry queryEntry, Map<String, Object> queryParams) {
     if (queryEntry == null || queryParams == null) {

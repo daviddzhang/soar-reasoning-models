@@ -14,7 +14,6 @@ import reasoningmodels.naivebayes.NaiveBayes;
 import sml.WMElement;
 
 public class ReasoningModelFactory {
-
   public static IReasoningModel createModel(WMElement wme) {
     IReasoningModel res;
     String targetClass = null;

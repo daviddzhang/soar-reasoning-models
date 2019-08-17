@@ -16,6 +16,6 @@ sp {apply*clean-query-play
    (<qh> ^result <r>)
    (<op> ^name clean-query-play)
 -->
-   (<s> ^play-result <r>)
+   (<ol> ^play-result <r>)
    (<ol> ^query-handler <qh> -)
 }

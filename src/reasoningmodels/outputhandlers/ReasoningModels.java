@@ -3,6 +3,12 @@ package reasoningmodels.outputhandlers;
 
 import org.apache.commons.math3.util.Pair;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,19 +25,77 @@ import sml.Agent;
 import sml.Agent.OutputEventInterface;
 import sml.WMElement;
 
-public class ReasoningModelOutputHandlers {
+public class ReasoningModels {
 
   private static List<IReasoningModel> models = new ArrayList<>();
+  private static Serializable userData = null;
 
-  public static List<IReasoningModel> getModels() {
-    return new ArrayList<>(ReasoningModelOutputHandlers.models);
+  public static String printModels() {
+    StringBuilder stringBuilder = new StringBuilder();
+    for (int i = 0; i < models.size(); i++) {
+      stringBuilder.append("Model: ").append(i).append("\n");
+      stringBuilder.append(models.get(i).toString()).append("\n");
+    }
+
+    return stringBuilder.toString();
+  }
+
+  public static void serialize(String filePath) throws IOException {
+    List<Object> toSave = new ArrayList<>();
+    toSave.add(models);
+    if (userData != null) {
+     toSave.add(userData);
+    }
+
+    try {
+      FileOutputStream fos = new FileOutputStream(filePath);
+      ObjectOutputStream out = new ObjectOutputStream(fos);
+      out.writeObject(toSave);
+
+      out.flush();
+      out.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public static Serializable deserialize(String filePath) throws IOException {
+    try {
+      FileInputStream fis = new FileInputStream(filePath);
+      ObjectInputStream in = new ObjectInputStream(fis);
+      List<Object> readModels = (List<Object>) in.readObject();
+      List<IReasoningModel> models = (List<IReasoningModel>) readModels.get(0);
+      in.close();
+
+      ReasoningModels.models.clear();
+      ReasoningModels.models.addAll(models);
+
+      try {
+        ReasoningModels.userData = (Serializable) readModels.get(1);
+        return (Serializable)readModels.get(1);
+      } catch (Exception e) {
+        return null;
+      }
+    } catch (IOException | ClassNotFoundException e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 
   public static void addReasoningOutputHandlersToAgent(Agent agent, String createWMEName,
                                                        String trainWMEName, String queryWMEName) {
-    agent.AddOutputHandler(createWMEName, createModel, models);
-    agent.AddOutputHandler(trainWMEName, trainModel, models);
-    agent.AddOutputHandler(queryWMEName, queryModel, models);
+    agent.AddOutputHandler(createWMEName, createModel, userData);
+    agent.AddOutputHandler(trainWMEName, trainModel, userData);
+    agent.AddOutputHandler(queryWMEName, queryModel, userData);
+  }
+
+  public static void addReasoningOutputHandlersToAgent(Agent agent,
+                                                       Serializable userData, String createWMEName,
+                                                       String trainWMEName, String queryWMEName) {
+    ReasoningModels.userData = userData;
+    agent.AddOutputHandler(createWMEName, createModel, userData);
+    agent.AddOutputHandler(trainWMEName, trainModel, userData);
+    agent.AddOutputHandler(queryWMEName, queryModel, userData);
   }
 
   private static final OutputEventInterface createModel = new OutputEventInterface() {
@@ -55,7 +119,7 @@ public class ReasoningModelOutputHandlers {
 
       WMElement features = pWmeAdded.ConvertToIdentifier().FindByAttribute("train", 0);
 
-      List<IFeature> trainingFeatures = ReasoningModelOutputHandlers.parseFeatures(features);
+      List<IFeature> trainingFeatures = ReasoningModels.parseFeatures(features);
 
       IEntry trainingExample = new EntryImpl(trainingFeatures);
       modelToTrain.train(trainingExample);
@@ -71,13 +135,13 @@ public class ReasoningModelOutputHandlers {
 
       WMElement queryWME = pWmeAdded.ConvertToIdentifier().FindByAttribute("query", 0);
       WMElement features = queryWME.ConvertToIdentifier().FindByAttribute("features", 0);
-      List<IFeature> queryFeatures = ReasoningModelOutputHandlers.parseFeatures(features);
+      List<IFeature> queryFeatures = ReasoningModels.parseFeatures(features);
 
       IEntry queryEntry = new EntryImpl(queryFeatures);
 
       WMElement params = queryWME.ConvertToIdentifier().FindByAttribute("parameters", 0);
 
-      Map<String, Object> queryParams = ReasoningModelOutputHandlers.handleParams(params);
+      Map<String, Object> queryParams = ReasoningModels.handleParams(params);
 
       String res  = modelToQuery.queryWithParams(queryEntry, queryParams);
 

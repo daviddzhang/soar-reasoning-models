@@ -16,6 +16,6 @@ sp {apply*clean-query-sign
    (<qh> ^result <r>)
    (<op> ^name clean-query-sign)
 -->
-   (<s> ^sign-result <r>)
+   (<ol> ^sign-result <r>)
    (<ol> ^query-handler <qh> -)
 }

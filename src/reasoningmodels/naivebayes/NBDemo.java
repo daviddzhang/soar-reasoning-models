@@ -6,22 +6,25 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Iterator;
-import java.util.List;
 
-import reasoningmodels.IReasoningModel;
 import reasoningmodels.ReasoningModelDemo;
-import reasoningmodels.outputhandlers.ReasoningModelOutputHandlers;
+import reasoningmodels.outputhandlers.ReasoningModels;
 import sml.Agent;
 import sml.Identifier;
 import sml.Kernel;
 
+/**
+ * A main method that runs a demonstration of the NB model through a Soar agent. Similarly to the
+ * KNN demo, it reads in the same CSV data to produce a result. See ReasoningModelDemo for query
+ * results.
+ */
 public class NBDemo {
   public static void main(String[] args) throws IOException {
     Kernel kernel = Kernel.CreateKernelInCurrentThread(true);
     Agent agent = kernel.CreateAgent("nb");
     agent.LoadProductions(ReasoningModelDemo.class.getResource("agents/nb-demo.soar").getPath());
 
-    ReasoningModelOutputHandlers.addReasoningOutputHandlersToAgent(agent, "create", "training-ex"
+    ReasoningModels.addReasoningOutputHandlersToAgent(agent, "create", "training-ex"
             , "query-handler");
 
     Identifier il = agent.GetInputLink();
@@ -91,13 +94,7 @@ public class NBDemo {
     querySign.DestroyWME();
     agent.RunSelf(2);
 
-    List<IReasoningModel> models = ReasoningModelOutputHandlers.getModels();
-
-    for (int i = 0; i < models.size(); i++) {
-      System.out.println("Model: " + i);
-      System.out.println(models.get(i).toString());
-    }
-
+    System.out.println(ReasoningModels.printModels());
 
   }
 }

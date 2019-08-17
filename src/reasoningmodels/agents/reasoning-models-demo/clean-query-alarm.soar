@@ -16,7 +16,7 @@ sp {apply*clean-query-alarm
    (<qh> ^result <r>)
    (<op> ^name clean-query-alarm)
 -->
-   (<s> ^alarm-result <r>)
+   (<ol> ^alarm-result <r>)
    (<ol> ^query-handler <qh> -)
 }
 

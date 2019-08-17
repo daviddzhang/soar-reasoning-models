@@ -1,5 +1,6 @@
 package reasoningmodels.bayesnet;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,7 +9,7 @@ import java.util.Map;
  * This class implements the IFreqTable interface. It keeps track of counts as a mapping of lists of
  * random variables to integers. Specific details are documented below.
  */
-public class FreqTableImpl implements IFreqTable {
+public class FreqTableImpl implements IFreqTable, Serializable {
   private final Map<List<IRandomVariable>, Integer> hm;
 
   /**
