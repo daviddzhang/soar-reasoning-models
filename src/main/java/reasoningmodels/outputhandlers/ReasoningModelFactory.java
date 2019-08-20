@@ -13,8 +13,24 @@ import reasoningmodels.knn.KNN;
 import reasoningmodels.naivebayes.NaiveBayes;
 import sml.WMElement;
 
+/**
+ * A factory for reasoning models. It supports construction of models through parsing information
+ * from a given working memory element.
+ */
 public class ReasoningModelFactory {
+
+  /**
+   * Construct an instance of the appropriate model based on the information in the given working
+   * memory element.
+   *
+   * @param wme working memory element that contains model info
+   * @return an instance of a reasoning model
+   */
   public static IReasoningModel createModel(WMElement wme) {
+    if (wme == null) {
+      throw new IllegalArgumentException("Provided WME cannot be null.");
+    }
+
     IReasoningModel res;
     String targetClass = null;
     WMElement maybeTarget = getParamWME(wme).ConvertToIdentifier().FindByAttribute("target",0);
@@ -49,6 +65,13 @@ public class ReasoningModelFactory {
     return res;
   }
 
+  /**
+   * Gets the graphical features found in the WME. Should only be called if the reasoning model
+   * requires graphical features.
+   *
+   * @param wme working memory element that contains the info
+   * @return a list of nodes based on the WME info
+   */
   private static List<INode> getGraphicalFeatures(WMElement wme) {
     WMElement params = getParamWME(wme);
     WMElement graph = params.ConvertToIdentifier().FindByAttribute("graph", 0);
@@ -86,6 +109,13 @@ public class ReasoningModelFactory {
     return nodesInNewGraph;
   }
 
+  /**
+   * Gets the flat features found in the WME. Should only be called if the reasoning model
+   * requires flat features.
+   *
+   * @param wme working memory element that contains the info
+   * @return a mapping of features to enums based on the WME info
+   */
   private static Map<String, String[]> getFlatFeatures(WMElement wme) {
     WMElement params = getParamWME(wme);
     WMElement features = params.ConvertToIdentifier().FindByAttribute("features", 0);
@@ -104,6 +134,12 @@ public class ReasoningModelFactory {
     return modelFeatures;
   }
 
+  /**
+   * Gets the enumeration associated with the feature found in the given WME.
+   *
+   * @param featureType the WME containing the feature info
+   * @return the enumeration if it exists, null otherwise
+   */
   private static String[] getFeatureEnums(WMElement featureType) {
     List<String> res = new ArrayList<>();
     if (featureType.GetValueType().equalsIgnoreCase("id")) {
@@ -117,6 +153,12 @@ public class ReasoningModelFactory {
     }
   }
 
+  /**
+   * Gets the WME labeled "parameters." Returns null if it cannot be found.
+   *
+   * @param wme wme that contains parameters
+   * @return the parameters WME
+   */
   private static WMElement getParamWME(WMElement wme) {
     return wme.ConvertToIdentifier().FindByAttribute("parameters", 0);
   }

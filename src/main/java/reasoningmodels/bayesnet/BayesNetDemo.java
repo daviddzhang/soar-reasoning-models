@@ -27,7 +27,7 @@ public class BayesNetDemo {
   public static void main(String[] args) throws IOException {
     Kernel kernel = Kernel.CreateKernelInCurrentThread(true);
     Agent agent = kernel.CreateAgent("bayes-nets");
-    agent.LoadProductions(ReasoningModelDemo.class.getResource("agents/bn-demo.soar").getPath());
+    agent.LoadProductions(ReasoningModelDemo.class.getResource("/agents/bn-demo.soar").getPath());
 
     ReasoningModels.addReasoningOutputHandlersToAgent(agent, "create", "training-ex"
             , "query-handler");
@@ -236,16 +236,32 @@ public class BayesNetDemo {
     Random rand;
     double occurrence;
 
+    /**
+     * Constructs an instance of SingleVarSample with the given occurrence rate.
+     *
+     * @param occurrence rate of the variable being true
+     */
     public SingleVarSample(double occurrence) {
       this.occurrence = occurrence;
       this.rand = new Random();
     }
 
+    /**
+     * Constructs an instance of SingleVarSample with the given occurrence rate and random seed.
+     *
+     * @param occurrence rate of the variable being true
+     * @param rand random seed
+     */
     public SingleVarSample(double occurrence, int rand) {
       this.occurrence = occurrence;
       this.rand = new Random(rand);
     }
 
+    /**
+     * Samples based on the occurrence rate.
+     *
+     * @return true if a random number falls below the occurrence rate, false otherwise
+     */
     public boolean sample() {
       double random = rand.nextDouble();
 
@@ -265,16 +281,34 @@ public class BayesNetDemo {
     Random rand;
     Map<List<IRandomVariable>, Double> prob;
 
+    /**
+     * Constructs an instance of MultiVarSample with the given probability table.
+     *
+     * @param prob a map of list of variables to their probability of occurring
+     */
     public MultiVarSample(Map<List<IRandomVariable>, Double> prob) {
       this.prob = prob;
       this.rand = new Random();
     }
 
+    /**
+     * Constructs an instance of MultiVarSample with the given probability table and random seed.
+     *
+     * @param prob a map of list of variables to their probability of occurring
+     * @param rand random seed
+     */
     public MultiVarSample(Map<List<IRandomVariable>, Double> prob, int rand) {
       this.prob = prob;
       this.rand = new Random(rand);
     }
 
+    /**
+     * Samples based on the given random variables that appeared.
+     *
+     * @param givens list of variables observed
+     * @return true if a randomly generated number falls below the probability for the variables,
+     * false otherwise
+     */
     public boolean sample(List<IRandomVariable> givens) {
       double probForGiven = this.prob.get(givens);
       double random = this.rand.nextDouble();

@@ -31,13 +31,11 @@ public class ReasoningModelDemo {
   public static void main(String[] args) throws IOException {
     Kernel kernel = Kernel.CreateKernelInCurrentThread(true);
     Agent agent = kernel.CreateAgent("reasoning-models");
-    System.out.println(ReasoningModelDemo.class.getResource(""));
-    agent.LoadProductions(ReasoningModelDemo.class.getResource("reasoning-models-demo" +
+    agent.LoadProductions(ReasoningModelDemo.class.getResource("/agents/reasoning-models-demo" +
             ".soar").getPath());
 
     ReasoningModels.addReasoningOutputHandlersToAgent(agent, "create",
-            "training-ex"
-            , "query-handler");
+            "training-ex", "query-handler");
 
     Identifier il = agent.GetInputLink();
 
@@ -106,14 +104,14 @@ public class ReasoningModelDemo {
 
     Random chooseModel = new Random(0);
 
-    Reader data1File = new FileReader("/Users/davidzhang/Downloads/data1.csv");
+    Reader data1File = new FileReader(ReasoningModelDemo.class.getResource("/data1.csv").getPath());
     CSVReader reader1 = new CSVReader(data1File);
 
     Iterator<String[]> iterator1 = reader1.iterator();
     String[] headers1 = iterator1.next();
 
     // train sign classifier
-    Reader data2File = new FileReader("/Users/davidzhang/Downloads/data2.csv");
+    Reader data2File = new FileReader(ReasoningModelDemo.class.getResource("/data2.csv").getPath());
     CSVReader reader2 = new CSVReader(data2File);
 
     Iterator<String[]> iterator2 = reader2.iterator();

@@ -25,11 +25,20 @@ import sml.Agent;
 import sml.Agent.OutputEventInterface;
 import sml.WMElement;
 
+/**
+ * This class contains all the operations an outside user might want from the reasoning models.
+ * This including saving and loading, and printing the models. This also includes registering
+ * output handlers to a given agent. All the output handlers are also stored in this class.
+ */
 public class ReasoningModels {
-
   private static List<IReasoningModel> models = new ArrayList<>();
   private static Serializable userData = null;
 
+  /**
+   * Prints the models that have been instantiated so far in the static list.
+   *
+   * @return a string with each model printed
+   */
   public static String printModels() {
     StringBuilder stringBuilder = new StringBuilder();
     for (int i = 0; i < models.size(); i++) {
@@ -40,6 +49,12 @@ public class ReasoningModels {
     return stringBuilder.toString();
   }
 
+  /**
+   * Serializes the list of models in the given file path.
+   *
+   * @param filePath path to save to
+   * @throws IOException if an error occurs when trying to write the object
+   */
   public static void serialize(String filePath) throws IOException {
     List<Object> toSave = new ArrayList<>();
     toSave.add(models);
@@ -59,6 +74,13 @@ public class ReasoningModels {
     }
   }
 
+  /**
+   * Deserializes the object from the given filepath. Gives back the user data if it exists.
+   *
+   * @param filePath where to deserialize from
+   * @return user data if possible
+   * @throws IOException if there is an error while deserializing
+   */
   public static Serializable deserialize(String filePath) throws IOException {
     try {
       FileInputStream fis = new FileInputStream(filePath);
@@ -82,6 +104,15 @@ public class ReasoningModels {
     return null;
   }
 
+  /**
+   * Registers the below output handlers to the given agent, using the names provided for the
+   * names of the output handler WMEs.
+   *
+   * @param agent to register output handlers to
+   * @param createWMEName name for creation output handler WME
+   * @param trainWMEName name for training output handler WME
+   * @param queryWMEName name for querying output handler WME
+   */
   public static void addReasoningOutputHandlersToAgent(Agent agent, String createWMEName,
                                                        String trainWMEName, String queryWMEName) {
     agent.AddOutputHandler(createWMEName, createModel, userData);
@@ -89,6 +120,16 @@ public class ReasoningModels {
     agent.AddOutputHandler(queryWMEName, queryModel, userData);
   }
 
+  /**
+   * Registers the below output handlers to the given agent, using the names provided for the
+   * names of the output handler WMEs. Also allows for a Serializable user data input.
+   *
+   * @param agent to register output handlers to
+   * @param userData user data to save
+   * @param createWMEName name for creation output handler WME
+   * @param trainWMEName name for training output handler WME
+   * @param queryWMEName name for querying output handler WME
+   */
   public static void addReasoningOutputHandlersToAgent(Agent agent,
                                                        Serializable userData, String createWMEName,
                                                        String trainWMEName, String queryWMEName) {
@@ -98,6 +139,11 @@ public class ReasoningModels {
     agent.AddOutputHandler(queryWMEName, queryModel, userData);
   }
 
+  /**
+   * Output handler to create models. Utilizes the ReasoningModelFactory to construct instances
+   * based on agent info. Writes an id to the agent that represents the index of the new model in
+   * the list.
+   */
   private static final OutputEventInterface createModel = new OutputEventInterface() {
     public void outputEventHandler(Object data, String agentName, String attributeName,
                                    WMElement pWmeAdded) {
@@ -110,6 +156,10 @@ public class ReasoningModels {
     }
   };
 
+  /**
+   * Output handler to train models. Parses info from the WME and passes it into the model's
+   * training method.
+   */
   private static final OutputEventInterface trainModel = new OutputEventInterface() {
     public void outputEventHandler(Object data, String agentName, String attributeName,
                                    WMElement pWmeAdded) {
@@ -126,6 +176,10 @@ public class ReasoningModels {
     }
   };
 
+  /**
+   * Output handler to query models. Parses information similarly to training output handler.
+   * Writes the result to the agent via the pWmeAdded.
+   */
   private static final OutputEventInterface queryModel = new OutputEventInterface() {
     public void outputEventHandler(Object data, String agentName, String attributeName,
                                    WMElement pWmeAdded) {
@@ -154,6 +208,13 @@ public class ReasoningModels {
     }
   };
 
+  /**
+   * Handles the query parameters and formats them into a mapping of name to object. Used to hold
+   * query options, like smoothing or k.
+   *
+   * @param params WME containing parameter info
+   * @return a mapping of string to object that models can read from
+   */
   private static Map<String, Object> handleParams(WMElement params) {
     Map<String, Object> res = new HashMap<>();
     int i = 0;
@@ -176,6 +237,12 @@ public class ReasoningModels {
     return res;
   }
 
+  /**
+   * Parses information on the given WME into a list of features.
+   *
+   * @param features WME containing feature info
+   * @return a list of features that was on the WME
+   */
   private static List<IFeature> parseFeatures(WMElement features) {
     List<IFeature> trainingFeatures = new ArrayList<>();
     for (int i = 0; i < features.ConvertToIdentifier().GetNumberChildren(); i++) {

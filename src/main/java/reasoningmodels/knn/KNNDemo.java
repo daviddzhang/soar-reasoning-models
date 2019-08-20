@@ -22,7 +22,7 @@ public class KNNDemo {
   public static void main(String[] args) throws IOException {
     Kernel kernel = Kernel.CreateKernelInCurrentThread(true);
     Agent agent = kernel.CreateAgent("knn");
-    agent.LoadProductions(ReasoningModelDemo.class.getResource("agents/knn-demo.soar").getPath());
+    agent.LoadProductions(ReasoningModelDemo.class.getResource("/agents/knn-demo.soar").getPath());
 
     ReasoningModels.addReasoningOutputHandlersToAgent(agent, "create", "training-ex"
             , "query-handler");
@@ -38,7 +38,7 @@ public class KNNDemo {
     agent.RunSelf(10);
 
     // train play classifier
-    Reader data1File = new FileReader("/Users/davidzhang/Downloads/data1.csv");
+    Reader data1File = new FileReader(ReasoningModelDemo.class.getResource("/data1.csv").getPath());
     CSVReader reader1 = new CSVReader(data1File);
 
     Iterator<String[]> iterator1 = reader1.iterator();
@@ -56,7 +56,7 @@ public class KNNDemo {
     }
 
     // train sign classifier
-    Reader data2File = new FileReader("/Users/davidzhang/Downloads/data2.csv");
+    Reader data2File = new FileReader(ReasoningModelDemo.class.getResource("/data2.csv").getPath());
     CSVReader reader2 = new CSVReader(data2File);
 
     Iterator<String[]> iterator2 = reader2.iterator();
