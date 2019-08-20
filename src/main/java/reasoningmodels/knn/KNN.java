@@ -1,6 +1,7 @@
 package reasoningmodels.knn;
 
-import org.apache.commons.math3.util.Pair;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,7 +48,7 @@ public class KNN extends AFlatClassifier {
     if (this.examples.size() == 1) {
       for (IFeature feature : entry.getFeatures()) {
         if (!feature.isCategorical()) {
-          this.minMaxLookup.put(feature.getFeatureName(), new Pair<>(feature.getValue(),
+          this.minMaxLookup.put(feature.getFeatureName(), new ImmutablePair<>(feature.getValue(),
                   feature.getValue()));
         }
       }
@@ -57,13 +58,13 @@ public class KNN extends AFlatClassifier {
         if (!feature.isCategorical()) {
           Pair<Double, Double> featureMinMax = this.minMaxLookup.get(feature.getFeatureName());
           if (feature.getValue() < featureMinMax.getKey()) {
-            this.minMaxLookup.replace(feature.getFeatureName(), new Pair<>(feature.getValue(),
-                    featureMinMax.getValue()));
+            this.minMaxLookup.replace(feature.getFeatureName(),
+                    new ImmutablePair<>(feature.getValue(), featureMinMax.getValue()));
             this.rescaleFeature(feature.getFeatureName());
           }
           else if (feature.getValue() > featureMinMax.getValue()) {
-            this.minMaxLookup.replace(feature.getFeatureName(), new Pair<>(featureMinMax.getKey(),
-                    feature.getValue()));
+            this.minMaxLookup.replace(feature.getFeatureName(),
+                    new ImmutablePair<>(featureMinMax.getKey(), feature.getValue()));
             this.rescaleFeature(feature.getFeatureName());
           }
         }

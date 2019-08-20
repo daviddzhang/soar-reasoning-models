@@ -1,6 +1,6 @@
 package bayesnettests;
 
-import org.apache.commons.math3.util.Pair;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -59,7 +59,7 @@ public class BayesNetTest {
   private Map<String, Object> targetVarParam = new HashMap<>();
 
   @BeforeEach
-  void testInit() {
+  public void testInit() {
     this.testBayes = new BayesNet();
     this.e = new NodeImpl("E", new ArrayList<>());
     this.b = new NodeImpl("B", new ArrayList<>());
@@ -67,31 +67,32 @@ public class BayesNetTest {
     this.j = new NodeImpl("J", new ArrayList<>(Collections.singletonList("A")));
     this.nodes = new ArrayList<>(Arrays.asList(this.e, this.b, this.a, this.j));
     this.testBayes.parameterizeWithGraphicalFeatures(this.nodes);
-    targetVarParam.put("target-vars",new ArrayList<>(Collections.singletonList(new Pair<>("B",
+    targetVarParam.put("target-vars",new ArrayList<>(Collections.singletonList(new ImmutablePair<>(
+            "B",
                     "1.0"))));
   }
 
   @Test
-  void testHasFlatFeatures() {
+  public void testHasFlatFeatures() {
     assertFalse(this.testBayes.hasFlatFeatures());
   }
 
   @Test
-  void testParameterizeWithFlatFeatures() {
+  public void testParameterizeWithFlatFeatures() {
     assertThrows(UnsupportedOperationException.class, () -> {
       this.testBayes.parameterizeWithFlatFeatures(new HashMap<>());
     });
   }
 
   @Test
-  void testParameterizeWithGraphicalFeaturesNull() {
+  public void testParameterizeWithGraphicalFeaturesNull() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.testBayes.parameterizeWithGraphicalFeatures(null);
     });
   }
 
   @Test
-  void testParameterizeWithGraphicalFeatures() {
+  public void testParameterizeWithGraphicalFeatures() {
     assertEquals("[]", this.emptyBayes.toString());
     this.emptyBayes.parameterizeWithGraphicalFeatures(this.nodes);
     assertEquals("[E, []\n" +
@@ -146,21 +147,21 @@ public class BayesNetTest {
   }
 
   @Test
-  void testTrainNull() {
+  public void testTrainNull() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.testBayes.train(null);
     });
   }
 
   @Test
-  void testTrainOnEmptyNetHasNoEffect() {
+  public void testTrainOnEmptyNetHasNoEffect() {
     assertEquals("[]", this.emptyBayes.toString());
     this.emptyBayes.train(this.varsAsEntry);
     assertEquals("[]", this.emptyBayes.toString());
   }
 
   @Test
-  void testTrainAllVars() {
+  public void testTrainAllVars() {
     assertEquals("[E, []\n" +
             "CPT: \n" +
             "[+E]| Probability: 0.0\n" +
@@ -263,7 +264,7 @@ public class BayesNetTest {
   }
 
   @Test
-  void testTrainWithVarNotInNetHasNoEffect() {
+  public void testTrainWithVarNotInNetHasNoEffect() {
     assertEquals("[E, []\n" +
             "CPT: \n" +
             "[+E]| Probability: 0.0\n" +
@@ -366,7 +367,7 @@ public class BayesNetTest {
   }
 
   @Test
-  void testMultiTrains() {
+  public void testMultiTrains() {
     assertEquals("[E, []\n" +
             "CPT: \n" +
             "[+E]| Probability: 0.0\n" +
@@ -470,26 +471,26 @@ public class BayesNetTest {
   }
 
   @Test
-  void testQueryWithVarsNotInNet() {
+  public void testQueryWithVarsNotInNet() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.testBayes.queryWithParams(this.zEntry, this.targetVarParam);
     });
   }
 
   @Test
-  void testQueryWithNull() {
+  public void testQueryWithNull() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.testBayes.queryWithParams(null, null);
     });
   }
 
   @Test
-  void testQueryNoTrain() {
+  public void testQueryNoTrain() {
     assertEquals("0.0", this.testBayes.queryWithParams(evidenceEntry, targetVarParam));
   }
 
   @Test
-  void testQueryAfterTrain() {
+  public void testQueryAfterTrain() {
     assertEquals("0.0", this.testBayes.queryWithParams(evidenceEntry, targetVarParam));
     this.testBayes.train(varsAsEntry);
     this.testBayes.train(varsAsEntry2);

@@ -32,36 +32,36 @@ public class RandomVariableTests {
   private final List<String> listOfNames = new ArrayList<>(Arrays.asList("B", "Z", "B"));
 
   @Test
-  void testNullConstructor() {
+  public void testNullConstructor() {
     assertThrows(IllegalArgumentException.class, () -> {
       new RandomVariableImpl(null, true);
     });
   }
 
   @Test
-  void testToString1() {
+  public void testToString1() {
     assertEquals("+B", bTrue.toString());
   }
 
   @Test
-  void testToString2() {
+  public void testToString2() {
     assertEquals("-Z", zFalse.toString());
   }
 
   @Test
-  void testEqualsReflexive() {
+  public void testEqualsReflexive() {
     assertEquals(bTrue, bTrue);
     assertEquals(bTrue.hashCode(), bTrue.hashCode());
   }
 
   @Test
-  void testEqualsSymmetric() {
+  public void testEqualsSymmetric() {
     assertEquals(bTrue2, bTrue);
     assertEquals(bTrue2.hashCode(), bTrue.hashCode());
   }
 
   @Test
-  void testEqualsTransitive() {
+  public void testEqualsTransitive() {
     assertEquals(bTrue2, bTrue);
     assertEquals(bTrue2, bTrue3);
     assertEquals(bTrue, bTrue3);
@@ -71,7 +71,7 @@ public class RandomVariableTests {
   }
 
   @Test
-  void testNotEquals() {
+  public void testNotEquals() {
     assertNotEquals(bTrue, bFalse);
     assertNotEquals(bTrue.hashCode(), bFalse.hashCode());
     assertNotEquals(bTrue, zFalse);
@@ -79,26 +79,26 @@ public class RandomVariableTests {
   }
 
   @Test
-  void testFeatureToVarNull() {
+  public void testFeatureToVarNull() {
     assertThrows(IllegalArgumentException.class, () -> {
       RandomVariableImpl.featureListToVarList(null);
     });
   }
 
   @Test
-  void testFeatureToVar() {
+  public void testFeatureToVar() {
     assertEquals(this.listOfVar, RandomVariableImpl.featureListToVarList(this.listOfFeature));
   }
 
   @Test
-  void testVarToNameNull() {
+  public void testVarToNameNull() {
     assertThrows(IllegalArgumentException.class, () -> {
       RandomVariableImpl.listOfVarsToListOfNames(null);
     });
   }
 
   @Test
-  void testVarToName() {
+  public void testVarToName() {
     assertEquals(this.listOfNames, RandomVariableImpl.listOfVarsToListOfNames(this.listOfVar));
   }
 }

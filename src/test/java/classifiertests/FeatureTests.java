@@ -24,148 +24,148 @@ public class FeatureTests {
   private final IFeature categorical1 = new CategoricalFeature("Category", "value1");
 
   @Test
-  void testNullNameNumericalConstructor() {
+  public void testNullNameNumericalConstructor() {
     assertThrows(IllegalArgumentException.class, () -> {
       new NumericalFeature(null, 3.0);
     });
   }
 
   @Test
-  void testNullNameBooleanConstructor() {
+  public void testNullNameBooleanConstructor() {
     assertThrows(IllegalArgumentException.class, () -> {
       new BooleanFeature(null, 1.0);
     });
   }
 
   @Test
-  void testNullNameCategoricalConstructor() {
+  public void testNullNameCategoricalConstructor() {
     assertThrows(IllegalArgumentException.class, () -> {
       new BooleanFeature(null, 1.0);
     });
   }
 
   @Test
-  void testInvalidValueBooleanConstructor() {
+  public void testInvalidValueBooleanConstructor() {
     assertThrows(IllegalArgumentException.class, () -> {
       new BooleanFeature("Boolean", 2.0);
     });
   }
 
   @Test
-  void testNullValueCategoricalConstructor() {
+  public void testNullValueCategoricalConstructor() {
     assertThrows(IllegalArgumentException.class, () -> {
       new CategoricalFeature("Categorical", null);
     });
   }
 
   @Test
-  void testIsCategoricalNumericalFeature() {
+  public void testIsCategoricalNumericalFeature() {
     assertFalse(this.numerical1.isCategorical());
   }
 
   @Test
-  void testIsCategoricalBooleanFeature() {
+  public void testIsCategoricalBooleanFeature() {
     assertFalse(this.boolean1.isCategorical());
   }
 
   @Test
-  void testIsCategoricalCategoricalFeature() {
+  public void testIsCategoricalCategoricalFeature() {
     assertTrue(this.categorical1.isCategorical());
   }
 
   @Test
-  void testValueAsVectorEmptyEnum() {
+  public void testValueAsVectorEmptyEnum() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.categorical1.getValueAsVector(new String[] {});
     });
   }
 
   @Test
-  void testValueAsVectorNullEnum() {
+  public void testValueAsVectorNullEnum() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.categorical1.getValueAsVector(null);
     });
   }
 
   @Test
-  void testValueAsVectorTwoEnums() {
+  public void testValueAsVectorTwoEnums() {
     assertTrue(Arrays.equals(this.categorical1.getValueAsVector(new String[] {"value1",
     "value2"}),  new double[] {1, 0}));
   }
 
   @Test
-  void testValueAsVectorTwoEnumsDifferentOrder() {
+  public void testValueAsVectorTwoEnumsDifferentOrder() {
     assertTrue(Arrays.equals(this.categorical1.getValueAsVector(new String[] {"value2",
             "value1"}),  new double[] {0, 1}));
   }
 
   @Test
-  void testGetValueNumerical() {
+  public void testGetValueNumerical() {
     assertEquals(2.5, this.numerical1.getValue());
   }
 
   @Test
-  void testGetValueBoolean() {
+  public void testGetValueBoolean() {
     assertEquals(1.0, this.boolean2.getValue());
   }
 
   @Test
-  void testGetFeatureNameNumerical() {
+  public void testGetFeatureNameNumerical() {
     assertEquals("Number", this.numerical1.getFeatureName());
   }
 
   @Test
-  void testGetFeatureNameBoolean() {
+  public void testGetFeatureNameBoolean() {
     assertEquals("Boolean", this.boolean1.getFeatureName());
   }
 
   @Test
-  void testGetFeatureNameCategorical() {
+  public void testGetFeatureNameCategorical() {
     assertEquals("Category", this.categorical1.getFeatureName());
   }
 
   @Test
-  void testOutOfBoundsScale() {
+  public void testOutOfBoundsScale() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.numerical1.scaleFeature(3, 5);
     });
   }
 
   @Test
-  void testGetScaledFeatureNumerical() {
+  public void testGetScaledFeatureNumerical() {
     this.numerical1.scaleFeature(0, 5);
     assertEquals(.5, this.numerical1.getScaledValue());
   }
 
   @Test
-  void testGetScaledFeatureNumericalZeroValue() {
+  public void testGetScaledFeatureNumericalZeroValue() {
     this.numerical1.scaleFeature(2.5, 5);
     assertEquals(0, this.numerical1.getScaledValue());
   }
 
   @Test
-  void testGetScaledFeatureNumericalOneValue() {
+  public void testGetScaledFeatureNumericalOneValue() {
     this.numerical1.scaleFeature(.5, 2.5);
     assertEquals(1, this.numerical1.getScaledValue());
   }
 
   @Test
-  void testToStringNumerical() {
+  public void testToStringNumerical() {
     assertEquals("2.5", this.numerical1.toString());
   }
 
   @Test
-  void testToStringBooleanTrue() {
+  public void testToStringBooleanTrue() {
     assertEquals("TRUE", this.boolean2.toString());
   }
 
   @Test
-  void testToStringBooleanFalse() {
+  public void testToStringBooleanFalse() {
     assertEquals("FALSE", this.boolean1.toString());
   }
 
   @Test
-  void testToStringCategorical() {
+  public void testToStringCategorical() {
     assertEquals("value1", this.categorical1.toString());
   }
 }

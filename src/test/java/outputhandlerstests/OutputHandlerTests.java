@@ -21,7 +21,7 @@ public class OutputHandlerTests {
    * to reset the static variables, which cannot be done without access to the field.
    */
   @Test
-  void testOutputHandlers() {
+  public void testOutputHandlers() {
     Kernel kernel = Kernel.CreateKernelInCurrentThread(true);
     Agent agent = kernel.CreateAgent("test");
     agent.LoadProductions(ReasoningModelDemo.class.getResource("/agents/reasoning-models-demo" +
@@ -117,6 +117,7 @@ public class OutputHandlerTests {
     agent.RunSelf(2);
     train.DestroyWME();
     agent.RunSelf(2);
+
     assertEquals("Model: 0\n" +
             "[M, [A]\n" +
             "CPT: \n" +
@@ -281,7 +282,7 @@ public class OutputHandlerTests {
 
     assertEquals(0.0, agent.GetOutputLink().FindByAttribute("alarm-result"
             , 0).ConvertToFloatElement().GetValue());
-    
+
     kernel.Shutdown();
   }
 

@@ -46,7 +46,7 @@ public class KNNTests {
   private Map<String, Object> params = new HashMap<>();
 
   @BeforeEach
-  void init() {
+  public void init() {
     testKNN = new KNN("Category");
     Map<String, String[]> features = new HashMap<>();
     features.put("Number", null);
@@ -60,26 +60,26 @@ public class KNNTests {
   }
 
   @Test
-  void testKNNNullConstructor() {
+  public void testKNNNullConstructor() {
     assertThrows(IllegalArgumentException.class, () -> {
       new KNN(null);
     });
   }
 
   @Test
-  void testHasFlatFeatures() {
+  public void testHasFlatFeatures() {
     assertTrue(this.testKNN.hasFlatFeatures());
   }
 
   @Test
-  void testParameterizeWithNull() {
+  public void testParameterizeWithNull() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.emptyKNN.parameterizeWithFlatFeatures(null);
     });
   }
 
   @Test
-  void testParameterizeWithNoTargetClass() {
+  public void testParameterizeWithNoTargetClass() {
     Map<String, String[]> features = new HashMap<>();
     features.put("Number", null);
     features.put("Boolean", null);
@@ -89,7 +89,7 @@ public class KNNTests {
   }
 
   @Test
-  void testParameterize() {
+  public void testParameterize() {
     assertEquals("[]\n", emptyKNN.toString());
     Map<String, String[]> features = new HashMap<>();
     features.put("Number", null);
@@ -100,14 +100,14 @@ public class KNNTests {
   }
 
   @Test
-  void testTrainNull() {
+  public void testTrainNull() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.testKNN.train(null);
     });
   }
 
   @Test
-  void testTrainIncompatibleSize() {
+  public void testTrainIncompatibleSize() {
     List<IFeature> testFeatures = this.entry.getFeatures();
     testFeatures.add(numerical2);
     IEntry testEntry = new EntryImpl(testFeatures);
@@ -117,14 +117,14 @@ public class KNNTests {
   }
 
   @Test
-  void testTrainRandomFeature() {
+  public void testTrainRandomFeature() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.testKNN.train(randomEntry);
     });
   }
 
   @Test
-  void testTrainOnce() {
+  public void testTrainOnce() {
     assertEquals("[Category, Number, Boolean]\n", testKNN.toString());
     testKNN.train(entry);
     assertEquals("[Number, Boolean, Category]\n" +
@@ -132,7 +132,7 @@ public class KNNTests {
   }
 
   @Test
-  void testTrainMultiple() {
+  public void testTrainMultiple() {
     assertEquals("[Category, Number, Boolean]\n", testKNN.toString());
     testKNN.train(entry);
     testKNN.train(entry2);
@@ -142,35 +142,35 @@ public class KNNTests {
   }
 
   @Test
-  void testQueryWithNullEntry() {
+  public void testQueryWithNullEntry() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.testKNN.queryWithParams(null, params);
     });
   }
 
   @Test
-  void testQueryWithNullParams() {
+  public void testQueryWithNullParams() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.testKNN.queryWithParams(queryEntry, null);
     });
   }
 
   @Test
-  void testQueryOnEmptyModel() {
+  public void testQueryOnEmptyModel() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.testKNN.queryWithParams(queryEntry, params);
     });
   }
 
   @Test
-  void testQueryWithEntryIncludingTargetClass() {
+  public void testQueryWithEntryIncludingTargetClass() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.testKNN.queryWithParams(entry, params);
     });
   }
 
   @Test
-  void testQueryWithKLargerThanExamplesSize() {
+  public void testQueryWithKLargerThanExamplesSize() {
     params.put("k", "5");
     assertThrows(IllegalArgumentException.class, () -> {
       this.testKNN.queryWithParams(entry, params);
@@ -178,7 +178,7 @@ public class KNNTests {
   }
 
   @Test
-  void testQueryWithEvenK() {
+  public void testQueryWithEvenK() {
     params.put("k", "2");
     assertThrows(IllegalArgumentException.class, () -> {
       this.testKNN.queryWithParams(entry, params);
@@ -186,7 +186,7 @@ public class KNNTests {
   }
 
   @Test
-  void testQueryWithKMultipleOfTargetDimension() {
+  public void testQueryWithKMultipleOfTargetDimension() {
     params.put("k", "3");
     assertThrows(IllegalArgumentException.class, () -> {
       this.testKNN.queryWithParams(entry, params);
@@ -194,7 +194,7 @@ public class KNNTests {
   }
 
   @Test
-  void testQueryWithNegativeK() {
+  public void testQueryWithNegativeK() {
     params.put("k", "-4");
     assertThrows(IllegalArgumentException.class, () -> {
       this.testKNN.queryWithParams(entry, params);
@@ -202,7 +202,7 @@ public class KNNTests {
   }
 
   @Test
-  void testQueryWithNoDistanceParam() {
+  public void testQueryWithNoDistanceParam() {
     params.clear();
     params.put("k", "1");
     assertThrows(IllegalArgumentException.class, () -> {
@@ -211,7 +211,7 @@ public class KNNTests {
   }
 
   @Test
-  void testQueryWithNoKParam() {
+  public void testQueryWithNoKParam() {
     params.clear();
     params.put("distance", "euclidean");
     assertThrows(IllegalArgumentException.class, () -> {
@@ -220,7 +220,7 @@ public class KNNTests {
   }
 
   @Test
-  void testQueryWithTargetClass() {
+  public void testQueryWithTargetClass() {
     List<IFeature> features = new ArrayList<>(Arrays.asList(numerical1, categorical1));
     IEntry query = new EntryImpl(features);
     assertThrows(IllegalArgumentException.class, () -> {
@@ -232,7 +232,7 @@ public class KNNTests {
    * See KNNDemo for more in-depth query test.
    */
   @Test
-  void testQuery() {
+  public void testQuery() {
     testKNN.train(entry);
     testKNN.train(entry2);
     assertEquals("value1", testKNN.queryWithParams(queryEntry, params));

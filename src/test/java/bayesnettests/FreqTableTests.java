@@ -33,7 +33,7 @@ public class FreqTableTests {
   private IFreqTable empty;
 
   @BeforeEach
-  void init() {
+  public void init() {
     IRandomVariable c = new RandomVariableImpl("C", true);
     this.cList = new ArrayList<>(Collections.singletonList(c));
     Map<List<IRandomVariable>, Integer> cInitFreq = new HashMap<>();
@@ -60,24 +60,24 @@ public class FreqTableTests {
   }
 
   @Test
-  void testNullConstructor() {
+  public void testNullConstructor() {
     assertThrows(IllegalArgumentException.class, () -> {
       new FreqTableImpl(null);
     });
   }
 
   @Test
-  void testPrintEmpty() {
+  public void testPrintEmpty() {
     assertEquals("", this.empty.printFreqTable());
   }
 
   @Test
-  void testPrintSingleVar() {
+  public void testPrintSingleVar() {
     assertEquals("[+C]| Frequencies: 0\n", this.cFreq.printFreqTable());
   }
 
   @Test
-  void testPrintMultiVar() {
+  public void testPrintMultiVar() {
     assertEquals("[+E, +B]| Frequencies: 0\n" +
             "[-E, -B]| Frequencies: 0\n" +
             "[+E, -B]| Frequencies: 0\n" +
@@ -85,47 +85,47 @@ public class FreqTableTests {
   }
 
   @Test
-  void testReplaceNullRow() {
+  public void testReplaceNullRow() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.cFreq.replace(null, 2);
     });
   }
 
   @Test
-  void testReplaceNegativeVal() {
+  public void testReplaceNegativeVal() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.cFreq.replace(eMinusBMinus, -3);
     });
   }
 
   @Test
-  void testReplaceEmpty() {
+  public void testReplaceEmpty() {
     this.empty.replace(this.eMinusBMinus, 20);
     assertEquals(this.empty, this.empty);
   }
 
   @Test
-  void testReplace() {
+  public void testReplace() {
     this.aFreq.replace(this.eMinusBMinus, 1);
     assertEquals(1, this.aFreq.getFreq(eMinusBMinus));
   }
 
   @Test
-  void testGetFreqEmpty() {
+  public void testGetFreqEmpty() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.empty.getFreq(this.eMinusBMinus);
     });
   }
 
   @Test
-  void testGetFreqNull() {
+  public void testGetFreqNull() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.cFreq.getFreq(null);
     });
   }
 
   @Test
-  void testGetFreq() {
+  public void testGetFreq() {
     this.aFreq.replace(this.eMinusBMinus, 20);
     assertEquals(20, this.aFreq.getFreq(this.eMinusBMinus));
   }

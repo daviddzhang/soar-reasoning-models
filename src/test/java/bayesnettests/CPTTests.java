@@ -37,7 +37,7 @@ public class CPTTests {
   private ICPT emptyCPT;
 
   @BeforeEach
-  void init() {
+  public void init() {
     IRandomVariable bVarPlus = new RandomVariableImpl("B", true);
     this.bVarPlusList = new ArrayList<>(Arrays.asList(bVarPlus));
     Map<List<IRandomVariable>, Double> bInitCPT = new HashMap<>();
@@ -68,24 +68,24 @@ public class CPTTests {
   }
 
   @Test
-  void testNullConstructor() {
+  public void testNullConstructor() {
     assertThrows(IllegalArgumentException.class, () -> {
       new CPTImpl(null);
     });
   }
 
   @Test
-  void testPrintCPTEmpty() {
+  public void testPrintCPTEmpty() {
     assertEquals("", this.emptyCPT.printCPT());
   }
 
   @Test
-  void testPrintCPTSingleVar() {
+  public void testPrintCPTSingleVar() {
     assertEquals("[+B]| Probability: 0.0\n", this.bCPT.printCPT());
   }
 
   @Test
-  void testPrintCPTMultiVar() {
+  public void testPrintCPTMultiVar() {
     assertEquals("[+E, +B]| Probability: 0.0\n" +
             "[-E, -B]| Probability: 0.0\n" +
             "[+E, -B]| Probability: 0.0\n" +
@@ -93,77 +93,77 @@ public class CPTTests {
   }
 
   @Test
-  void testReplaceNullRow() {
+  public void testReplaceNullRow() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.bCPT.replace(null, 2.0);
     });
   }
 
   @Test
-  void testReplaceNegativeVal() {
+  public void testReplaceNegativeVal() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.bCPT.replace(bVarPlusList, -.4);
     });
   }
 
   @Test
-  void testReplaceEmpty() {
+  public void testReplaceEmpty() {
     this.emptyCPT.replace(this.eMinusBMinus, .01);
     assertEquals(this.emptyCPT, this.emptyCPT);
   }
 
   @Test
-  void testReplace() {
+  public void testReplace() {
     this.bCPT.replace(this.bVarPlusList, 1);
     assertEquals(1, this.bCPT.getQueryVar(bVarPlusList));
   }
 
   @Test
-  void testGetCPTEmptyCPT() {
+  public void testGetCPTEmptyCPT() {
     assertEquals(new HashMap<List<IRandomVariable>, Double>(), this.emptyCPT.getCPT());
   }
 
   @Test
-  void testGetCPTWithVars() {
+  public void testGetCPTWithVars() {
     assertEquals(this.aInitCPT, this.aCPT.getCPT());
   }
 
   @Test
-  void testVariablesInEmptyCPT() {
+  public void testVariablesInEmptyCPT() {
     assertEquals(new ArrayList<>(), this.emptyCPT.variablesInCPT());
   }
 
   @Test
-  void testVariablesInOneCPT() {
+  public void testVariablesInOneCPT() {
     assertEquals(new ArrayList<>(Arrays.asList("B")), this.bCPT.variablesInCPT());
   }
 
   @Test
-  void testVariablesInTwoVarCPT() {
+  public void testVariablesInTwoVarCPT() {
     assertEquals(new ArrayList<>(Arrays.asList("E", "B")), this.aCPT.variablesInCPT());
   }
 
   @Test
-  void testEliminateExceptNull() {
+  public void testEliminateExceptNull() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.bCPT.eliminateExcept(null);
     });
   }
 
   @Test
-  void testEliminateExceptEmpty() {
+  public void testEliminateExceptEmpty() {
     List<String> bList = new ArrayList<>(Collections.singletonList("B"));
     assertEquals("", this.emptyCPT.eliminateExcept(bList).printCPT());
   }
 
   @Test
-  void testEliminateExceptOnlyVar() {
+  public void testEliminateExceptOnlyVar() {
     List<String> bList = new ArrayList<>(Collections.singletonList("B"));
     assertEquals("[+B]| Probability: 0.0\n", this.bCPT.eliminateExcept(bList).printCPT());
   }
 
   @Test
-  void testEliminateExceptBVar() {
+  public void testEliminateExceptBVar() {
     List<String> bList = new ArrayList<>(Collections.singletonList("B"));
     this.aCPT.replace(this.eMinusBMinus, .5);
     this.aCPT.replace(this.ePlusBMinus, .5);
@@ -176,20 +176,20 @@ public class CPTTests {
   }
 
   @Test
-  void testNormalizeEmpty() {
+  public void testNormalizeEmpty() {
     this.emptyCPT.normalize();
     assertEquals(this.emptyCPT, this.emptyCPT);
   }
 
   @Test
-  void testNormalizeOneVar() {
+  public void testNormalizeOneVar() {
     this.bCPT.replace(this.bVarPlusList, .25);
     this.bCPT.normalize();
     assertEquals(1.0, this.bCPT.getCPT().get(this.bVarPlusList), 001);
   }
 
   @Test
-  void testNormalizeMultiVarsSameDistribution() {
+  public void testNormalizeMultiVarsSameDistribution() {
     this.aCPT.replace(this.eMinusBMinus, 1.0);
     this.aCPT.replace(this.eMinusBPlus, 1.0);
     this.aCPT.replace(this.ePlusBMinus, 1.0);
@@ -202,7 +202,7 @@ public class CPTTests {
   }
 
   @Test
-  void testNormalizeMultiVarsDiffDistribution() {
+  public void testNormalizeMultiVarsDiffDistribution() {
     this.aCPT.replace(this.eMinusBMinus, .75);
     this.aCPT.replace(this.eMinusBPlus, 1.0);
     this.aCPT.replace(this.ePlusBMinus, .25);
@@ -215,20 +215,20 @@ public class CPTTests {
   }
 
   @Test
-  void testGetQueryVarEmpty() {
+  public void testGetQueryVarEmpty() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.emptyCPT.getQueryVar(new ArrayList<>());
     });
   }
 
   @Test
-  void testGetQueryVarSingleVar() {
+  public void testGetQueryVarSingleVar() {
     this.bCPT.replace(this.bVarPlusList, .25);
     assertEquals(.25, this.bCPT.getQueryVar(this.bVarPlusList));
   }
 
   @Test
-  void testGetQueryVarMultiVar() {
+  public void testGetQueryVarMultiVar() {
     this.aCPT.replace(this.eMinusBMinus, 1.0);
     this.aCPT.replace(this.eMinusBPlus, 1.0);
     this.aCPT.replace(this.ePlusBMinus, 1.0);
@@ -237,38 +237,38 @@ public class CPTTests {
   }
 
   @Test
-  void testGetQueryVarWhenInputIsNotInCPT() {
+  public void testGetQueryVarWhenInputIsNotInCPT() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.bCPT.getQueryVar(this.eMinusBMinus);
     });
   }
 
   @Test
-  void testGetQueryVarNull() {
+  public void testGetQueryVarNull() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.bCPT.getQueryVar(null);
     });
   }
 
   @Test
-  void testToInferenceCPTEmpty() {
+  public void testToInferenceCPTEmpty() {
     assertEquals("", this.emptyCPT.toInferenceCPT("Z").printCPT());
   }
 
   @Test
-  void testToInferenceCPTSingleVar() {
+  public void testToInferenceCPTSingleVar() {
     assertEquals("[-B]| Probability: 1.0\n" +
             "[+B]| Probability: 0.0\n", this.bCPT.toInferenceCPT("B").printCPT());
   }
 
   @Test
-  void testToInferenceCPTSingleVar2() {
+  public void testToInferenceCPTSingleVar2() {
     assertEquals("[-B]| Probability: 1.0\n" +
             "[+B]| Probability: 0.0\n", this.bCPT.toInferenceCPT("C").printCPT());
   }
 
   @Test
-  void testToInferenceCPTMultiVar() {
+  public void testToInferenceCPTMultiVar() {
     assertEquals("[+E, +B, -A]| Probability: 1.0\n" +
             "[-E, -B, -A]| Probability: 1.0\n" +
             "[-E, +B, +A]| Probability: 0.0\n" +
@@ -280,7 +280,7 @@ public class CPTTests {
   }
 
   @Test
-  void testToInferenceCPTNull() {
+  public void testToInferenceCPTNull() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.bCPT.toInferenceCPT(null);
     });

@@ -16,14 +16,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  */
 public class FactoryTests {
   @Test
-  void testCreateNull() {
+  public void testCreateNull() {
     assertThrows(IllegalArgumentException.class, () -> {
       ReasoningModelFactory.createModel(null);
     });
   }
 
   @Test
-  void testCreateBayesNet() {
+  public void testCreateBayesNet() {
     Kernel kernel = Kernel.CreateKernelInCurrentThread(true);
     Agent agent = kernel.CreateAgent("test");
     agent.LoadProductions(ReasoningModelDemo.class.getResource("/agents/bn-demo.soar").getPath());
@@ -98,7 +98,7 @@ public class FactoryTests {
   }
 
   @Test
-  void testCreateKNN() {
+  public void testCreateKNN() {
     Kernel kernel = Kernel.CreateKernelInCurrentThread(true);
     Agent agent = kernel.CreateAgent("test");
     agent.LoadProductions(ReasoningModelDemo.class.getResource("/agents/knn-demo.soar").getPath());
@@ -113,7 +113,7 @@ public class FactoryTests {
   }
 
   @Test
-  void testCreateNB() {
+  public void testCreateNB() {
     Kernel kernel = Kernel.CreateKernelInCurrentThread(true);
     Agent agent = kernel.CreateAgent("test");
     agent.LoadProductions(ReasoningModelDemo.class.getResource("/agents/nb-demo.soar").getPath());

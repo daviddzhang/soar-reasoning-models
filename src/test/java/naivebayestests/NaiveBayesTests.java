@@ -46,7 +46,7 @@ public class NaiveBayesTests {
   private Map<String, Object> params = new HashMap<>();
 
   @BeforeEach
-  void init() {
+  public void init() {
     emptyNB = new NaiveBayes("Category");
     testNB = new NaiveBayes("Category");
     Map<String, String[]> features = new HashMap<>();
@@ -59,26 +59,26 @@ public class NaiveBayesTests {
   }
 
   @Test
-  void testNBNullConstructor() {
+  public void testNBNullConstructor() {
     assertThrows(IllegalArgumentException.class, () -> {
       new NaiveBayes(null);
     });
   }
 
   @Test
-  void testHasFlatFeatures() {
+  public void testHasFlatFeatures() {
     assertTrue(this.testNB.hasFlatFeatures());
   }
 
   @Test
-  void testParameterizeWithNull() {
+  public void testParameterizeWithNull() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.emptyNB.parameterizeWithFlatFeatures(null);
     });
   }
 
   @Test
-  void testParameterizeWithNoTargetClass() {
+  public void testParameterizeWithNoTargetClass() {
     Map<String, String[]> features = new HashMap<>();
     features.put("Number", null);
     features.put("Boolean", null);
@@ -88,7 +88,7 @@ public class NaiveBayesTests {
   }
 
   @Test
-  void testParameterize() {
+  public void testParameterize() {
     assertEquals("[]\n", emptyNB.toString());
     Map<String, String[]> features = new HashMap<>();
     features.put("Number", null);
@@ -99,14 +99,14 @@ public class NaiveBayesTests {
   }
 
   @Test
-  void testTrainNull() {
+  public void testTrainNull() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.testNB.train(null);
     });
   }
 
   @Test
-  void testTrainIncompatibleSize() {
+  public void testTrainIncompatibleSize() {
     List<IFeature> testFeatures = this.entry.getFeatures();
     testFeatures.add(numerical2);
     IEntry testEntry = new EntryImpl(testFeatures);
@@ -116,14 +116,14 @@ public class NaiveBayesTests {
   }
 
   @Test
-  void testTrainRandomFeature() {
+  public void testTrainRandomFeature() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.testNB.train(randomEntry);
     });
   }
 
   @Test
-  void testTrainOnce() {
+  public void testTrainOnce() {
     assertEquals("[Category, Number, Boolean]\n", testNB.toString());
     testNB.train(entry);
     assertEquals("[Number, Boolean, Category]\n" +
@@ -131,7 +131,7 @@ public class NaiveBayesTests {
   }
 
   @Test
-  void testTrainMultiple() {
+  public void testTrainMultiple() {
     assertEquals("[Category, Number, Boolean]\n", testNB.toString());
     testNB.train(entry);
     testNB.train(entry2);
@@ -141,35 +141,35 @@ public class NaiveBayesTests {
   }
 
   @Test
-  void testQueryWithNullEntry() {
+  public void testQueryWithNullEntry() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.testNB.queryWithParams(null, params);
     });
   }
 
   @Test
-  void testQueryWithNullParams() {
+  public void testQueryWithNullParams() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.testNB.queryWithParams(queryEntry, null);
     });
   }
 
   @Test
-  void testQueryOnEmptyModel() {
+  public void testQueryOnEmptyModel() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.testNB.queryWithParams(queryEntry, params);
     });
   }
 
   @Test
-  void testQueryWithEntryIncludingTargetClass() {
+  public void testQueryWithEntryIncludingTargetClass() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.testNB.queryWithParams(entry, params);
     });
   }
 
   @Test
-  void testQueryWithTargetClass() {
+  public void testQueryWithTargetClass() {
     List<IFeature> features = new ArrayList<>(Arrays.asList(numerical1, categorical1));
     IEntry query = new EntryImpl(features);
     assertThrows(IllegalArgumentException.class, () -> {
@@ -178,14 +178,14 @@ public class NaiveBayesTests {
   }
 
   @Test
-  void testQueryWithNoSmoothing() {
+  public void testQueryWithNoSmoothing() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.testNB.queryWithParams(queryEntry, new HashMap<>());
     });
   }
 
   @Test
-  void testQueryWithNegativeSmoothing() {
+  public void testQueryWithNegativeSmoothing() {
     params.put("smoothing", "-3");
     assertThrows(IllegalArgumentException.class, () -> {
       this.testNB.queryWithParams(queryEntry, params);
@@ -196,7 +196,7 @@ public class NaiveBayesTests {
    * See NBDemo for a more in depth test for querying.
    */
   @Test
-  void testQuery() {
+  public void testQuery() {
     testNB.train(entry);
     testNB.train(entry2);
     assertEquals("value2", testNB.queryWithParams(queryEntry, params));

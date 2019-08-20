@@ -25,28 +25,28 @@ public class NodeTests {
   private INode j;
 
   @BeforeEach
-  void init() {
+  public void init() {
     a = new NodeImpl("A", new ArrayList<>(Arrays.asList("B", "E")));
     b = new NodeImpl("B", new ArrayList<>());
     j = new NodeImpl("J", new ArrayList<>(Collections.singletonList("A")));
   }
 
   @Test
-  void testNullNameConstructor() {
+  public void testNullNameConstructor() {
     assertThrows(IllegalArgumentException.class, () -> {
       new NodeImpl(null, new ArrayList<>());
     });
   }
 
   @Test
-  void testNullParentsConstructor() {
+  public void testNullParentsConstructor() {
     assertThrows(IllegalArgumentException.class, () -> {
       new NodeImpl("B", null);
     });
   }
 
   @Test
-  void testNoParentsConstructor() {
+  public void testNoParentsConstructor() {
     assertEquals("B, []\n" +
             "CPT: \n" +
             "[+B]| Probability: 0.0\n" +
@@ -59,7 +59,7 @@ public class NodeTests {
   }
 
   @Test
-  void testOneParentConstructor() {
+  public void testOneParentConstructor() {
     assertEquals("J, [A]\n" +
             "CPT: \n" +
             "[-A]| Probability: 0.0\n" +
@@ -75,7 +75,7 @@ public class NodeTests {
   }
 
   @Test
-  void testMultiParentConstructor() {
+  public void testMultiParentConstructor() {
     assertEquals("A, [B, E]\n" +
             "CPT: \n" +
             "[+E, +B]| Probability: 0.0\n" +
@@ -97,14 +97,14 @@ public class NodeTests {
   }
 
   @Test
-  void testUpdateCPTNull() {
+  public void testUpdateCPTNull() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.a.updateCPT(null);
     });
   }
 
   @Test
-  void testUpdateCPTNoParentsOccur() {
+  public void testUpdateCPTNoParentsOccur() {
     assertEquals("B, []\n" +
             "CPT: \n" +
             "[+B]| Probability: 0.0\n" +
@@ -127,7 +127,7 @@ public class NodeTests {
   }
 
   @Test
-  void testUpdateCPTNoParentsNotOccur() {
+  public void testUpdateCPTNoParentsNotOccur() {
     assertEquals("B, []\n" +
             "CPT: \n" +
             "[+B]| Probability: 0.0\n" +
@@ -150,7 +150,7 @@ public class NodeTests {
   }
 
   @Test
-  void testUpdateCPTNoParentsBoth() {
+  public void testUpdateCPTNoParentsBoth() {
     assertEquals("B, []\n" +
             "CPT: \n" +
             "[+B]| Probability: 0.0\n" +
@@ -174,7 +174,7 @@ public class NodeTests {
   }
 
   @Test
-  void testUpdateCPTSingleParentOccurThisOccur() {
+  public void testUpdateCPTSingleParentOccurThisOccur() {
     assertEquals("J, [A]\n" +
             "CPT: \n" +
             "[-A]| Probability: 0.0\n" +
@@ -204,7 +204,7 @@ public class NodeTests {
   }
 
   @Test
-  void testUpdateCPTSingleParentOccurThisNotOccur() {
+  public void testUpdateCPTSingleParentOccurThisNotOccur() {
     assertEquals("J, [A]\n" +
             "CPT: \n" +
             "[-A]| Probability: 0.0\n" +
@@ -234,7 +234,7 @@ public class NodeTests {
   }
 
   @Test
-  void testUpdateCPTSingleParentNotOccurThisNotOccur() {
+  public void testUpdateCPTSingleParentNotOccurThisNotOccur() {
     assertEquals("J, [A]\n" +
             "CPT: \n" +
             "[-A]| Probability: 0.0\n" +
@@ -264,7 +264,7 @@ public class NodeTests {
   }
 
   @Test
-  void testUpdateCPTSingleParentNotOccurThisOccur() {
+  public void testUpdateCPTSingleParentNotOccurThisOccur() {
     assertEquals("J, [A]\n" +
             "CPT: \n" +
             "[-A]| Probability: 0.0\n" +
@@ -294,7 +294,7 @@ public class NodeTests {
   }
 
   @Test
-  void testUpdateCPTSingleParentAll() {
+  public void testUpdateCPTSingleParentAll() {
     assertEquals("J, [A]\n" +
             "CPT: \n" +
             "[-A]| Probability: 0.0\n" +
@@ -330,7 +330,7 @@ public class NodeTests {
   }
 
   @Test
-  void testUpdateCPTSingleParentExtraVarsHasNoEffect() {
+  public void testUpdateCPTSingleParentExtraVarsHasNoEffect() {
     assertEquals("J, [A]\n" +
             "CPT: \n" +
             "[-A]| Probability: 0.0\n" +
@@ -366,7 +366,7 @@ public class NodeTests {
   }
 
   @Test
-  void testToInferenceCPTNoParents() {
+  public void testToInferenceCPTNoParents() {
     assertEquals("B, []\n" +
             "CPT: \n" +
             "[-B]| Probability: 1.0\n" +
@@ -380,7 +380,7 @@ public class NodeTests {
   }
 
   @Test
-  void testToInferenceCPTSingleParents() {
+  public void testToInferenceCPTSingleParents() {
     assertEquals("J, [A]\n" +
             "CPT: \n" +
             "[-A, +J]| Probability: 0.0\n" +
@@ -398,7 +398,7 @@ public class NodeTests {
   }
 
   @Test
-  void testToInferenceCPTMultiParent() {
+  public void testToInferenceCPTMultiParent() {
     assertEquals("A, [B, E]\n" +
             "CPT: \n" +
             "[+E, +B, -A]| Probability: 1.0\n" +
@@ -424,7 +424,7 @@ public class NodeTests {
   }
 
   @Test
-  void testToInferenceCPTSingleParentsDiffVals() {
+  public void testToInferenceCPTSingleParentsDiffVals() {
     this.j.updateCPT(new ArrayList<>(Arrays.asList(new RandomVariableImpl("J", true),
             new RandomVariableImpl("A", false), new RandomVariableImpl("B", true))));
     this.j.updateCPT(new ArrayList<>(Arrays.asList(new RandomVariableImpl("J", true),
@@ -452,34 +452,34 @@ public class NodeTests {
   }
 
   @Test
-  void testHasParentNull() {
+  public void testHasParentNull() {
     assertThrows(IllegalArgumentException.class, () -> {
       this.a.hasParent(null);
     });
   }
 
   @Test
-  void testHasParentNoParents() {
+  public void testHasParentNoParents() {
     assertFalse(this.b.hasParent("C"));
   }
 
   @Test
-  void testHasParentNoParents2() {
+  public void testHasParentNoParents2() {
     assertFalse(this.b.hasParent(""));
   }
 
   @Test
-  void testHasParentTrue() {
+  public void testHasParentTrue() {
     assertTrue(this.a.hasParent("E"));
   }
 
   @Test
-  void testHasParentFalse() {
+  public void testHasParentFalse() {
     assertFalse(this.a.hasParent("Z"));
   }
 
   @Test
-  void testJoin() {
+  public void testJoin() {
     assertEquals("[-E, -B, +A, -J]| Probability: 0.0\n" +
             "[+E, -B, -A, +J]| Probability: 0.0\n" +
             "[+E, +B, -A, -J]| Probability: 1.0\n" +
@@ -500,7 +500,7 @@ public class NodeTests {
   }
 
   @Test
-  void testJoinDifferentVals() {
+  public void testJoinDifferentVals() {
     this.j.updateCPT(new ArrayList<>(Arrays.asList(new RandomVariableImpl("J", true),
             new RandomVariableImpl("A", true), new RandomVariableImpl("B", true))));
     this.a.updateCPT(new ArrayList<>(Arrays.asList(new RandomVariableImpl("J", true),

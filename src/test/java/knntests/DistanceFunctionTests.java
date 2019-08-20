@@ -17,24 +17,24 @@ public class DistanceFunctionTests {
   private final IDistanceFunction l2 = new L2Distance();
 
   @Test
-  void testL2DistanceZero() {
+  public void testL2DistanceZero() {
     assertEquals(0, l2.evaluate(new double[] {}, new double[] {}));
   }
 
   @Test
-  void testL2DistanceZero2() {
+  public void testL2DistanceZero2() {
     assertEquals(0, l2.evaluate(new double[] {0, 0}, new double[] {0, 0}));
   }
 
   @Test
-  void testDifferingSizes() {
+  public void testDifferingSizes() {
     assertThrows(DimensionMismatchException.class, () -> {
       l2.evaluate(new double[] {1, 0}, new double[] {0});
     });
   }
 
   @Test
-  void testL2Distance() {
+  public void testL2Distance() {
     assertEquals(1, l2.evaluate(new double[] {1, 0}, new double[] {0, 0}));
   }
 }

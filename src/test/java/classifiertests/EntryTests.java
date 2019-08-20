@@ -29,34 +29,34 @@ public class EntryTests {
           categorical1));
 
   @Test
-  void testNullEntryConstructor() {
+  public void testNullEntryConstructor() {
     assertThrows(IllegalArgumentException.class, () -> {
       new EntryImpl(null);
     });
   }
 
   @Test
-  void testToString() {
+  public void testToString() {
     assertEquals("[2.5, FALSE, TRUE, value1]", entry.toString());
   }
 
   @Test
-  void testContainsFeatureNumerical() {
+  public void testContainsFeatureNumerical() {
     assertTrue(this.entry.containsFeature("Number"));
   }
 
   @Test
-  void testContainsFeatureBoolean() {
+  public void testContainsFeatureBoolean() {
     assertTrue(this.entry.containsFeature("Boolean"));
   }
 
   @Test
-  void testContainsFeatureCategorical() {
+  public void testContainsFeatureCategorical() {
     assertTrue(this.entry.containsFeature("Category"));
   }
 
   @Test
-  void testContainsFeatureFalse() {
+  public void testContainsFeatureFalse() {
     assertFalse(this.entry.containsFeature("Feature"));
   }
 }

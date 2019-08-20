@@ -1,7 +1,8 @@
 package reasoningmodels.outputhandlers;
 
 
-import org.apache.commons.math3.util.Pair;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -228,7 +229,8 @@ public class ReasoningModels {
         List<Pair<String, String>> extraFeatures = new ArrayList<>();
         for (int j = 0; j < curParam.ConvertToIdentifier().GetNumberChildren(); j++) {
           WMElement curFeature = curParam.ConvertToIdentifier().GetChild(j);
-          extraFeatures.add(new Pair<>(curFeature.GetAttribute(), curFeature.GetValueAsString()));
+          extraFeatures.add(new ImmutablePair<>(curFeature.GetAttribute(),
+                  curFeature.GetValueAsString()));
         }
 
         res.put(curParamName, extraFeatures);
