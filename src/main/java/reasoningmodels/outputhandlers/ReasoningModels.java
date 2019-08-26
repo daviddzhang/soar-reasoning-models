@@ -57,6 +57,10 @@ public class ReasoningModels {
    * @throws IOException if an error occurs when trying to write the object
    */
   public static void serialize(String filePath) throws IOException {
+    if (filePath == null) {
+      throw new IllegalArgumentException("Filepath cannot be null");
+    }
+
     List<Object> toSave = new ArrayList<>();
     toSave.add(models);
     if (userData != null) {
@@ -83,6 +87,10 @@ public class ReasoningModels {
    * @throws IOException if there is an error while deserializing
    */
   public static Serializable deserialize(String filePath) throws IOException {
+    if (filePath == null) {
+      throw new IllegalArgumentException("Filepath cannot be null");
+    }
+
     try {
       FileInputStream fis = new FileInputStream(filePath);
       ObjectInputStream in = new ObjectInputStream(fis);
@@ -116,6 +124,14 @@ public class ReasoningModels {
    */
   public static void addReasoningOutputHandlersToAgent(Agent agent, String createWMEName,
                                                        String trainWMEName, String queryWMEName) {
+    if (agent == null) {
+      throw new IllegalArgumentException("Agent cannot be null.");
+    }
+
+    if (createWMEName == null || trainWMEName == null || queryWMEName == null) {
+      throw new IllegalArgumentException("WME names cannot be null");
+    }
+
     agent.AddOutputHandler(createWMEName, createModel, userData);
     agent.AddOutputHandler(trainWMEName, trainModel, userData);
     agent.AddOutputHandler(queryWMEName, queryModel, userData);
@@ -134,6 +150,18 @@ public class ReasoningModels {
   public static void addReasoningOutputHandlersToAgent(Agent agent,
                                                        Serializable userData, String createWMEName,
                                                        String trainWMEName, String queryWMEName) {
+    if (agent == null) {
+      throw new IllegalArgumentException("Agent cannot be null.");
+    }
+
+    if (createWMEName == null || trainWMEName == null || queryWMEName == null) {
+      throw new IllegalArgumentException("WME names cannot be null");
+    }
+
+    if (userData == null) {
+      throw new IllegalArgumentException("User data cannot be null");
+    }
+
     ReasoningModels.userData = userData;
     agent.AddOutputHandler(createWMEName, createModel, userData);
     agent.AddOutputHandler(trainWMEName, trainModel, userData);
