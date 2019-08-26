@@ -2,6 +2,7 @@ package reasoningmodels.naivebayes;
 
 import com.opencsv.CSVReader;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -22,7 +23,9 @@ public class NBDemo {
   public static void main(String[] args) throws IOException {
     Kernel kernel = Kernel.CreateKernelInCurrentThread(true);
     Agent agent = kernel.CreateAgent("nb");
-    agent.LoadProductions(ReasoningModelDemo.class.getResource("/agents/nb-demo.soar").getPath());
+    agent.LoadProductions(
+            new File(ReasoningModelDemo.class.getResource("/agents/nb-demo.soar").getFile())
+                    .getAbsolutePath());
 
     ReasoningModels.addReasoningOutputHandlersToAgent(agent, "create", "training-ex"
             , "query-handler");
@@ -96,5 +99,6 @@ public class NBDemo {
 
     System.out.println(ReasoningModels.printModels());
 
+    kernel.Shutdown();
   }
 }

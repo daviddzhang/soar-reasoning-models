@@ -1,6 +1,7 @@
 package reasoningmodels.bayesnet;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -27,7 +28,9 @@ public class BayesNetDemo {
   public static void main(String[] args) throws IOException {
     Kernel kernel = Kernel.CreateKernelInCurrentThread(true);
     Agent agent = kernel.CreateAgent("bayes-nets");
-    agent.LoadProductions(ReasoningModelDemo.class.getResource("/agents/bn-demo.soar").getPath());
+    agent.LoadProductions(
+            new File(ReasoningModelDemo.class.getResource("/agents/bn-demo.soar").getFile())
+                    .getAbsolutePath());
 
     ReasoningModels.addReasoningOutputHandlersToAgent(agent, "create", "training-ex"
             , "query-handler");

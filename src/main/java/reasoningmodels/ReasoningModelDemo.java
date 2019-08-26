@@ -3,6 +3,7 @@ package reasoningmodels;
 import com.opencsv.CSVReader;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -25,14 +26,16 @@ import sml.Identifier;
 import sml.Kernel;
 
 /**
- * 
+ * A class containing a main method to run a demo of all the reasoning models. It trains the
+ * models either using randomly sampled values or a csv file in the resources package. At the end,
+ * it will print out the query results and string representations of each model.
  */
 public class ReasoningModelDemo {
   public static void main(String[] args) throws IOException {
     Kernel kernel = Kernel.CreateKernelInCurrentThread(true);
     Agent agent = kernel.CreateAgent("reasoning-models");
-    agent.LoadProductions(ReasoningModelDemo.class.getResource("/agents/reasoning-models-demo" +
-            ".soar").getPath());
+    agent.LoadProductions(new File(ReasoningModelDemo.class.getResource("/agents/reasoning-models" +
+            "-demo.soar").getFile()).getAbsolutePath());
 
     ReasoningModels.addReasoningOutputHandlersToAgent(agent, "create",
             "training-ex", "query-handler");
@@ -224,7 +227,7 @@ public class ReasoningModelDemo {
 
     System.out.println(ReasoningModels.printModels());
 
-
+    kernel.Shutdown();
   }
 
   private static double booleanToDouble(boolean occurred) {

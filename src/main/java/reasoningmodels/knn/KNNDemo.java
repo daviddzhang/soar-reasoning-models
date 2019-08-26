@@ -2,6 +2,7 @@ package reasoningmodels.knn;
 
 import com.opencsv.CSVReader;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -22,7 +23,9 @@ public class KNNDemo {
   public static void main(String[] args) throws IOException {
     Kernel kernel = Kernel.CreateKernelInCurrentThread(true);
     Agent agent = kernel.CreateAgent("knn");
-    agent.LoadProductions(ReasoningModelDemo.class.getResource("/agents/knn-demo.soar").getPath());
+    agent.LoadProductions(
+            new File(ReasoningModelDemo.class.getResource("/agents/knn-demo.soar").getFile())
+                    .getAbsolutePath());
 
     ReasoningModels.addReasoningOutputHandlersToAgent(agent, "create", "training-ex"
             , "query-handler");
@@ -96,5 +99,6 @@ public class KNNDemo {
 
     System.out.println(ReasoningModels.printModels());
 
+    kernel.Shutdown();
   }
 }
