@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * Tests for methods of the BayesNet class.
  */
 public class BayesNetTest {
-  private IReasoningModel emptyBayes = new BayesNet();
+  private IReasoningModel emptyBayes;
   private IReasoningModel testBayes;
   private INode e;
   private INode b;
@@ -60,6 +60,7 @@ public class BayesNetTest {
 
   @BeforeEach
   public void testInit() {
+    this.emptyBayes = new BayesNet();
     this.testBayes = new BayesNet();
     this.e = new NodeImpl("E", new ArrayList<>());
     this.b = new NodeImpl("B", new ArrayList<>());

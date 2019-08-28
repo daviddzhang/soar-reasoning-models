@@ -68,7 +68,7 @@ public class ReasoningModels {
     }
 
     try {
-      FileOutputStream fos = new FileOutputStream(filePath);
+      FileOutputStream fos = new FileOutputStream(filePath, false);
       ObjectOutputStream out = new ObjectOutputStream(fos);
       out.writeObject(toSave);
 

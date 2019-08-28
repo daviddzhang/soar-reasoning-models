@@ -1,17 +1,16 @@
 package outputhandlerstests;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import reasoningmodels.IReasoningModel;
@@ -35,6 +34,14 @@ public class SerializationTests {
 
   @BeforeAll
   public static void init() {
+    try {
+      Field models = ReasoningModels.class.getDeclaredField("models");
+      models.setAccessible(true);
+      models.set(null, new ArrayList<IReasoningModel>());
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
     IReasoningModel bayes = new BayesNet();
     INode a = new NodeImpl("A", new ArrayList<>());
     INode b = new NodeImpl("B", new ArrayList<>(Collections.singletonList("A")));
