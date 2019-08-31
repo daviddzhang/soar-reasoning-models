@@ -61,8 +61,8 @@ public class SerializationTests {
 
     Kernel kernel = Kernel.CreateKernelInCurrentThread(true);
     Agent agent = kernel.CreateAgent("test");
-    agent.LoadProductions(ReasoningModelDemo.class.getResource("/agents/reasoning-models-demo" +
-            ".soar").getPath());
+    agent.LoadProductions(new File(ReasoningModelDemo.class.getResource("/agents/reasoning-models" +
+            "-demo.soar").getFile()).getAbsolutePath());
     ReasoningModels.addReasoningOutputHandlersToAgent(agent, userData, "create",
             "training-ex", "query-handler");
 

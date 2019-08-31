@@ -59,7 +59,8 @@ public class KNNDemo {
     }
 
     // train sign classifier
-    Reader data2File = new FileReader(ReasoningModelDemo.class.getResource("/data2.csv").getPath());
+    Reader data2File =
+            new FileReader(ReasoningModelDemo.class.getResource("/data2.csv").getPath());
     CSVReader reader2 = new CSVReader(data2File);
 
     Iterator<String[]> iterator2 = reader2.iterator();

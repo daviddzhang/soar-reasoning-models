@@ -37,12 +37,34 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M3</version>
-                <configuration>
-                    <argLine>-Djava.library.path=${project.basedir}/src/main/resources</argLine>
-                    <systemPropertyVariables>
-                        <PATH>${project.basedir}/src/main/resources</PATH>
-                    </systemPropertyVariables>
-                </configuration>
+                <executions>
+                    <execution>
+                        <id>mac</id>
+                        <goals>
+                            <goal>
+                                test
+                            </goal>
+                        </goals>
+                        <configuration>
+                            <argLine>-Djava.library.path=${project.basedir}/src/main/resources</argLine>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>windows</id>
+                        <goals>
+                            <goal>
+                                test
+                            </goal>
+                        </goals>
+                        <configuration>
+                            <reuseForks>false</reuseForks>
+                            <environmentVariables>
+                                <PATH>${project.basedir}/src/main/resources</PATH>
+                            </environmentVariables>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
@@ -58,7 +80,7 @@
                     <arguments>
                         <argument>-Djava.library.path=${project.basedir}/src/main/resources</argument>
                         <argument>-classpath</argument>
-                        <classpath />
+                        <classpath/>
                         <argument>reasoningmodels.ReasoningModelDemo</argument>
                     </arguments>
                 </configuration>

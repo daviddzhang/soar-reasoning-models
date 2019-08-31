@@ -2,6 +2,8 @@ package outputhandlerstests;
 
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+
 import reasoningmodels.ReasoningModelDemo;
 import reasoningmodels.outputhandlers.ReasoningModelFactory;
 import sml.Agent;
@@ -26,12 +28,13 @@ public class FactoryTests {
   public void testCreateBayesNet() {
     Kernel kernel = Kernel.CreateKernelInCurrentThread(true);
     Agent agent = kernel.CreateAgent("test");
-    agent.LoadProductions(ReasoningModelDemo.class.getResource("/agents/bn-demo.soar").getPath());
+    agent.LoadProductions(new File(ReasoningModelDemo.class
+            .getResource("/agents/bn-demo.soar").getFile()).getAbsolutePath());
     agent.GetInputLink().CreateIdWME("init");
     agent.RunSelf(3);
     WMElement model =
             agent.GetOutputLink().FindByAttribute("create", 0).ConvertToIdentifier().FindByAttribute(
-            "model", 0).ConvertToIdentifier().FindByAttribute("bayes-net", 0);
+                    "model", 0).ConvertToIdentifier().FindByAttribute("bayes-net", 0);
 
     assertEquals("[M, [A]\n" +
             "CPT: \n" +
@@ -101,7 +104,8 @@ public class FactoryTests {
   public void testCreateKNN() {
     Kernel kernel = Kernel.CreateKernelInCurrentThread(true);
     Agent agent = kernel.CreateAgent("test");
-    agent.LoadProductions(ReasoningModelDemo.class.getResource("/agents/knn-demo.soar").getPath());
+    agent.LoadProductions(new File(ReasoningModelDemo.class
+            .getResource("/agents/knn-demo.soar").getFile()).getAbsolutePath());
     agent.GetInputLink().CreateIdWME("init");
     agent.RunSelf(3);
     WMElement model =
@@ -116,7 +120,8 @@ public class FactoryTests {
   public void testCreateNB() {
     Kernel kernel = Kernel.CreateKernelInCurrentThread(true);
     Agent agent = kernel.CreateAgent("test");
-    agent.LoadProductions(ReasoningModelDemo.class.getResource("/agents/nb-demo.soar").getPath());
+    agent.LoadProductions(new File(ReasoningModelDemo.class
+            .getResource("/agents/nb-demo.soar").getFile()).getAbsolutePath());
     agent.GetInputLink().CreateIdWME("init");
     agent.RunSelf(3);
     WMElement model =

@@ -2,6 +2,8 @@ package outputhandlerstests;
 
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+
 import reasoningmodels.ReasoningModelDemo;
 import reasoningmodels.outputhandlers.ReasoningModels;
 import sml.Agent;
@@ -24,8 +26,8 @@ public class OutputHandlerTests {
   public void testOutputHandlers() {
     Kernel kernel = Kernel.CreateKernelInCurrentThread(true);
     Agent agent = kernel.CreateAgent("test");
-    agent.LoadProductions(ReasoningModelDemo.class.getResource("/agents/reasoning-models-demo" +
-            ".soar").getPath());
+    agent.LoadProductions(new File(ReasoningModelDemo.class.getResource("/agents/reasoning-models" +
+            "-demo.soar").getFile()).getAbsolutePath());
     ReasoningModels.addReasoningOutputHandlersToAgent(agent, "create",
             "training-ex", "query-handler");
 
