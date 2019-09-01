@@ -164,3 +164,4 @@ To run any of the demos, set an environment variable in the run configuration:
 ## Built With
 
 * [Maven](https://maven.apache.org/) - Dependency Management
+* [Soar](https://soar.eecs.umich.edu/) - Cognitive Architecture
