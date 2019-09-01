@@ -142,7 +142,7 @@ Everything your agent needs from this project can be found as static methods of 
 
 ### Tests
 
-To run the test, use the Maven surefire plugin's `test` goal. In the Maven command line, enter `surefire:test@___` where the underline will either be `mac` for MacOS or `windows` for Windows.
+To run the test, use the Maven surefire plugin's `test` goal. In the Maven command line, enter `surefire:test@___` where the underline will either be `mac` for Mac or `windows` for Windows.
 
 ### Running the Demos
 
@@ -156,7 +156,7 @@ In the VM arguments section, specify the following: `Djava.library.path=/path/to
 
 #### Windows
 
-To run any of the demos, set an environment variable in the run configuration: 
+To run any of the demos, set an environment variable in the run configuration:
 * Name = `PATH`
 * Value = `/path/to/this/project/src/main/resources`
 
