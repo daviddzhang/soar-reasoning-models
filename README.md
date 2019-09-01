@@ -4,13 +4,13 @@ This project contains Java implementations of various reasoning models. Along wi
 
 #### Supported Models
 
-As of now, the current models of implemented and supported:
+As of now, the current models are implemented and supported:
 
-* Bayes Net
-* Naive Bayes
-* K-Nearest Neighbor
+* Bayes Net (BN)
+* Naive Bayes (NB)
+* K-Nearest Neighbor (KNN)
 
-Users have the option to create, train, and query the model through each operation's respective output handler.
+Users have the option to create, train, and query the model through each operation's respective output handler. Since Naive Bayes and KNN are both flat-featured classifiers, they are often similar in rules and structure.
 
 ## Getting Started
 
@@ -19,6 +19,8 @@ These instructions will explain how to create and set up an agent to work with S
 ### Defining a Compatible Soar Agent
 
 The agent's rules must have a specific structure in order for the output handlers to properly recognize parameters and information. The following section will be split into the three possible operations, with further specifications for each type of model if necessary. For further clarification, demo agents for each model and each operation are in the source resources package.
+
+*Note: Boolean features are assigned values through floats/doubles, where 1.0 is true and 0.0 is false*
 
 #### Rules for: Model Creation
 
@@ -32,60 +34,133 @@ General structure for a model-creating rule:
 ...
 ```
 
-The `parameters` attribute differs for each type of model. They are specified below.
+**Upon creation of a model, the output handler will return an ID (aka the index of the model out of all the models created so far) on the output-handler WME. It is advisable to store this ID within the agent as it's required for training and querying.**  The `parameters` attribute differs for each type of model. They are specified below.
 
-##### Bayes Net
+**Bayes Net**
 
-### Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
+The `parameters` attribute holds information about the net structure. Key identifiers are the `nodes` attribute and the `edge` attribute. These help to describe nodes and edges. The following is an example of how a net with the node A has an edge to the node B.
 
 ```
-Give an example
+(<bayes-net> ^parameters <p>)
+(<p> ^graph <g>)
+(<g> ^nodes <n> ^edge <atob>)
+(<n> ^A <a> ^B <b>)
+(<atob> ^from <fromA> ^to <toB>)
+(<fromA> ^A <a>)
+(<toB> ^B <b>)
 ```
 
-### And coding style tests
+The identifiers that branch from `nodes` represent the names of the nodes, and each edge is split into a `from` and a `to` which should lead to the same node identifiers. With this format, the output handlers will be able to parse this information and construct a Bayes Net structure.
 
-Explain what these tests test and why
+**Naive Bayes & KNN**
+
+The `parameters` attribute holds information about the features that each classifier uses. Features can be of three types: numerical, categorical, and boolean. This information, along with the feature name must be supplied under parameters as follows:
 
 ```
-Give an example
+(<a-classifier> ^parameters <p>)
+(<p> ^features <f>)
+(<f> ^feature1 <f1> ^feature2 <f2> ^feature3 <f3>)
+(<f1> ^categorical <f1-vals>)
+(<f1-vals> ^val1 <v1> ^val2 <v2> ^val3 <v3>)
+(<f2> ^numerical <num>)
+(<f3> ^boolean <bool>)
+```
+Additionally, the target feature/class must also be specified: *(Note: target class must be categorical, and the value for the WME must be the name of a valid feature)*
+
+```
+(<p> ^target feature1)
 ```
 
-## Deployment
+#### Rules for: Training
 
-Add additional notes about how to deploy this on a live system
+General structure for training rules:
+
+```
+(<output-link> ^training-output-handler-wme <wme>)
+(<wme> ^id <id>)
+(<wme> ^train <train>)
+(<train> ^boolean <bool> ^numerical <num> ^categorical <cat>)
+(<bool> ^Boolean-Feature-Name <bool-val>)
+(<num> ^Numerical-Feature-Name <num-val>)
+(<cat> ^Categorical-Feature-Name <cat-val>)
+```
+
+As evident, the agent should have some way of knowing the ID of the model that the user wants to train. To specify the features to train, the WME structure must specify the feature-type, then the name of the feature as a WME attribute whose value is the value of the feature.
+
+#### Rules for: Querying
+
+General structure for querying rules:
+
+```
+(<output-link> ^query-output-handler-wme <wme>)
+(<wme> ^id <id>)
+(<wme> ^query <q>)
+(<q> ^boolean <bool> ^numerical <num>)
+(<bool> ^Boolean-Feature-Name <bool-val>)
+(<num> ^Numerical-Feature-Name <num-val>)
+(<q> ^parameters <p>)
+```
+
+The query rule structure is very similar to that of training, with the removal of the target feature, and the addition of a parameters WME. Parameters will be different for each model, which will be specified below:
+
+**Bayes Net**
+
+The `parameters` attribute holds information about the target variable(s) in the query. The features shown in the general structure are the evidence variables. Target variables should be specified with the attribute name "target-vars." Below is an example for a query that asks the likelihood of B occurring given J and M:
+
+```
+(<ol> ^query-wme <qh>)
+(<qh> ^id <id> ^query <q>)
+(<q> ^features <f>)
+(<f> ^boolean <j1> ^boolean <m1>)
+(<j1> ^j <j>)
+(<m1> ^m <m>)
+(<q> ^parameters <p>)
+(<p> ^target-vars <tv>)
+(<tv> ^b 1.0)
+```
+
+**KNN**
+
+The `parameters` attribute holds information about the K value and the distance function to use. The k value must be positive and the only supported distance function currently is euclidean. Below is an example of how to structure the parameters WME:
+
+```
+(<p> ^k 1)
+(<p> ^distance euclidean)
+```
+
+**Naive Bayes**
+
+The `parameters` attribute holds information about the smoothing value. The value must be a positive double/float. Below is an example of how to structure the parameters WME:
+
+```
+(<p> ^smoothing 1.0)
+```
+
+### Registering Your Agent to the Models
+
+Everything your agent needs from this project can be found as static methods of the ReasoningModels class. It provides methods to register an agent to all the output handlers, saving and loading, and printing the current state of all the models so far. Check the documentation for ReasoningModels for more details.
+
+### Tests
+
+To run the test, use the Maven surefire plugin's `test` goal. In the Maven command line, enter `surefire:test@___` where the underline will either be `mac` for MacOS or `windows` for Windows.
+
+### Running the Demos
+
+There are four demos in the project: three for each model, and one that combines all of them (to be referred to as the "main" demo).
+
+#### Mac
+
+To run the main demo, use the Maven exec plugin's exec goal. To run the other demos, set up your run configurations as follows:
+
+In the VM arguments section, specify the following: `Djava.library.path=/path/to/this/project/src/main/resources`
+
+#### Windows
+
+To run any of the demos, set an environment variable in the run configuration: 
+* Name = `PATH`
+* Value = `/path/to/this/project/src/main/resources`
+
 
 ## Built With
 
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
 * [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags).
-
-## Authors
-
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
