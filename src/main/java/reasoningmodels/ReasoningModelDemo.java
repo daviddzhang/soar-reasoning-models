@@ -52,7 +52,8 @@ public class ReasoningModelDemo {
 
     int num = 0;
 
-    System.out.print("How many times do you want to train in total?");
+    System.out.println("How many times do you want to train in total? (enough to train each model" +
+            " once)");
 
     try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
       num = Integer.parseInt(reader.readLine());

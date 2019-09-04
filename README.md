@@ -142,15 +142,23 @@ Everything your agent needs from this project can be found as static methods of 
 
 ### Compiling
 
-Assuming Maven is properly installed (see link below if not) and you are in the correct working directory, to compile the project after it has been downloaded, run both `mvn compiler:compile` and `mvn compiler:testCompile`. Additionally, run `mvn resources:resources` to ensure the Soar agents are properly loaded.
+Assuming Maven is properly installed (see link below if not) and you are in the correct working directory, to compile the project after it has been downloaded, run the command `mvn compile`.
 
 ### Tests
 
-To run the test, use the Maven surefire plugin's `test` goal. In the command line, enter `mvn surefire:test@___` where the underline will either be `mac` for Mac or `windows` for Windows.
+**Mac**
+
+To run the tests, simply use Maven's test lifecycle via the following command `mvn test`.
+
+**Windows**
+
+To run the tests, use the Maven surefire plugin's `test` goal. In the command line, enter `mvn surefire:test@windows`.
 
 ### Running the Demos
 
-There are four demos in the project: three for each model, and one that combines all of them (to be referred to as the "main" demo).
+There are four demos in the project: three for each model, and one that combines all of them (to be referred to as the "main" demo). In the main demo, the Bayes Net has the [burglar alarm structure](https://i.stack.imgur.com/QTXrZ.gif), the KNN classifier determines whether a sport should be played or not based on weather features, and the Naive Bayes classifier determines the sign assigned to a square based on color and shape.
+
+The main demo asks for the number of training examples you want to provide. For the Bayes Net, random variables are sampled from preset probabilities. For the classifiers, examples are read in from CSV's. The models are trained in a random order, and at the end print their query results and contents to the console.  
 
 #### Mac
 
