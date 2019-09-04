@@ -140,9 +140,13 @@ The `parameters` attribute holds information about the smoothing value. The valu
 
 Everything your agent needs from this project can be found as static methods of the ReasoningModels class. It provides methods to register an agent to all the output handlers, saving and loading, and printing the current state of all the models so far. Check the documentation for ReasoningModels for more details.
 
+### Compiling
+
+Assuming Maven is properly installed (see link below if not) and you are in the correct working directory, to compile the project after it has been downloaded, run both `mvn compiler:compile` and `mvn compiler:testCompile`. Additionally, run `mvn resources:resources` to ensure the Soar agents are properly loaded.
+
 ### Tests
 
-To run the test, use the Maven surefire plugin's `test` goal. In the Maven command line, enter `surefire:test@___` where the underline will either be `mac` for Mac or `windows` for Windows.
+To run the test, use the Maven surefire plugin's `test` goal. In the command line, enter `mvn surefire:test@___` where the underline will either be `mac` for Mac or `windows` for Windows.
 
 ### Running the Demos
 
@@ -150,7 +154,7 @@ There are four demos in the project: three for each model, and one that combines
 
 #### Mac
 
-To run the main demo, use the Maven exec plugin's exec goal. To run the other demos, set up your run configurations as follows:
+To run the main demo, use the Maven exec plugin's exec goal by using the following command on the command line: `mvn exec:exec`. To run the other demos, set up your run configurations as follows:
 
 In the VM arguments section, specify the following: `Djava.library.path=/path/to/this/project/src/main/resources`
 
