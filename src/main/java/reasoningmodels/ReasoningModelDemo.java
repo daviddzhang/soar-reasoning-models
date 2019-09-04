@@ -52,8 +52,9 @@ public class ReasoningModelDemo {
 
     int num = 0;
 
+    System.out.print("How many times do you want to train in total?");
+
     try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
-      System.out.print("How many times do you want to train in total?");
       num = Integer.parseInt(reader.readLine());
     } catch (Exception e) {
       e.printStackTrace();
