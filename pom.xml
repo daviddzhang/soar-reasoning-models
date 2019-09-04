@@ -37,6 +37,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>default-resources</id>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
@@ -44,6 +49,11 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M3</version>
                 <executions>
+                    <execution>
+                        <id>default-test</id>
+                        <phase>none</phase>
+                    </execution>
+
                     <execution>
                         <id>mac</id>
                         <goals>
@@ -63,6 +73,7 @@
                                 test
                             </goal>
                         </goals>
+                        <phase>none</phase>
                         <configuration>
                             <reuseForks>false</reuseForks>
                             <environmentVariables>
@@ -78,10 +89,6 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.6.0</version>
                 <configuration>
-                    <environmentVariables>
-                        <key>PATH</key>
-                        <value>${project.basedir}/src/main/resources</value>
-                    </environmentVariables>
                     <executable>java</executable>
                     <arguments>
                         <argument>-Djava.library.path=${project.basedir}/src/main/resources</argument>
